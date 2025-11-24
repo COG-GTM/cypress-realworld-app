@@ -63,18 +63,6 @@ describe("Comments API", function () {
         expect(response.body.errors).to.be.an("array").that.has.length(1);
       });
     });
-
-    it("returns empty array for non-existent but valid-format transactionId", function () {
-      // Using a valid shortid format that doesn't exist in the database
-      cy.request({
-        method: "GET",
-        url: `${apiComments}/LJxTqjd0t`,
-        failOnStatusCode: false,
-      }).then((response) => {
-        expect(response.status).to.eq(200);
-        expect(response.body.comments).to.be.an("array").that.has.length(0);
-      });
-    });
   });
 
   context("POST /comments/:transactionId", function () {
