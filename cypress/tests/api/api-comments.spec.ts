@@ -41,7 +41,7 @@ describe("Comments API", function () {
       });
     });
 
-    it("errors when attempting to get comments without authentication", function () {
+    it("errors when unauthenticated", function () {
       cy.request("POST", `${Cypress.env("apiUrl")}/logout`);
       cy.request({
         method: "GET",
@@ -87,7 +87,7 @@ describe("Comments API", function () {
       });
     });
 
-    it("errors when attempting to create comment without authentication", function () {
+    it("errors when unauthenticated", function () {
       cy.request("POST", `${Cypress.env("apiUrl")}/logout`);
       cy.request({
         method: "POST",
