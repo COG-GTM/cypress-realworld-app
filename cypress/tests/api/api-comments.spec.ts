@@ -40,6 +40,17 @@ describe("Comments API", function () {
         expect(response.body.comments).to.be.an("array").that.has.length(1);
       });
     });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/invalid-id-1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 
   context("POST /comments/:transactionId", function () {
@@ -49,6 +60,43 @@ describe("Comments API", function () {
         content: "This is my comment",
       }).then((response) => {
         expect(response.status).to.eq(200);
+      });
+    });
+
+    it("errors when invalid field sent", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          notACommentField: "not a comment field",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
+
+    it("errors when content is missing", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("errors when content is empty", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: { content: "" },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
       });
     });
   });
