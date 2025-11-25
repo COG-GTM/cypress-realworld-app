@@ -26,7 +26,7 @@ router.get(
 router.post(
   "/:transactionId",
   ensureAuthenticated,
-  validateMiddleware([shortIdValidation("transactionId"), isCommentValidator]),
+  validateMiddleware([shortIdValidation("transactionId"), ...isCommentValidator]),
   (req, res) => {
     const { transactionId } = req.params;
     const { content } = req.body;
