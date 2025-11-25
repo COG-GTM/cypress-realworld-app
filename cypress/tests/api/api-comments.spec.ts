@@ -51,5 +51,126 @@ describe("Comments API", function () {
         expect(response.status).to.eq(200);
       });
     });
+
+    it("returns 422 when transactionId is invalid", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+        body: { content: "Test comment" },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array").that.has.length(1);
+      });
+    });
+
+    it("handles non-existent transaction ID gracefully", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/nonexistent123`,
+        failOnStatusCode: false,
+        body: { content: "Test comment" },
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([404, 422, 500]);
+      });
+    });
+
+    it("returns 422 when comment content is empty", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: { content: "" },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns 422 when content field is missing", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns 422 when invalid field is sent", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          content: "Valid content",
+          invalidField: "should not be here",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns 400 when request body is malformed JSON", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        headers: { "Content-Type": "application/json" },
+        body: "{ invalid json }",
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([400, 422]);
+      });
+    });
+  });
+});
+
+describe("Comments API - Authentication", function () {
+  let ctx: TestCommentsCtx = {};
+
+  before(() => {
+    cy.request("GET", "/");
+  });
+
+  beforeEach(function () {
+    cy.task("db:seed");
+
+    cy.database("find", "comments").then((comment: Comment) => {
+      ctx.transactionId = comment.transactionId;
+    });
+  });
+
+  it("returns 401 when not authenticated", function () {
+    const transactionId = ctx.transactionId!;
+
+    cy.request({
+      method: "POST",
+      url: `${apiComments}/${transactionId}`,
+      failOnStatusCode: false,
+      body: { content: "Test comment" },
+    }).then((response) => {
+      expect(response.status).to.eq(401);
+      expect(response.body.error).to.eq("Unauthorized");
+    });
+  });
+
+  it("returns 401 for GET when not authenticated", function () {
+    const transactionId = ctx.transactionId!;
+
+    cy.request({
+      method: "GET",
+      url: `${apiComments}/${transactionId}`,
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(401);
+      expect(response.body.error).to.eq("Unauthorized");
+    });
   });
 });

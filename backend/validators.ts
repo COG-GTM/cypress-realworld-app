@@ -93,7 +93,18 @@ export const isTransactionPublicQSValidator = [
   query("order").optional({ checkFalsy: true }).isIn(["default"]),
 ];
 
-export const isCommentValidator = body("content").isString().trim();
+export const isCommentValidator = [
+  body("content").isString().trim().notEmpty().withMessage("Comment content is required"),
+  body().custom((value, { req }) => {
+    const allowedFields = ["content"];
+    const bodyKeys = Object.keys(req.body);
+    const invalidFields = bodyKeys.filter((key) => !allowedFields.includes(key));
+    if (invalidFields.length > 0) {
+      throw new Error(`Invalid field(s): ${invalidFields.join(", ")}`);
+    }
+    return true;
+  }),
+];
 
 export const isNotificationsBodyValidator = [
   body("items.*.type").isIn(NotificationsTypeValues).trim(),
