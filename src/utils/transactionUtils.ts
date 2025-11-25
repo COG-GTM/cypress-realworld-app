@@ -10,6 +10,7 @@ import {
   TransactionAmountRangePayload,
   LikeNotification,
   CommentNotification,
+  ValuePiece,
 } from "../models";
 import { faker } from "@faker-js/faker";
 import Dinero from "dinero.js";
@@ -29,6 +30,10 @@ import {
   map,
   drop,
 } from "lodash/fp";
+import { parseISO } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
+
+const timezone = "UTC";
 
 export const isRequestTransaction = (transaction: Transaction) =>
   flow(get("requestStatus"), negate(isEmpty))(transaction);
@@ -181,12 +186,72 @@ export const getPaginatedItems = (page: number, limit: number, items: any) => {
   };
 };
 
+const getDateParts = (isoString: string) => {
+  const date = parseISO(isoString);
+  const day = Number(formatInTimeZone(date, timezone, "d"));
+  const month = Number(formatInTimeZone(date, timezone, "M")) - 1;
+  const year = Number(formatInTimeZone(date, timezone, "Y"));
+  const hour = Number(formatInTimeZone(date, timezone, "H"));
+  const minute = Number(formatInTimeZone(date, timezone, "m"));
+  const second = Number(formatInTimeZone(date, timezone, "s"));
+  const ms = Number(formatInTimeZone(date, timezone, "SSS"));
+  return { day, month, year, hour, minute, second, ms };
+};
+
+export function isoStringToLocalMidnightStart(isoString: string) {
+  const { year, month, day } = getDateParts(isoString);
+  return new Date(year, month, day, 0, 0, 0, 0);
+}
+
+export function isoStringToLocalMidnightEnd(isoString: string) {
+  const { year, month, day } = getDateParts(isoString);
+  return new Date(year, month, day, 23, 59, 59, 999);
+}
+
+export function isoStringToLocalDateFull(isoString: string): Date {
+  const { year, month, day, hour, minute, second, ms = 0 } = getDateParts(isoString);
+  return new Date(year, month, day, hour, minute, second, ms);
+}
+
+export function localDateToIsoString(date: Date): string {
+  return fromZonedTime(date, timezone).toISOString();
+}
+
+export function localDateToUTCISOString(localDate: ValuePiece) {
+  if (!(localDate instanceof Date)) return new Date().toISOString();
+  const utcDate = new Date(
+    Date.UTC(
+      localDate.getFullYear(),
+      localDate.getMonth(),
+      localDate.getDate(),
+      localDate.getHours(),
+      localDate.getMinutes(),
+      localDate.getSeconds(),
+      localDate.getMilliseconds()
+    )
+  );
+  return utcDate.toISOString();
+}
+
 // Custom UTC functions per:
 // https://github.com/date-fns/date-fns/issues/376#issuecomment-544274031
 // not used in application code
 /* istanbul ignore next */
-export const startOfDayUTC = (date: Date) => new Date(new Date(date).setUTCHours(0, 0, 0, 0));
+export const startOfDayUTC = (date: Date): Date => {
+  if (!(date instanceof Date)) date = new Date();
+  const utcDate = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0)
+  );
 
+  return utcDate;
+};
 // not used in application code
 /* istanbul ignore next */
-export const endOfDayUTC = (date: Date) => new Date(new Date(date).setUTCHours(23, 59, 59, 999));
+export const endOfDayUTC = (date: Date): Date => {
+  if (!(date instanceof Date)) date = new Date();
+  const utcDate = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999)
+  );
+
+  return utcDate;
+};
