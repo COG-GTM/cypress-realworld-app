@@ -25,19 +25,19 @@ describe("SignUpForm", () => {
         </MemoryRouter>
       );
 
-      cy.getBySel("signup-first-name").type("a").clear().blur();
+      cy.getBySel("signup-first-name").find("input").type("a").clear().blur();
       cy.get("#firstName-helper-text").should("contain", "First Name is required");
 
-      cy.getBySel("signup-last-name").type("a").clear().blur();
+      cy.getBySel("signup-last-name").find("input").type("a").clear().blur();
       cy.get("#lastName-helper-text").should("contain", "Last Name is required");
 
-      cy.getBySel("signup-username").type("a").clear().blur();
+      cy.getBySel("signup-username").find("input").type("a").clear().blur();
       cy.get("#username-helper-text").should("contain", "Username is required");
 
-      cy.getBySel("signup-password").type("a").clear().blur();
+      cy.getBySel("signup-password").find("input").type("a").clear().blur();
       cy.get("#password-helper-text").should("contain", "Enter your password");
 
-      cy.getBySel("signup-confirmPassword").type("a").clear().blur();
+      cy.getBySel("signup-confirmPassword").find("input").type("a").clear().blur();
       cy.get("#confirmPassword-helper-text").should("contain", "Confirm your password");
 
       cy.getBySel("signup-submit").should("be.disabled");
@@ -50,7 +50,7 @@ describe("SignUpForm", () => {
         </MemoryRouter>
       );
 
-      cy.getBySel("signup-password").type("abc").blur();
+      cy.getBySel("signup-password").find("input").type("abc").blur();
       cy.get("#password-helper-text").should(
         "contain",
         "Password must contain at least 4 characters"
@@ -66,8 +66,8 @@ describe("SignUpForm", () => {
         </MemoryRouter>
       );
 
-      cy.getBySel("signup-password").type("password123");
-      cy.getBySel("signup-confirmPassword").type("differentpassword").blur();
+      cy.getBySel("signup-password").find("input").type("password123");
+      cy.getBySel("signup-confirmPassword").find("input").type("differentpassword").blur();
       cy.get("#confirmPassword-helper-text").should("contain", "Password does not match");
 
       cy.getBySel("signup-submit").should("be.disabled");
@@ -75,13 +75,14 @@ describe("SignUpForm", () => {
   });
 
   describe("Form State Management", () => {
-    it("has submit button disabled initially", () => {
+    it("has submit button disabled when form is invalid", () => {
       cy.mount(
         <MemoryRouter>
           <SignUpForm authService={authService} />
         </MemoryRouter>
       );
 
+      cy.getBySel("signup-first-name").find("input").type("John");
       cy.getBySel("signup-submit").should("be.disabled");
     });
 
@@ -92,11 +93,11 @@ describe("SignUpForm", () => {
         </MemoryRouter>
       );
 
-      cy.getBySel("signup-first-name").type("John");
-      cy.getBySel("signup-last-name").type("Doe");
-      cy.getBySel("signup-username").type("johndoe");
-      cy.getBySel("signup-password").type("password123");
-      cy.getBySel("signup-confirmPassword").type("password123");
+      cy.getBySel("signup-first-name").find("input").type("John");
+      cy.getBySel("signup-last-name").find("input").type("Doe");
+      cy.getBySel("signup-username").find("input").type("johndoe");
+      cy.getBySel("signup-password").find("input").type("password123");
+      cy.getBySel("signup-confirmPassword").find("input").type("password123");
 
       cy.getBySel("signup-submit").should("be.enabled");
     });
@@ -135,11 +136,11 @@ describe("SignUpForm", () => {
         </MemoryRouter>
       );
 
-      cy.getBySel("signup-first-name").type(signupData.firstName);
-      cy.getBySel("signup-last-name").type(signupData.lastName);
-      cy.getBySel("signup-username").type(signupData.username);
-      cy.getBySel("signup-password").type(signupData.password);
-      cy.getBySel("signup-confirmPassword").type(signupData.password);
+      cy.getBySel("signup-first-name").find("input").type(signupData.firstName);
+      cy.getBySel("signup-last-name").find("input").type(signupData.lastName);
+      cy.getBySel("signup-username").find("input").type(signupData.username);
+      cy.getBySel("signup-password").find("input").type(signupData.password);
+      cy.getBySel("signup-confirmPassword").find("input").type(signupData.password);
 
       cy.getBySel("signup-submit").click();
 
