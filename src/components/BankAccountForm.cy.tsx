@@ -52,8 +52,11 @@ describe("BankAccountForm", () => {
       );
     });
 
-    it("submit button is initially disabled", () => {
+    it("submit button becomes disabled after touching empty fields", () => {
       mountComponent();
+
+      // Formik starts with isValid=true, but becomes invalid after validation runs
+      cy.get("[data-test=bankaccount-bankName-input] input").focus().blur();
 
       cy.get("[data-test=bankaccount-submit]").should("be.disabled");
     });
