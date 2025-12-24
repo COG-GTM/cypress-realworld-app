@@ -52,4 +52,89 @@ describe("Comments API", function () {
       });
     });
   });
+
+  context("Error Handling", function () {
+    it("returns 401 for missing authentication", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+        expect(response.body.error).to.eq("Unauthorized");
+      });
+    });
+
+    it("returns 401 for unauthenticated POST request", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: {
+          content: "Test comment",
+        },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+        expect(response.body.error).to.eq("Unauthorized");
+      });
+    });
+
+    it("returns 422 for invalid transaction ID format", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/invalid-id-format!!!`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns 422 for missing comment content", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        body: {},
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns empty array for non-existent transaction", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/validShortId`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.comments).to.be.an("array").that.is.empty;
+      });
+    });
+
+    it("handles very long comment content", function () {
+      const transactionId = ctx.transactionId!;
+      const longContent = "A".repeat(10000);
+      cy.request("POST", `${apiComments}/${transactionId}`, {
+        content: longContent,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+      });
+    });
+
+    it("handles special characters in comments", function () {
+      const transactionId = ctx.transactionId!;
+      const specialContent =
+        "Test <script>alert('xss')</script> & \"quotes\" 'apostrophes' émojis 🎉";
+      cy.request("POST", `${apiComments}/${transactionId}`, {
+        content: specialContent,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+      });
+    });
+  });
 });
