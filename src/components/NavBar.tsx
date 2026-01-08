@@ -14,21 +14,17 @@ import {
   Toolbar,
   Typography,
   IconButton,
-  Badge,
   Button,
   useTheme,
   useMediaQuery,
   Link,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  Notifications as NotificationsIcon,
-  AttachMoney as AttachMoneyIcon,
-} from "@mui/icons-material";
+import { Menu as MenuIcon, AttachMoney as AttachMoneyIcon } from "@mui/icons-material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 
 import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
 import TransactionNavTabs from "./TransactionNavTabs";
+import NotificationBadge from "./NotificationBadge";
 import RWALogo from "./SvgRwaLogo";
 import RWALogoIcon from "./SvgRwaIconLogo";
 
@@ -177,13 +173,10 @@ const NavBar: React.FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notifications
           data-test="nav-top-notifications-link"
           size="large"
         >
-          <Badge
-            badgeContent={allNotifications ? allNotifications.length : undefined}
-            data-test="nav-top-notifications-count"
-            classes={{ badge: classes.customBadge }}
-          >
-            <NotificationsIcon />
-          </Badge>
+          <NotificationBadge
+            count={allNotifications ? allNotifications.length : 0}
+            badgeClassName={classes.customBadge}
+          />
         </IconButton>
       </Toolbar>
       {(match.pathname === "/" || RegExp("/(?:public|contacts|personal)").test(match.pathname)) && (
