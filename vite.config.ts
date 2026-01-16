@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import eslint from "vite-plugin-eslint";
 import istanbul from "vite-plugin-istanbul";
 
-export default defineConfig(({ command, mode }) => {
+export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE");
   return {
     // expose all vite "VITE_*" variables as process.env.VITE_* in the browser
@@ -40,6 +40,7 @@ export default defineConfig(({ command, mode }) => {
       environment: "jsdom",
       setupFiles: "./src/setup-tests.js",
       exclude: ["node_modules", "cypress", "dist"],
+      fileParallelism: false, // #1666: Run tests sequentially to avoid race conditions with shared database.json file.
     },
   };
 });
