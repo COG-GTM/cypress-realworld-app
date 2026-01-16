@@ -84,21 +84,21 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 
   [`& .${classes.newTransactionButton}`]: {
     fontSize: 16,
-    backgroundColor: "#00C853",
+    backgroundColor: theme.palette.success.main,
     paddingTop: 5,
     paddingBottom: 5,
     paddingRight: 20,
     fontWeight: "bold",
     "&:hover": {
-      backgroundColor: "#4CAF50",
-      borderColor: "#00C853",
+      backgroundColor: theme.palette.success.dark,
+      borderColor: theme.palette.success.main,
       boxShadow: "none",
     },
   },
 
   [`& .${classes.customBadge}`]: {
-    backgroundColor: "red",
-    color: "white",
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.common.white,
   },
 }));
 
