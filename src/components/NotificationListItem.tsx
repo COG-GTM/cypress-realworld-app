@@ -42,7 +42,7 @@ const classes = {
   blue: `${PREFIX}-blue`,
 };
 
-const StyledListItem = styled(ListItem)({
+const StyledListItem = styled(ListItem)(({ theme }) => ({
   [`& .${classes.card}`]: {
     minWidth: "100%",
   },
@@ -50,15 +50,15 @@ const StyledListItem = styled(ListItem)({
     fontSize: 18,
   },
   [`& .${classes.green}`]: {
-    color: "#4CAF50",
+    color: theme.palette.success.main,
   },
   [`& .${classes.red}`]: {
-    color: "red",
+    color: theme.palette.error.main,
   },
   [`& .${classes.blue}`]: {
-    color: "blue",
+    color: theme.palette.primary.main,
   },
-});
+}));
 
 const NotificationListItem: React.FC<NotificationListItemProps> = ({
   notification,
