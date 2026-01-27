@@ -314,24 +314,19 @@ describe("Comments API", function () {
 
   context("GET /comments/:transactionId - Database State Validation", function () {
     it("returns empty array for transaction with no comments", function () {
-      cy.database("filter", "transactions").then((transactions: Transaction[]) => {
-        const transactionWithoutComments = transactions.find((t) => {
-          return true;
+      cy.database("filter", "comments").then((comments: Comment[]) => {
+        const transactionIdsWithComments = comments.map((c) => c.transactionId);
+        cy.database("filter", "transactions").then((transactions: Transaction[]) => {
+          const txWithoutComment = transactions.find(
+            (t) => !transactionIdsWithComments.includes(t.id)
+          );
+          if (txWithoutComment) {
+            cy.request("GET", `${apiComments}/${txWithoutComment.id}`).then((response) => {
+              expect(response.status).to.eq(200);
+              expect(response.body.comments).to.be.an("array").that.has.length(0);
+            });
+          }
         });
-        if (transactionWithoutComments) {
-          cy.database("filter", "comments").then((comments: Comment[]) => {
-            const transactionIdsWithComments = comments.map((c) => c.transactionId);
-            const txWithoutComment = transactions.find(
-              (t) => !transactionIdsWithComments.includes(t.id)
-            );
-            if (txWithoutComment) {
-              cy.request("GET", `${apiComments}/${txWithoutComment.id}`).then((response) => {
-                expect(response.status).to.eq(200);
-                expect(response.body.comments).to.be.an("array").that.has.length(0);
-              });
-            }
-          });
-        }
       });
     });
 
