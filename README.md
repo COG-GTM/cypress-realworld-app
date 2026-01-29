@@ -16,8 +16,8 @@
     <img src="https://img.shields.io/endpoint?url=https://cloud.cypress.io/badge/detailed/7s5okt/develop&style=flat&logo=cypress" />
   </a>
 
-  <a href="https://codecov.io/gh/cypress-io/cypress-realworld-app">
-    <img src="https://codecov.io/gh/cypress-io/cypress-realworld-app/branch/develop/graph/badge.svg" />
+  <a href="https://codecov.io/gh/COG-GTM/cypress-realworld-app">
+    <img src="https://codecov.io/gh/COG-GTM/cypress-realworld-app/branch/develop/graph/badge.svg" />
   </a>
 
   <a href="https://percy.io/cypress-io/cypress-realworld-app">
@@ -182,11 +182,34 @@ For a complete list of scripts see [package.json](./package.json)
 
 The Cypress Real-World App uses the [@cypress/code-coverage](https://github.com/cypress-io/code-coverage) plugin to generate code coverage reports for the app frontend and backend.
 
+### Coverage Thresholds
+
+This project enforces minimum coverage thresholds of 80% for lines, branches, functions, and statements. PRs that drop coverage below these thresholds will fail CI checks.
+
+### Generating Coverage Reports
+
 To generate a code coverage report:
 
 1. Start the development server with coverage enabled by running `yarn dev:coverage`.
 2. Run `yarn cypress:run --env coverage=true` and wait for the test run to complete.
 3. Once the test run is complete, you can view the report at `coverage/index.html`.
+
+For unit tests, run `yarn test:unit:ci` which will generate coverage in the `coverage/` directory.
+
+### Per-Directory Coverage
+
+Coverage is tracked separately for the following directories to help identify gaps:
+
+| Directory       | Description                |
+| --------------- | -------------------------- |
+| backend/        | Express API server         |
+| src/            | React frontend application |
+| src/components/ | React UI components        |
+| src/machines/   | XState state machines      |
+| src/utils/      | Utility functions          |
+| src/models/     | Data models                |
+
+View detailed per-directory coverage on the [Codecov dashboard](https://codecov.io/gh/COG-GTM/cypress-realworld-app).
 
 ## 3rd Party Authentication Providers
 
