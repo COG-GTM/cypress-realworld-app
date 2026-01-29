@@ -28,6 +28,9 @@ describe("User Settings", function () {
   });
 
   it("should display user setting form errors", function () {
+    cy.wait("@getNotifications");
+    cy.visualSnapshot("User Settings Form Before Validation");
+
     ["first", "last"].forEach((field) => {
       cy.getBySelLike(`${field}Name-input`).type("Abc");
       cy.getBySelLike(`${field}Name-input`).clear();
@@ -68,6 +71,9 @@ describe("User Settings", function () {
   });
 
   it("updates first name, last name, email and phone number", function () {
+    cy.wait("@getNotifications");
+    cy.visualSnapshot("User Settings Form Before Update");
+
     cy.getBySelLike("firstName").clear();
     cy.getBySelLike("firstName").type("New First Name");
     cy.getBySelLike("lastName").clear();
@@ -77,6 +83,8 @@ describe("User Settings", function () {
     cy.getBySelLike("phoneNumber-input").clear();
     cy.getBySelLike("phoneNumber-input").type("6155551212");
     cy.getBySelLike("phoneNumber-input").blur();
+
+    cy.visualSnapshot("User Settings Form Filled Out");
 
     cy.getBySelLike("submit").should("not.be.disabled");
     cy.getBySelLike("submit").click();

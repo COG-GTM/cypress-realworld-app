@@ -28,6 +28,8 @@ describe("User Sign-up and Login", function () {
       cy.login(user.username, "s3cret", { rememberUser: true });
     });
     cy.location("pathname").should("equal", "/");
+    cy.getBySel("transaction-list").should("be.visible");
+    cy.visualSnapshot("Home Page After Login");
   });
 
   it("should remember a user for 30 days after login", function () {
@@ -37,6 +39,10 @@ describe("User Sign-up and Login", function () {
 
     // Verify Session Cookie
     cy.getCookie("connect.sid").should("have.property", "expiry");
+
+    // Visual snapshot of logged-in state
+    cy.getBySel("transaction-list").should("be.visible");
+    cy.visualSnapshot("Logged In State with Remember Me");
 
     // Logout User
     if (isMobile()) {
