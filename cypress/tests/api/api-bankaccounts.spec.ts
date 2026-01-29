@@ -55,6 +55,17 @@ describe("Bank Accounts API", function () {
         expect(response.body.account.userId).to.eq(userId);
       });
     });
+
+    it("errors when invalid bankAccountId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiBankAccounts}/1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 
   context("POST /bankAccounts", function () {
@@ -71,13 +82,38 @@ describe("Bank Accounts API", function () {
         expect(response.body.account.userId).to.eq(userId);
       });
     });
+
+    it("errors when missing required fields", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+        body: {
+          bankName: "Test Bank",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
   });
 
-  context("DELETE /contacts/:bankAccountId", function () {
+  context("DELETE /bankAccounts/:bankAccountId", function () {
     it("deletes a bank account", function () {
       const { id: bankAccountId } = ctx.bankAccounts![0];
       cy.request("DELETE", `${apiBankAccounts}/${bankAccountId}`).then((response) => {
         expect(response.status).to.eq(200);
+      });
+    });
+
+    it("errors when invalid bankAccountId", function () {
+      cy.request({
+        method: "DELETE",
+        url: `${apiBankAccounts}/1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
       });
     });
   });
@@ -143,6 +179,49 @@ describe("Bank Accounts API", function () {
         variables: { id: bankAccountId },
       }).then((response) => {
         expect(response.status).to.eq(200);
+      });
+    });
+
+    it("errors when creating bank account with missing fields", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiGraphQL}`,
+        failOnStatusCode: false,
+        body: {
+          query: `mutation createBankAccount ($bankName: String!, $accountNumber: String!,  $routingNumber: String!) {
+            createBankAccount(
+              bankName: $bankName,
+              accountNumber: $accountNumber,
+              routingNumber: $routingNumber
+            ) {
+              id
+            }
+          }`,
+          variables: {
+            bankName: "Test Bank",
+          },
+        },
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([200, 400]);
+        if (response.status === 200) {
+          expect(response.body.errors).to.exist;
+        }
+      });
+    });
+
+    it("handles invalid GraphQL query syntax", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiGraphQL}`,
+        failOnStatusCode: false,
+        body: {
+          query: `invalid query syntax {`,
+        },
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([200, 400]);
+        if (response.status === 200) {
+          expect(response.body.errors).to.exist;
+        }
       });
     });
   });

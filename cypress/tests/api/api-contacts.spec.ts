@@ -73,5 +73,16 @@ describe("Contacts API", function () {
         expect(response.status).to.eq(200);
       });
     });
+
+    it("errors when invalid contactId", function () {
+      cy.request({
+        method: "DELETE",
+        url: `${apiContacts}/1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 });
