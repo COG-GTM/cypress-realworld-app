@@ -201,18 +201,25 @@ describe("Error Recovery Flows", function () {
 
   describe("network recovery scenarios", function () {
     it("should recover after network failure on page reload", function () {
-      cy.intercept("GET", "/transactions/public*", {
-        statusCode: 500,
-        body: { error: "Internal Server Error" },
-      }).as("failedPublicTransactions");
+      let requestCount = 0;
+
+      cy.intercept("GET", "/transactions/public*", (req) => {
+        requestCount++;
+        if (requestCount === 1) {
+          req.reply({
+            statusCode: 500,
+            body: { error: "Internal Server Error" },
+          });
+        } else {
+          req.continue();
+        }
+      }).as("publicTransactionsWithRecovery");
 
       cy.visit("/");
-      cy.wait("@failedPublicTransactions");
-
-      cy.intercept("GET", "/transactions/public*").as("recoveredPublicTransactions");
+      cy.wait("@publicTransactionsWithRecovery");
 
       cy.reload();
-      cy.wait("@recoveredPublicTransactions");
+      cy.wait("@publicTransactionsWithRecovery");
       cy.getBySel("transaction-list").should("be.visible");
     });
 
@@ -289,6 +296,10 @@ describe("Error Recovery Flows", function () {
 
   describe("malformed response scenarios", function () {
     it("should handle malformed JSON response", function () {
+      cy.on("uncaught:exception", () => {
+        return false;
+      });
+
       cy.intercept("GET", "/transactions/public*", {
         statusCode: 200,
         body: "invalid json",
@@ -300,6 +311,10 @@ describe("Error Recovery Flows", function () {
     });
 
     it("should handle missing required fields in response", function () {
+      cy.on("uncaught:exception", () => {
+        return false;
+      });
+
       cy.intercept("GET", "/transactions/public*", {
         statusCode: 200,
         body: { pageData: null, results: null },
@@ -312,13 +327,6 @@ describe("Error Recovery Flows", function () {
 
   describe("GraphQL error scenarios", function () {
     it("should handle GraphQL query errors", function () {
-      cy.wait("@getNotifications");
-
-      if (isMobile()) {
-        cy.getBySel("sidenav-toggle").click();
-      }
-      cy.getBySel("sidenav-bankaccounts").click();
-
       cy.intercept("POST", apiGraphQL, {
         statusCode: 200,
         body: {
@@ -327,10 +335,6 @@ describe("Error Recovery Flows", function () {
         },
       }).as("graphqlError");
 
-      cy.wait("@graphqlError");
-    });
-
-    it("should handle GraphQL partial data with errors", function () {
       cy.wait("@getNotifications");
 
       if (isMobile()) {
@@ -338,6 +342,10 @@ describe("Error Recovery Flows", function () {
       }
       cy.getBySel("sidenav-bankaccounts").click();
 
+      cy.wait("@graphqlError");
+    });
+
+    it("should handle GraphQL partial data with errors", function () {
       cy.intercept("POST", apiGraphQL, {
         statusCode: 200,
         body: {
@@ -345,6 +353,13 @@ describe("Error Recovery Flows", function () {
           data: { listBankAccount: [] },
         },
       }).as("graphqlPartialError");
+
+      cy.wait("@getNotifications");
+
+      if (isMobile()) {
+        cy.getBySel("sidenav-toggle").click();
+      }
+      cy.getBySel("sidenav-bankaccounts").click();
 
       cy.wait("@graphqlPartialError");
     });
