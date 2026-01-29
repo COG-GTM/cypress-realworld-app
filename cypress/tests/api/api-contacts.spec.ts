@@ -77,7 +77,7 @@ describe("Contacts API", function () {
     it("errors when invalid contactId", function () {
       cy.request({
         method: "DELETE",
-        url: `${apiContacts}/invalid-id`,
+        url: `${apiContacts}/1234`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);

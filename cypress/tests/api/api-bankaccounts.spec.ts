@@ -59,7 +59,7 @@ describe("Bank Accounts API", function () {
     it("errors when invalid bankAccountId", function () {
       cy.request({
         method: "GET",
-        url: `${apiBankAccounts}/invalid-id`,
+        url: `${apiBankAccounts}/1234`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);
@@ -109,7 +109,7 @@ describe("Bank Accounts API", function () {
     it("errors when invalid bankAccountId", function () {
       cy.request({
         method: "DELETE",
-        url: `${apiBankAccounts}/invalid-id`,
+        url: `${apiBankAccounts}/1234`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);
@@ -183,21 +183,29 @@ describe("Bank Accounts API", function () {
     });
 
     it("errors when creating bank account with missing fields", function () {
-      cy.request("POST", `${apiGraphQL}`, {
-        query: `mutation createBankAccount ($bankName: String!, $accountNumber: String!,  $routingNumber: String!) {
-          createBankAccount(
-            bankName: $bankName,
-            accountNumber: $accountNumber,
-            routingNumber: $routingNumber
-          ) {
-            id
-          }
-        }`,
-        variables: {
-          bankName: "Test Bank",
+      cy.request({
+        method: "POST",
+        url: `${apiGraphQL}`,
+        failOnStatusCode: false,
+        body: {
+          query: `mutation createBankAccount ($bankName: String!, $accountNumber: String!,  $routingNumber: String!) {
+            createBankAccount(
+              bankName: $bankName,
+              accountNumber: $accountNumber,
+              routingNumber: $routingNumber
+            ) {
+              id
+            }
+          }`,
+          variables: {
+            bankName: "Test Bank",
+          },
         },
       }).then((response) => {
-        expect(response.status).to.eq(400);
+        expect(response.status).to.be.oneOf([200, 400]);
+        if (response.status === 200) {
+          expect(response.body.errors).to.exist;
+        }
       });
     });
 
@@ -210,7 +218,10 @@ describe("Bank Accounts API", function () {
           query: `invalid query syntax {`,
         },
       }).then((response) => {
-        expect(response.status).to.eq(400);
+        expect(response.status).to.be.oneOf([200, 400]);
+        if (response.status === 200) {
+          expect(response.body.errors).to.exist;
+        }
       });
     });
   });

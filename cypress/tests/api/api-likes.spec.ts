@@ -53,7 +53,7 @@ describe("Likes API", function () {
     it("errors when invalid transactionId", function () {
       cy.request({
         method: "POST",
-        url: `${apiLikes}/invalid-id`,
+        url: `${apiLikes}/1234`,
         failOnStatusCode: false,
         body: {},
       }).then((response) => {
@@ -67,7 +67,7 @@ describe("Likes API", function () {
     it("errors when invalid transactionId", function () {
       cy.request({
         method: "GET",
-        url: `${apiLikes}/invalid-id`,
+        url: `${apiLikes}/1234`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);

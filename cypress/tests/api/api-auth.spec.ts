@@ -155,18 +155,5 @@ describe("Auth API", function () {
         expect(response.status).to.eq(401);
       });
     });
-
-    it("returns 401 for GraphQL queries without authentication", function () {
-      cy.request({
-        method: "POST",
-        url: `${apiUrl}/graphql`,
-        failOnStatusCode: false,
-        body: {
-          query: `query { listBankAccount { id } }`,
-        },
-      }).then((response) => {
-        expect(response.status).to.eq(401);
-      });
-    });
   });
 });

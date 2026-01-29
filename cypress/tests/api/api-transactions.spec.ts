@@ -132,7 +132,7 @@ describe("Transactions API", function () {
     it("errors when invalid transactionId", function () {
       cy.request({
         method: "GET",
-        url: `${apiTransactions}/invalid-id`,
+        url: `${apiTransactions}/1234`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);

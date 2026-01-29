@@ -108,7 +108,7 @@ describe("Notifications API", function () {
           items: [
             {
               type: "payment",
-              transactionId: "invalid-id",
+              transactionId: "1234",
             },
           ],
         },
