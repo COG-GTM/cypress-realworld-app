@@ -40,6 +40,7 @@ describe("Transaction View", function () {
   });
 
   it("transactions navigation tabs are hidden on a transaction view page", function () {
+    cy.visualSnapshot("Transaction List Before Clicking Item");
     // { force: true } is a workaround for https://github.com/cypress-io/cypress/issues/29776
     cy.getBySelLike("transaction-item").first().click({ force: true });
     cy.location("pathname").should("include", "/transaction");
@@ -53,6 +54,9 @@ describe("Transaction View", function () {
     cy.getBySelLike("transaction-item").first().click({ force: true });
     cy.wait("@getTransaction");
 
+    cy.getBySel("transaction-detail-header").should("be.visible");
+    cy.visualSnapshot("Transaction Detail Before Like");
+
     cy.getBySelLike("like-button").click();
     cy.getBySelLike("like-count").should("contain", 2);
     cy.getBySelLike("like-button").should("be.disabled");
@@ -63,6 +67,9 @@ describe("Transaction View", function () {
     // { force: true } is a workaround for https://github.com/cypress-io/cypress/issues/29776
     cy.getBySelLike("transaction-item").first().click({ force: true });
     cy.wait("@getTransaction");
+
+    cy.getBySel("transaction-detail-header").should("be.visible");
+    cy.visualSnapshot("Transaction Detail Before Comment");
 
     const comments = ["Thank you!", "Appreciate it."];
 
@@ -79,6 +86,9 @@ describe("Transaction View", function () {
     cy.visit(`/transaction/${ctx.transactionRequest!.id}`);
     cy.wait("@getTransaction");
 
+    cy.getBySel("transaction-detail-header").should("be.visible");
+    cy.visualSnapshot("Transaction Request Before Accept");
+
     cy.getBySelLike("accept-request").click();
     cy.wait("@updateTransaction").its("response.statusCode").should("equal", 204);
     cy.getBySelLike("accept-request").should("not.exist");
@@ -89,6 +99,9 @@ describe("Transaction View", function () {
   it("rejects a transaction request", function () {
     cy.visit(`/transaction/${ctx.transactionRequest!.id}`);
     cy.wait("@getTransaction");
+
+    cy.getBySel("transaction-detail-header").should("be.visible");
+    cy.visualSnapshot("Transaction Request Before Reject");
 
     cy.getBySelLike("reject-request").click();
     cy.wait("@updateTransaction").its("response.statusCode").should("equal", 204);

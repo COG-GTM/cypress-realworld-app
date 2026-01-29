@@ -30,6 +30,8 @@ describe("Notifications", function () {
       cy.loginByXstate(ctx.userA.username);
       cy.wait("@getNotifications");
 
+      cy.visualSnapshot("User A Home Page After Login");
+
       cy.database("find", "transactions", { senderId: ctx.userB.id }).then(
         (transaction: Transaction) => {
           cy.visit(`/transaction/${transaction.id}`);
@@ -69,6 +71,8 @@ describe("Notifications", function () {
         .first()
         .should("contain", ctx.userA?.firstName)
         .and("contain", "liked");
+
+      cy.visualSnapshot("Notifications List Before Dismissing");
 
       cy.log("🚩 Marks notification as read");
       cy.getBySelLike("notification-mark-read").first().click({ force: true });

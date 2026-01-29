@@ -50,6 +50,10 @@ describe("Bank Accounts", function () {
 
     cy.getBySel("sidenav-bankaccounts").click();
 
+    cy.wait("@gqlListBankAccountQuery");
+    cy.getBySelLike("bankaccount-list-item").should("have.length.at.least", 1);
+    cy.visualSnapshot("Bank Accounts List Page");
+
     cy.getBySel("bankaccount-new").click();
     cy.location("pathname").should("eq", "/bankaccounts/new");
     cy.visualSnapshot("Display New Bank Account Form");
@@ -71,6 +75,8 @@ describe("Bank Accounts", function () {
 
   it("should display bank account form errors", function () {
     cy.visit("/bankaccounts");
+    cy.wait("@gqlListBankAccountQuery");
+    cy.visualSnapshot("Bank Accounts Page Before Creating New");
     cy.getBySel("bankaccount-new").click();
 
     cy.getBySelLike("bankName-input").type("The");
@@ -146,6 +152,8 @@ describe("Bank Accounts", function () {
 
   it("soft deletes a bank account", function () {
     cy.visit("/bankaccounts");
+    cy.wait("@gqlListBankAccountQuery");
+    cy.visualSnapshot("Bank Accounts Before Delete");
     cy.getBySelLike("delete").first().click();
 
     cy.wait("@gqlDeleteBankAccountMutation");
