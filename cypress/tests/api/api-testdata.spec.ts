@@ -27,6 +27,14 @@ describe("Test Data API", function () {
     });
   });
 
+  context("POST /testData/seed", function () {
+    it("seeds the database", function () {
+      cy.request("POST", `${apiTestData}/seed`).then((response) => {
+        expect(response.status).to.eq(200);
+      });
+    });
+  });
+
   context("GET /testData/:entity", function () {
     Cypress._.each(
       [
@@ -48,5 +56,16 @@ describe("Test Data API", function () {
         });
       }
     );
+
+    it("errors when invalid entity", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiTestData}/invalid-entity`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
   });
 });

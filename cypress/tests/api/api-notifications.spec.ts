@@ -79,6 +79,44 @@ describe("Notifications API", function () {
         expect(response.body.results[0].transactionId).to.equal(ctx.transactionId);
       });
     });
+
+    it("errors when invalid notification type", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiNotifications}/bulk`,
+        failOnStatusCode: false,
+        body: {
+          items: [
+            {
+              type: "invalid-type",
+              transactionId: ctx.transactionId,
+            },
+          ],
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("errors when invalid transactionId in items", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiNotifications}/bulk`,
+        failOnStatusCode: false,
+        body: {
+          items: [
+            {
+              type: "payment",
+              transactionId: "invalid-id",
+            },
+          ],
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
   });
 
   context("PATCH /notifications/:notificationId", function () {

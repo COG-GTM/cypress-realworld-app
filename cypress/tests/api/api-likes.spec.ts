@@ -49,5 +49,30 @@ describe("Likes API", function () {
         expect(response.status).to.eq(200);
       });
     });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiLikes}/invalid-id`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
+  });
+
+  context("GET /likes/:transactionId - validation", function () {
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiLikes}/invalid-id`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 });

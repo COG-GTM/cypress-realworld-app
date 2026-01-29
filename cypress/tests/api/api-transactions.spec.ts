@@ -107,6 +107,38 @@ describe("Transactions API", function () {
         expect(response.body.results).length.to.be.greaterThan(1);
       });
     });
+
+    it("gets public transactions with pagination", function () {
+      cy.request("GET", `${apiTransactions}/public?page=1`).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.pageData).to.have.property("page");
+        expect(response.body.pageData).to.have.property("limit");
+        expect(response.body.pageData).to.have.property("hasNextPages");
+        expect(response.body.pageData).to.have.property("totalPages");
+        expect(response.body.pageData.page).to.eq(1);
+      });
+    });
+  });
+
+  context("GET /transactions/:transactionId", function () {
+    it("gets a transaction by id", function () {
+      cy.request("GET", `${apiTransactions}/${ctx.transactionId}`).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.transaction).to.have.property("id");
+        expect(response.body.transaction.id).to.eq(ctx.transactionId);
+      });
+    });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiTransactions}/invalid-id`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 
   context("POST /transactions", function () {
@@ -139,6 +171,38 @@ describe("Transactions API", function () {
         expect(response.body.transaction.id).to.be.a("string");
         expect(response.body.transaction.status).to.eq("pending");
         expect(response.body.transaction.requestStatus).to.eq("pending");
+      });
+    });
+
+    it("errors when invalid transactionType", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "invalid",
+          source: ctx.bankAccountId,
+          receiverId: ctx.receiver!.id,
+          description: "Test",
+          amount: 100,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("errors when missing required fields", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
       });
     });
   });

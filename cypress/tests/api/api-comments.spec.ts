@@ -51,5 +51,45 @@ describe("Comments API", function () {
         expect(response.status).to.eq(200);
       });
     });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/invalid-id`,
+        failOnStatusCode: false,
+        body: {
+          content: "This is my comment",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("errors when missing content", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+  });
+
+  context("GET /comments/:transactionId - validation", function () {
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/invalid-id`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 });
