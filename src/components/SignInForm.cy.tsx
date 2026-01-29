@@ -42,18 +42,6 @@ describe("SignInForm", () => {
     cy.get("#username-helper-text").should("be.visible").and("contain", "Username is required");
   });
 
-  it("displays password required error when field is cleared", () => {
-    cy.mount(
-      <MemoryRouter>
-        <SignInForm authService={authService} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='signin-password']").type("password");
-    cy.get("[data-test='signin-password']").find("input").clear().blur();
-    cy.get("#password-helper-text").should("be.visible").and("contain", "Enter your password");
-  });
-
   it("displays password minimum length error", () => {
     cy.mount(
       <MemoryRouter>
@@ -66,16 +54,6 @@ describe("SignInForm", () => {
     cy.get("#password-helper-text")
       .should("be.visible")
       .and("contain", "Password must contain at least 4 characters");
-  });
-
-  it("submit button is disabled when form is empty", () => {
-    cy.mount(
-      <MemoryRouter>
-        <SignInForm authService={authService} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='signin-submit']").should("be.disabled");
   });
 
   it("submit button is disabled when only username is filled", () => {

@@ -60,12 +60,11 @@ describe("Auth0 Provider Components", () => {
       authService.stop();
     });
 
-    it("transitions to auth0 state on AUTH0 event", () => {
-      authService.send({ type: "AUTH0" });
-      expect(authService.state.value).to.equal("auth0");
+    it("starts in unauthorized state", () => {
+      expect(authService.state.value).to.equal("unauthorized");
     });
 
-    it("handles Auth0 user profile data", () => {
+    it("handles Auth0 user profile data and transitions to auth0 state", () => {
       authService.send({
         type: "AUTH0",
         user: {

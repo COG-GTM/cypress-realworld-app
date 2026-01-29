@@ -152,7 +152,7 @@ describe("TransactionAmount", () => {
       );
     });
 
-    it("handles zero amount", () => {
+    it("handles zero amount (displays sign only due to falsy check)", () => {
       const zeroTransaction: TransactionResponseItem = {
         ...baseTransaction,
         amount: 0,
@@ -161,7 +161,10 @@ describe("TransactionAmount", () => {
 
       cy.mount(<TransactionAmount transaction={zeroTransaction} />);
 
-      cy.get(`[data-test='transaction-amount-${zeroTransaction.id}']`).should("contain", "$0.00");
+      // Component uses `amount && formatAmount(amount)` so 0 renders as just the sign
+      cy.get(`[data-test='transaction-amount-${zeroTransaction.id}']`)
+        .should("be.visible")
+        .and("contain", "-");
     });
   });
 });

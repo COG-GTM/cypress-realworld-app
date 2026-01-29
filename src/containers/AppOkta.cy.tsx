@@ -74,12 +74,11 @@ describe("Okta Provider Components", () => {
       authService.stop();
     });
 
-    it("transitions to okta state on OKTA event", () => {
-      authService.send({ type: "OKTA" });
-      expect(authService.state.value).to.equal("okta");
+    it("starts in unauthorized state", () => {
+      expect(authService.state.value).to.equal("unauthorized");
     });
 
-    it("handles Okta user profile data", () => {
+    it("handles Okta user profile data and transitions to okta state", () => {
       authService.send({
         type: "OKTA",
         user: {

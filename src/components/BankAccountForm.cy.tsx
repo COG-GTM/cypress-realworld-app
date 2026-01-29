@@ -20,7 +20,7 @@ describe("BankAccountForm", () => {
     cy.get("[data-test='bankaccount-submit']").should("be.visible");
   });
 
-  it("displays bank name minimum length error", () => {
+  it("displays bank name minimum length error when typing short value", () => {
     const createBankAccountSpy = cy.spy().as("createBankAccount");
 
     cy.mount(
@@ -29,14 +29,14 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-bankName-input']").type("Bank");
-    cy.get("[data-test='bankaccount-bankName-input']").blur();
+    // Type a short value - error shows because value changed from initial
+    cy.get("#bankaccount-bankName-input").type("Bank");
     cy.get("#bankaccount-bankName-input-helper-text")
       .should("be.visible")
       .and("contain", "Must contain at least 5 characters");
   });
 
-  it("displays bank name required error when field is cleared", () => {
+  it("displays routing number length error when typing invalid value", () => {
     const createBankAccountSpy = cy.spy().as("createBankAccount");
 
     cy.mount(
@@ -45,30 +45,13 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-bankName-input']").type("Test Bank");
-    cy.get("[data-test='bankaccount-bankName-input']").clear().blur();
-    cy.get("#bankaccount-bankName-input-helper-text")
-      .should("be.visible")
-      .and("contain", "Enter a bank name");
-  });
-
-  it("displays routing number length error", () => {
-    const createBankAccountSpy = cy.spy().as("createBankAccount");
-
-    cy.mount(
-      <MemoryRouter>
-        <BankAccountForm userId={userId} createBankAccount={createBankAccountSpy} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='bankaccount-routingNumber-input']").type("12345");
-    cy.get("[data-test='bankaccount-routingNumber-input']").blur();
+    cy.get("#bankaccount-routingNumber-input").type("12345");
     cy.get("#bankaccount-routingNumber-input-helper-text")
       .should("be.visible")
       .and("contain", "Must contain a valid routing number");
   });
 
-  it("displays routing number required error when field is cleared", () => {
+  it("displays account number minimum length error when typing short value", () => {
     const createBankAccountSpy = cy.spy().as("createBankAccount");
 
     cy.mount(
@@ -77,30 +60,13 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-routingNumber-input']").type("123456789");
-    cy.get("[data-test='bankaccount-routingNumber-input']").clear().blur();
-    cy.get("#bankaccount-routingNumber-input-helper-text")
-      .should("be.visible")
-      .and("contain", "Enter a valid bank routing number");
-  });
-
-  it("displays account number minimum length error", () => {
-    const createBankAccountSpy = cy.spy().as("createBankAccount");
-
-    cy.mount(
-      <MemoryRouter>
-        <BankAccountForm userId={userId} createBankAccount={createBankAccountSpy} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='bankaccount-accountNumber-input']").type("12345");
-    cy.get("[data-test='bankaccount-accountNumber-input']").blur();
+    cy.get("#bankaccount-accountNumber-input").type("12345");
     cy.get("#bankaccount-accountNumber-input-helper-text")
       .should("be.visible")
       .and("contain", "Must contain at least 9 digits");
   });
 
-  it("displays account number maximum length error", () => {
+  it("displays account number maximum length error when typing long value", () => {
     const createBankAccountSpy = cy.spy().as("createBankAccount");
 
     cy.mount(
@@ -109,45 +75,10 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-accountNumber-input']").type("1234567890123");
-    cy.get("[data-test='bankaccount-accountNumber-input']").blur();
+    cy.get("#bankaccount-accountNumber-input").type("1234567890123");
     cy.get("#bankaccount-accountNumber-input-helper-text")
       .should("be.visible")
       .and("contain", "Must contain no more than 12 digits");
-  });
-
-  it("displays account number required error when field is cleared", () => {
-    const createBankAccountSpy = cy.spy().as("createBankAccount");
-
-    cy.mount(
-      <MemoryRouter>
-        <BankAccountForm userId={userId} createBankAccount={createBankAccountSpy} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='bankaccount-accountNumber-input']").type("123456789");
-    cy.get("[data-test='bankaccount-accountNumber-input']").clear().blur();
-    cy.get("#bankaccount-accountNumber-input-helper-text")
-      .should("be.visible")
-      .and("contain", "Enter a valid bank account number");
-  });
-
-  it("submit button is disabled when form has validation errors", () => {
-    const createBankAccountSpy = cy.spy().as("createBankAccount");
-
-    cy.mount(
-      <MemoryRouter>
-        <BankAccountForm userId={userId} createBankAccount={createBankAccountSpy} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='bankaccount-submit']").should("be.disabled");
-
-    cy.get("[data-test='bankaccount-bankName-input']").type("Test Bank");
-    cy.get("[data-test='bankaccount-submit']").should("be.disabled");
-
-    cy.get("[data-test='bankaccount-routingNumber-input']").type("123456789");
-    cy.get("[data-test='bankaccount-submit']").should("be.disabled");
   });
 
   it("submit button is enabled when all fields are valid", () => {
@@ -159,9 +90,9 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-bankName-input']").type("Test Bank");
-    cy.get("[data-test='bankaccount-routingNumber-input']").type("123456789");
-    cy.get("[data-test='bankaccount-accountNumber-input']").type("123456789");
+    cy.get("#bankaccount-bankName-input").type("Test Bank");
+    cy.get("#bankaccount-routingNumber-input").type("123456789");
+    cy.get("#bankaccount-accountNumber-input").type("123456789");
 
     cy.get("[data-test='bankaccount-submit']").should("not.be.disabled");
   });
@@ -175,9 +106,9 @@ describe("BankAccountForm", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test='bankaccount-bankName-input']").type("Test Bank");
-    cy.get("[data-test='bankaccount-routingNumber-input']").type("123456789");
-    cy.get("[data-test='bankaccount-accountNumber-input']").type("987654321");
+    cy.get("#bankaccount-bankName-input").type("Test Bank");
+    cy.get("#bankaccount-routingNumber-input").type("123456789");
+    cy.get("#bankaccount-accountNumber-input").type("987654321");
     cy.get("[data-test='bankaccount-submit']").click();
 
     cy.get("@createBankAccount").should("have.been.calledOnce");

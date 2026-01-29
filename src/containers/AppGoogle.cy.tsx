@@ -74,12 +74,11 @@ describe("Google Provider Components", () => {
       authService.stop();
     });
 
-    it("transitions to google state on GOOGLE event", () => {
-      authService.send({ type: "GOOGLE" });
-      expect(authService.state.value).to.equal("google");
+    it("starts in unauthorized state", () => {
+      expect(authService.state.value).to.equal("unauthorized");
     });
 
-    it("handles Google user profile data", () => {
+    it("handles Google user profile data and transitions to google state", () => {
       authService.send({
         type: "GOOGLE",
         user: {

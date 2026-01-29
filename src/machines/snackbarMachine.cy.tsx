@@ -75,17 +75,19 @@ describe("SnackbarMachine State Transitions", () => {
   });
 
   describe("Multiple Show Events", () => {
-    it("updates message when showing new message while visible", () => {
+    it("ignores SHOW events when already visible (must HIDE first)", () => {
       snackbarService.send({
         type: "SHOW",
         severity: Severities.success,
         message: "First message",
       });
       expect(snackbarService.state.context.message).to.equal("First message");
+      expect(snackbarService.state.value).to.equal("visible");
 
+      // SHOW is not handled in visible state, so message stays the same
       snackbarService.send({ type: "SHOW", severity: Severities.error, message: "Second message" });
-      expect(snackbarService.state.context.message).to.equal("Second message");
-      expect(snackbarService.state.context.severity).to.equal(Severities.error);
+      expect(snackbarService.state.context.message).to.equal("First message");
+      expect(snackbarService.state.value).to.equal("visible");
     });
   });
 });

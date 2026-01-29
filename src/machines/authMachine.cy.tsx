@@ -33,18 +33,46 @@ describe("AuthMachine State Transitions", () => {
     expect(authService.state.value).to.equal("signup");
   });
 
-  it("transitions to google state on GOOGLE event", () => {
-    authService.send({ type: "GOOGLE" });
+  it("transitions to google state on GOOGLE event with user data", () => {
+    authService.send({
+      type: "GOOGLE",
+      user: {
+        googleId: "google-123",
+        email: "user@gmail.com",
+        givenName: "Test",
+        familyName: "User",
+        imageUrl: "https://example.com/avatar.png",
+      },
+    });
     expect(authService.state.value).to.equal("google");
   });
 
-  it("transitions to auth0 state on AUTH0 event", () => {
-    authService.send({ type: "AUTH0" });
+  it("transitions to auth0 state on AUTH0 event with user data", () => {
+    authService.send({
+      type: "AUTH0",
+      user: {
+        sub: "auth0|123456",
+        email: "user@example.com",
+        nickname: "testuser",
+        picture: "https://example.com/avatar.png",
+      },
+      token: "mock-auth0-token",
+    });
     expect(authService.state.value).to.equal("auth0");
   });
 
-  it("transitions to okta state on OKTA event", () => {
-    authService.send({ type: "OKTA" });
+  it("transitions to okta state on OKTA event with user data", () => {
+    authService.send({
+      type: "OKTA",
+      user: {
+        sub: "okta-123",
+        email: "user@example.com",
+        given_name: "Test",
+        family_name: "User",
+        preferred_username: "testuser",
+      },
+      token: "mock-okta-token",
+    });
     expect(authService.state.value).to.equal("okta");
   });
 

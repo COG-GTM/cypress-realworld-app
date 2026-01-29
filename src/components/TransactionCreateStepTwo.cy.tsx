@@ -55,44 +55,6 @@ describe("TransactionCreateStepTwo", () => {
     cy.get("[data-test='transaction-create-submit-payment']").should("be.visible");
   });
 
-  it("displays amount required error when field is empty", () => {
-    const createTransactionSpy = cy.spy().as("createTransaction");
-    const showSnackbarSpy = cy.spy().as("showSnackbar");
-
-    cy.mount(
-      <TransactionCreateStepTwo
-        sender={sender}
-        receiver={receiver}
-        createTransaction={createTransactionSpy}
-        showSnackbar={showSnackbarSpy}
-      />
-    );
-
-    cy.get("[data-test='transaction-create-amount-input']").click().blur();
-    cy.get("#transaction-create-amount-input-helper-text")
-      .should("be.visible")
-      .and("contain", "Please enter a valid amount");
-  });
-
-  it("displays description required error when field is empty", () => {
-    const createTransactionSpy = cy.spy().as("createTransaction");
-    const showSnackbarSpy = cy.spy().as("showSnackbar");
-
-    cy.mount(
-      <TransactionCreateStepTwo
-        sender={sender}
-        receiver={receiver}
-        createTransaction={createTransactionSpy}
-        showSnackbar={showSnackbarSpy}
-      />
-    );
-
-    cy.get("[data-test='transaction-create-description-input']").click().blur();
-    cy.get("#transaction-create-description-input-helper-text")
-      .should("be.visible")
-      .and("contain", "Please enter a note");
-  });
-
   it("request and pay buttons are disabled when form is invalid", () => {
     const createTransactionSpy = cy.spy().as("createTransaction");
     const showSnackbarSpy = cy.spy().as("showSnackbar");

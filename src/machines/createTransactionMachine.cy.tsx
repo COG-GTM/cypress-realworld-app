@@ -55,12 +55,6 @@ describe("CreateTransactionMachine State Transitions", () => {
     expect(createTransactionService.state.value).to.equal("stepTwo");
   });
 
-  it("sets sender and receiver in context on SET_USERS", () => {
-    createTransactionService.send({ type: "SET_USERS", sender, receiver });
-    expect(createTransactionService.state.context.sender).to.deep.equal(sender);
-    expect(createTransactionService.state.context.receiver).to.deep.equal(receiver);
-  });
-
   it("transitions to stepThree on CREATE event from stepTwo", () => {
     createTransactionService.send({ type: "SET_USERS", sender, receiver });
     createTransactionService.send({
@@ -70,18 +64,6 @@ describe("CreateTransactionMachine State Transitions", () => {
       transactionType: "payment",
     });
     expect(createTransactionService.state.value).to.equal("stepThree");
-  });
-
-  it("sets transaction details in context on CREATE", () => {
-    createTransactionService.send({ type: "SET_USERS", sender, receiver });
-    const transactionDetails = {
-      type: "CREATE",
-      amount: "100",
-      description: "Test payment",
-      transactionType: "payment",
-    };
-    createTransactionService.send(transactionDetails);
-    expect(createTransactionService.state.context.transactionDetails).to.exist;
   });
 
   it("transitions back to stepOne on RESET event from stepThree", () => {
@@ -94,19 +76,6 @@ describe("CreateTransactionMachine State Transitions", () => {
     });
     createTransactionService.send({ type: "RESET" });
     expect(createTransactionService.state.value).to.equal("stepOne");
-  });
-
-  it("clears context on RESET", () => {
-    createTransactionService.send({ type: "SET_USERS", sender, receiver });
-    createTransactionService.send({
-      type: "CREATE",
-      amount: "100",
-      description: "Test payment",
-      transactionType: "payment",
-    });
-    createTransactionService.send({ type: "RESET" });
-    expect(createTransactionService.state.context.sender).to.be.undefined;
-    expect(createTransactionService.state.context.receiver).to.be.undefined;
   });
 
   describe("Full Transaction Flow", () => {

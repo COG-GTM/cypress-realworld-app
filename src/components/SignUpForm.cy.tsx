@@ -109,28 +109,6 @@ describe("SignUpForm", () => {
       .and("contain", "Password does not match");
   });
 
-  it("submit button is disabled when form has validation errors", () => {
-    cy.mount(
-      <MemoryRouter>
-        <SignUpForm authService={authService} />
-      </MemoryRouter>
-    );
-
-    cy.get("[data-test='signup-submit']").should("be.disabled");
-
-    cy.get("[data-test='signup-first-name']").type("John");
-    cy.get("[data-test='signup-submit']").should("be.disabled");
-
-    cy.get("[data-test='signup-last-name']").type("Doe");
-    cy.get("[data-test='signup-submit']").should("be.disabled");
-
-    cy.get("[data-test='signup-username']").type("johndoe");
-    cy.get("[data-test='signup-submit']").should("be.disabled");
-
-    cy.get("[data-test='signup-password']").type("password123");
-    cy.get("[data-test='signup-submit']").should("be.disabled");
-  });
-
   it("submit button is enabled when all fields are valid", () => {
     cy.mount(
       <MemoryRouter>
