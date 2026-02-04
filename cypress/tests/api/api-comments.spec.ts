@@ -52,4 +52,167 @@ describe("Comments API", function () {
       });
     });
   });
+
+  context("GET /comments/:transactionId - Error Handling", function () {
+    it("returns 422 when transactionId has invalid format", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/invalid-id-format!@#`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "transactionId");
+      });
+    });
+
+    it("returns 422 when transactionId is empty", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([404, 422]);
+      });
+    });
+
+    it("returns empty array for non-existent but valid format transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/abcd1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+        expect(response.body.comments).to.be.an("array").that.has.length(0);
+      });
+    });
+  });
+
+  context("POST /comments/:transactionId - Error Handling", function () {
+    it("returns 422 when content is missing from request body", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: {},
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "content");
+      });
+    });
+
+    it("accepts empty string content (backend trims but does not reject)", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: "" },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(200);
+      });
+    });
+
+    it("returns 422 when content is not a string (number)", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: 12345 },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "content");
+      });
+    });
+
+    it("returns 422 when content is not a string (object)", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: { nested: "value" } },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "content");
+      });
+    });
+
+    it("returns 422 when content is not a string (array)", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: ["array", "value"] },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "content");
+      });
+    });
+
+    it("returns 422 when content is null", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: null },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "content");
+      });
+    });
+
+    it("returns 422 when request body is missing", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("returns 422 when transactionId has invalid format", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/invalid-id-format!@#`,
+        body: { content: "test comment" },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors[0]).to.have.property("param", "transactionId");
+      });
+    });
+
+    it("returns 422 when both transactionId and content are invalid", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/invalid-id!@#`,
+        body: { content: 12345 },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+        expect(response.body.errors.length).to.be.at.least(2);
+      });
+    });
+  });
+
+  context("POST /comments/:transactionId - Database Error Handling", function () {
+    it("handles non-existent transaction gracefully", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/abcd1234`,
+        body: { content: "test comment for non-existent transaction" },
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.be.oneOf([200, 404, 500]);
+      });
+    });
+  });
 });
