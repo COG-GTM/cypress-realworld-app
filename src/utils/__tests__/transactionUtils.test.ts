@@ -50,6 +50,7 @@ import {
   TransactionStatus,
   TransactionResponseItem,
   PaymentNotificationStatus,
+  User,
 } from "../../models";
 import shortid from "shortid";
 
@@ -73,9 +74,7 @@ const fakeTransaction = (
   modifiedAt: createdAt || faker.date.recent(),
 });
 
-const fakeUser = (
-  overrides: Partial<import("../../models").User> = {}
-): import("../../models").User => ({
+const fakeUser = (overrides: Partial<User> = {}): User => ({
   id: shortid(),
   uuid: faker.datatype.uuid(),
   firstName: faker.name.firstName(),
@@ -535,6 +534,19 @@ describe("Transaction Utils", () => {
       expect(padAmountWithZeros(5)).toBe(5000);
       expect(padAmountWithZeros(1.5)).toBe(1500);
       expect(padAmountWithZeros(0)).toBe(0);
+    });
+  });
+
+  describe("amountRangeValueText", () => {
+    test("pads amount and formats as currency", () => {
+      expect(amountRangeValueText(10)).toBe("$100.00");
+      expect(amountRangeValueText(0)).toBe("$0.00");
+    });
+  });
+
+  describe("formatAmountRangeValues", () => {
+    test("formats an array of amounts as a range string", () => {
+      expect(formatAmountRangeValues([0, 10])).toBe("$0 - $100");
     });
   });
 
