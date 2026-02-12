@@ -45,6 +45,10 @@ A payment application to demonstrate <strong>real-world</strong> usage of <a hre
 
 ---
 
+## About
+
+This is a dummy change to verify the CI/PR workflow.
+
 ## Features
 
 🛠 Built with [React][reactjs], [XState][xstate], [Express][express], [lowdb][lowdb], [Material-UI][material-ui] and [TypeScript][typescript]
