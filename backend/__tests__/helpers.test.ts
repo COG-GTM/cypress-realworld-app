@@ -63,17 +63,17 @@ describe("helpers", () => {
 
     beforeEach(() => {
       req = {
-        isAuthenticated: vi.fn(),
+        isAuthenticated: vi.fn() as any,
       };
       res = {
-        status: vi.fn().mockReturnThis(),
+        status: vi.fn().mockReturnThis() as any,
         send: vi.fn(),
       };
       next = vi.fn();
     });
 
     it("should call next() when user is authenticated", () => {
-      (req.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      (req.isAuthenticated as any).mockReturnValue(true);
       // @ts-ignore
       req.user = { id: "user-1" };
 
@@ -84,7 +84,7 @@ describe("helpers", () => {
     });
 
     it("should send 401 when user is not authenticated", () => {
-      (req.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(false);
+      (req.isAuthenticated as any).mockReturnValue(false);
 
       ensureAuthenticated(req as Request, res as Response, next);
 
@@ -94,7 +94,7 @@ describe("helpers", () => {
     });
 
     it("should map req.user.sub to req.user.id when sub is present", () => {
-      (req.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      (req.isAuthenticated as any).mockReturnValue(true);
       // @ts-ignore
       req.user = { sub: "auth0|12345" };
 
@@ -106,7 +106,7 @@ describe("helpers", () => {
     });
 
     it("should not map sub to id when sub is not present", () => {
-      (req.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+      (req.isAuthenticated as any).mockReturnValue(true);
       // @ts-ignore
       req.user = { id: "user-1" };
 
