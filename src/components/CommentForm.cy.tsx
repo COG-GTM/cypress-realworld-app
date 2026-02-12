@@ -9,9 +9,7 @@ describe("CommentForm", () => {
   });
 
   it("renders the comment input", () => {
-    cy.mount(
-      <CommentForm transactionId={transactionId} transactionComment={transactionComment} />
-    );
+    cy.mount(<CommentForm transactionId={transactionId} transactionComment={transactionComment} />);
     cy.get(`[data-test=transaction-comment-input-${transactionId}]`).should("be.visible");
     cy.get(`[data-test=transaction-comment-input-${transactionId}]`)
       .invoke("attr", "placeholder")
@@ -19,9 +17,7 @@ describe("CommentForm", () => {
   });
 
   it("allows typing a comment", () => {
-    cy.mount(
-      <CommentForm transactionId={transactionId} transactionComment={transactionComment} />
-    );
+    cy.mount(<CommentForm transactionId={transactionId} transactionComment={transactionComment} />);
     cy.get(`[data-test=transaction-comment-input-${transactionId}]`).type("Great transaction!");
     cy.get(`[data-test=transaction-comment-input-${transactionId}]`).should(
       "have.value",
@@ -30,12 +26,8 @@ describe("CommentForm", () => {
   });
 
   it("submits comment text on Enter", () => {
-    cy.mount(
-      <CommentForm transactionId={transactionId} transactionComment={transactionComment} />
-    );
-    cy.get(`[data-test=transaction-comment-input-${transactionId}]`).type(
-      "Nice payment!{enter}"
-    );
+    cy.mount(<CommentForm transactionId={transactionId} transactionComment={transactionComment} />);
+    cy.get(`[data-test=transaction-comment-input-${transactionId}]`).type("Nice payment!{enter}");
     cy.wrap(transactionComment).should("be.calledOnce");
     cy.wrap(transactionComment).should("be.calledWithMatch", {
       transactionId: "tx-123",

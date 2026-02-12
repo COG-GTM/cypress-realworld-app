@@ -38,10 +38,7 @@ describe("UserSettingsForm", () => {
 
     cy.get("[data-test=user-settings-firstName-input]").clear();
     cy.get("[data-test=user-settings-lastName-input]").focus();
-    cy.get("#user-settings-firstName-input-helper-text").should(
-      "contain",
-      "Enter a first name"
-    );
+    cy.get("#user-settings-firstName-input-helper-text").should("contain", "Enter a first name");
 
     cy.get("[data-test=user-settings-lastName-input]").clear();
     cy.get("[data-test=user-settings-email-input]").focus();
@@ -49,10 +46,7 @@ describe("UserSettingsForm", () => {
 
     cy.get("[data-test=user-settings-email-input]").clear();
     cy.get("[data-test=user-settings-phoneNumber-input]").focus();
-    cy.get("#user-settings-email-input-helper-text").should(
-      "contain",
-      "Enter an email address"
-    );
+    cy.get("#user-settings-email-input-helper-text").should("contain", "Enter an email address");
 
     cy.get("[data-test=user-settings-phoneNumber-input]").clear();
     cy.get("[data-test=user-settings-firstName-input]").focus();
