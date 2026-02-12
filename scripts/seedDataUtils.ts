@@ -483,9 +483,7 @@ export const createSeedNotifications = (
       if (likeTransaction) {
         const like = getLikeByTransactionId(likeTransaction.id, seedLikes);
         if (like) {
-          allNotifications.push(
-            createFakeLikeNotification(user.id, likeTransaction.id, like.id)
-          );
+          allNotifications.push(createFakeLikeNotification(user.id, likeTransaction.id, like.id));
         }
       }
 
