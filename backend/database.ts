@@ -293,7 +293,6 @@ export const removeBankAccountById = (bankAccountId: string) => {
 // Note: Balance transfers from/to bank accounts is a future feature,
 // but some of the backend database functionality is already implemented here.
 
-/* istanbul ignore next */
 export const getBankTransferBy = (key: string, value: any) =>
   getBy(BANK_TRANSFER_TABLE, key, value);
 
@@ -302,7 +301,6 @@ export const getBankTransfersBy = (key: string, value: any) =>
 
 export const getBankTransfersByUserId = (userId: string) => getBankTransfersBy("userId", userId);
 
-/* istanbul ignore next */
 export const createBankTransfer = (bankTransferDetails: BankTransferPayload) => {
   const bankTransfer: BankTransfer = {
     id: shortid(),
@@ -316,7 +314,6 @@ export const createBankTransfer = (bankTransferDetails: BankTransferPayload) => 
   return savedBankTransfer;
 };
 
-/* istanbul ignore next */
 const saveBankTransfer = (bankTransfer: BankTransfer): BankTransfer => {
   db.get(BANK_TRANSFER_TABLE).push(bankTransfer).write();
 
@@ -824,36 +821,27 @@ export const formatNotificationsForApiResponse = (
   );
 
 // dev/test private methods
-/* istanbul ignore next */
 export const getRandomUser = () => {
   const users = getAllUsers();
   return sample(users)!;
 };
 
-/* istanbul ignore next */
 export const getAllContacts = () => db.get(CONTACT_TABLE).value();
 
-/* istanbul ignore next */
 export const getAllTransactions = () => db.get(TRANSACTION_TABLE).value();
 
-/* istanbul ignore */
 export const getBankAccountsByUserId = (userId: string) => getBankAccountsBy("userId", userId);
 
-/* istanbul ignore next */
 export const getNotificationById = (id: string): NotificationType => getNotificationBy("id", id);
 
-/* istanbul ignore next */
 export const getNotificationsByUserId = (userId: string) => getNotificationsByObj({ userId });
 
-/* istanbul ignore next */
 export const getBankTransferByTransactionId = (transactionId: string) =>
   getBankTransferBy("transactionId", transactionId);
 
-/* istanbul ignore next */
 export const getTransactionsBy = (key: string, value: string) =>
   getAllBy(TRANSACTION_TABLE, key, value);
 
-/* istanbul ignore next */
 export const getTransactionsByUserId = (userId: string) => getTransactionsBy("receiverId", userId);
 
 export default db;
