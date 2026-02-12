@@ -49,7 +49,6 @@ const googleJwtConfig = {
   algorithms: ["RS256"],
 };
 
-/* istanbul ignore next */
 export const verifyOktaToken = (req: Request, res: Response, next: NextFunction) => {
   const bearerHeader = req.headers["authorization"];
 
@@ -100,13 +99,11 @@ export const ensureAuthenticated = (req: Request, res: Response, next: NextFunct
     // @ts-ignore
     // Map sub to id on req.user
     if (req.user?.sub) {
-      /* istanbul ignore next */
       // @ts-ignore
       set(req.user, "id", req.user.sub);
     }
     return next();
   }
-  /* istanbul ignore next */
   res.status(401).send({
     error: "Unauthorized",
   });
