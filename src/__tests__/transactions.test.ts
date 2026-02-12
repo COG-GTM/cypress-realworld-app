@@ -15,6 +15,9 @@ import {
   getPublicTransactionsDefaultSort,
   getUserById,
   getBankTransferByTransactionId,
+  createBankTransfer,
+  getBankTransferBy,
+  getRandomUser,
 } from "../../backend/database";
 
 import {
@@ -25,6 +28,7 @@ import {
   BankTransferType,
   TransactionPayload,
   TransactionStatus,
+  BankTransferPayload,
 } from "../../src/models";
 import { getFakeAmount } from "../../src/utils/transactionUtils";
 import { totalTransactions, transactionsPerUser } from "../../scripts/seedDataUtils";
@@ -320,5 +324,69 @@ describe("Transactions", () => {
     // Verify Sender's Updated App Balance
     const updatedSender: User = getAllUsers()[0];
     expect(updatedSender.balance).toBe(sender.balance - requestAmount);
+  });
+});
+
+describe("Bank Transfers", () => {
+  beforeEach(() => {
+    seedDatabase();
+  });
+
+  it("should create a bank transfer and retrieve it by id", () => {
+    const user: User = getAllUsers()[0];
+    const bankAccount = getBankAccountsByUserId(user.id)[0];
+    const transactions = getTransactionsByUserId(user.id);
+    const transaction = transactions[0];
+
+    const bankTransferDetails: BankTransferPayload = {
+      userId: user.id,
+      source: bankAccount.id!,
+      amount: 1000,
+      transactionId: transaction.id,
+      type: BankTransferType.withdrawal,
+    };
+
+    const result = createBankTransfer(bankTransferDetails);
+    expect(result.id).toBeDefined();
+    expect(result.uuid).toBeDefined();
+    expect(result.userId).toBe(user.id);
+    expect(result.amount).toBe(1000);
+    expect(result.type).toBe(BankTransferType.withdrawal);
+    expect(result.transactionId).toBe(transaction.id);
+
+    const retrieved = getBankTransferBy("id", result.id);
+    expect(retrieved.id).toBe(result.id);
+    expect(retrieved.userId).toBe(user.id);
+
+    const retrievedByTransactionId = getBankTransferByTransactionId(transaction.id);
+    expect(retrievedByTransactionId.id).toBe(result.id);
+  });
+
+  it("should create a deposit bank transfer", () => {
+    const user: User = getAllUsers()[1];
+    const bankAccount = getBankAccountsByUserId(user.id)[0];
+    const transactions = getTransactionsByUserId(user.id);
+    const transaction = transactions[0];
+
+    const bankTransferDetails: BankTransferPayload = {
+      userId: user.id,
+      source: bankAccount.id!,
+      amount: 500,
+      transactionId: transaction.id,
+      type: BankTransferType.deposit,
+    };
+
+    const result = createBankTransfer(bankTransferDetails);
+    expect(result.id).toBeDefined();
+    expect(result.type).toBe(BankTransferType.deposit);
+    expect(result.amount).toBe(500);
+  });
+
+  it("should retrieve a random user", () => {
+    const user = getRandomUser();
+    expect(user).toBeDefined();
+    expect(user.id).toBeDefined();
+    expect(user.firstName).toBeDefined();
+    expect(user.lastName).toBeDefined();
   });
 });
