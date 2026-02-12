@@ -20,7 +20,7 @@ vi.mock("../../utils/portUtils", () => ({
   backendPort: 3001,
 }));
 
-import { authMachine, AuthMachineContext } from "../authMachine";
+import { authMachine } from "../authMachine";
 import { httpClient } from "../../utils/asyncUtils";
 
 describe("authMachine", () => {
