@@ -39,7 +39,7 @@ describe("ensureAuthenticated", () => {
 
   beforeEach(() => {
     mockReq = {
-      isAuthenticated: vi.fn(),
+      isAuthenticated: vi.fn() as unknown as Request["isAuthenticated"],
     };
     mockRes = {
       status: vi.fn().mockReturnThis(),
@@ -49,7 +49,7 @@ describe("ensureAuthenticated", () => {
   });
 
   it("should call next() when user is authenticated", () => {
-    (mockReq.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (mockReq.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
     mockReq.user = { id: "user-1" } as any;
 
     ensureAuthenticated(mockReq as Request, mockRes as Response, mockNext);
@@ -58,7 +58,7 @@ describe("ensureAuthenticated", () => {
   });
 
   it("should send 401 when user is not authenticated", () => {
-    (mockReq.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (mockReq.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(false);
 
     ensureAuthenticated(mockReq as Request, mockRes as Response, mockNext);
 
@@ -68,7 +68,7 @@ describe("ensureAuthenticated", () => {
   });
 
   it("should map req.user.sub to req.user.id when sub exists", () => {
-    (mockReq.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (mockReq.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
     mockReq.user = { sub: "okta-user-123" } as any;
 
     ensureAuthenticated(mockReq as Request, mockRes as Response, mockNext);
@@ -78,7 +78,7 @@ describe("ensureAuthenticated", () => {
   });
 
   it("should not map sub to id when sub does not exist", () => {
-    (mockReq.isAuthenticated as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    (mockReq.isAuthenticated as unknown as ReturnType<typeof vi.fn>).mockReturnValue(true);
     mockReq.user = { id: "local-user-1" } as any;
 
     ensureAuthenticated(mockReq as Request, mockRes as Response, mockNext);
