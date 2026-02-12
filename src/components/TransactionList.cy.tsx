@@ -7,7 +7,11 @@ import {
   DefaultPrivacyLevel,
 } from "../models";
 
-const createTransaction = (id: string, senderName: string, receiverName: string): TransactionResponseItem => ({
+const createTransaction = (
+  id: string,
+  senderName: string,
+  receiverName: string
+): TransactionResponseItem => ({
   id,
   uuid: `uuid-${id}`,
   source: "",
