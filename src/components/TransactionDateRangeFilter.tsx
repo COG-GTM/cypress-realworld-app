@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import { format as formatDate } from "date-fns";
 import { Popover, Chip, useTheme, Drawer, Button, useMediaQuery, colors } from "@mui/material";
@@ -42,7 +42,22 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
   const theme = useTheme();
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));
   const queryHasDateFields = dateRangeFilters && hasDateQueryFields(dateRangeFilters);
-  const [calendarValue, setCalendarValue] = useState<Value>(null);
+  const [calendarValue, setCalendarValue] = useState<Value>(() => {
+    if (dateRangeFilters && hasDateQueryFields(dateRangeFilters)) {
+      return [new Date(dateRangeFilters.dateRangeStart), new Date(dateRangeFilters.dateRangeEnd)];
+    }
+
+    return null;
+  });
+
+  useEffect(() => {
+    if (dateRangeFilters && hasDateQueryFields(dateRangeFilters)) {
+      setCalendarValue([new Date(dateRangeFilters.dateRangeStart), new Date(dateRangeFilters.dateRangeEnd)]);
+      return;
+    }
+
+    setCalendarValue(null);
+  }, [dateRangeFilters?.dateRangeStart, dateRangeFilters?.dateRangeEnd]);
 
   const [dateRangeAnchorEl, setDateRangeAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
