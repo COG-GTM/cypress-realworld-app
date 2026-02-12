@@ -18,15 +18,17 @@ const mockReceiver: Partial<User> = {
 };
 
 const createTestMachine = () =>
-  createTransactionMachine.withConfig({
-    services: {
-      transactionDataMachine: () => () => {},
-    },
-  }).withContext({
-    sender: undefined as unknown as User,
-    receiver: undefined as unknown as User,
-    transactionDetails: undefined as unknown as any,
-  });
+  createTransactionMachine
+    .withConfig({
+      services: {
+        transactionDataMachine: () => () => {},
+      },
+    })
+    .withContext({
+      sender: undefined as unknown as User,
+      receiver: undefined as unknown as User,
+      transactionDetails: undefined as unknown as any,
+    });
 
 describe("createTransactionMachine", () => {
   let service: InterpreterFrom<typeof createTransactionMachine>;
