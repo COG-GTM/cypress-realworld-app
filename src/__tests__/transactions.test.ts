@@ -210,23 +210,24 @@ describe("Transactions", () => {
     expect(transaction.comments).toBeDefined();
   });
 
-  it.skip("should create a payment and withdrawal (bank transfer) for remaining balance", () => {
+  it("should create a payment and withdrawal (bank transfer) for remaining balance", () => {
     const sender: User = getAllUsers()[0];
     const receiver: User = getAllUsers()[1];
     const senderBankAccount = getBankAccountsByUserId(sender.id)[0];
     const firstPaymentAmount = 1000;
     const secondPaymentAmount = 500;
+    const initialSenderBalance = sender.balance;
+    const initialReceiverBalance = receiver.balance;
 
     const receiverTransactions = getTransactionsByUserId(receiver.id);
     expect(receiverTransactions.length).toBeGreaterThan(1);
 
-    console.log("sender balance:", sender.balance + 1000);
     const paymentDetails: TransactionPayload = {
       source: senderBankAccount.id!,
       senderId: sender.id,
       receiverId: receiver.id,
       description: `Payment: ${sender.id} to ${receiver.id}`,
-      amount: sender.balance + firstPaymentAmount,
+      amount: (initialSenderBalance + firstPaymentAmount) / 100,
       privacyLevel: DefaultPrivacyLevel.public,
       status: TransactionStatus.pending,
     };
@@ -243,13 +244,13 @@ describe("Transactions", () => {
     expect(withdrawal.type).toBe(BankTransferType.withdrawal);
     expect(withdrawal.amount).toBe(firstPaymentAmount);
 
-    // second transaction - $500
+    // second transaction - sender balance is now 0, entire amount from bank
     const secondPaymentDetails: TransactionPayload = {
       source: senderBankAccount.id!,
       senderId: sender.id,
       receiverId: receiver.id,
       description: `Payment: ${sender.id} to ${receiver.id}`,
-      amount: secondPaymentAmount,
+      amount: secondPaymentAmount / 100,
       privacyLevel: DefaultPrivacyLevel.public,
       status: TransactionStatus.pending,
     };
@@ -273,15 +274,17 @@ describe("Transactions", () => {
     // Verify Receiver's Updated App Balance
     const updatedReceiver: User = getAllUsers()[1];
     expect(updatedReceiver.balance).toBe(
-      receiver.balance + firstPaymentAmount + secondPaymentAmount
+      initialReceiverBalance + initialSenderBalance + firstPaymentAmount + secondPaymentAmount
     );
   });
 
-  it.skip("should create a request and withdrawal (bank transfer) for remaining balance", () => {
+  it("should create a request and withdrawal (bank transfer) for remaining balance", () => {
     const sender: User = getAllUsers()[0];
     const receiver: User = getAllUsers()[1];
     const senderBankAccount = getBankAccountsByUserId(sender.id)[0];
     const requestAmount = 100;
+    const initialSenderBalance = sender.balance;
+    const initialReceiverBalance = receiver.balance;
 
     const receiverTransactions = getTransactionsByUserId(receiver.id);
     expect(receiverTransactions.length).toBeGreaterThan(1);
@@ -310,15 +313,14 @@ describe("Transactions", () => {
     expect(updatedTransaction.requestStatus).toEqual("accepted");
 
     const updatedReceiver: User = getAllUsers()[1];
-    expect(updatedReceiver.balance).toBe(receiver.balance + requestAmount);
+    expect(updatedReceiver.balance).toBe(initialReceiverBalance - requestAmount * 100);
 
-    // Verify Deposit Transactions for Sender
-    const updatedSenderTransactions = getTransactionsByUserId(sender.id);
+    // Verify Transactions for Receiver
+    const updatedReceiverTransactions = getTransactionsByUserId(receiver.id);
+    expect(updatedReceiverTransactions.length).toBe(receiverTransactions.length + 1);
 
-    expect(updatedSenderTransactions.length).toBe(receiverTransactions.length + 2);
-
-    // Verify Sender's Updated App Balance
+    // Verify Sender's (requester's) Updated App Balance
     const updatedSender: User = getAllUsers()[0];
-    expect(updatedSender.balance).toBe(sender.balance - requestAmount);
+    expect(updatedSender.balance).toBe(initialSenderBalance + requestAmount * 100);
   });
 });
