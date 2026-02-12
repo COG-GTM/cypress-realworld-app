@@ -42,10 +42,7 @@ describe("BankAccountListItem", () => {
   it("hides delete button for deleted account", () => {
     const deleteBankAccount = cy.stub();
     cy.mount(
-      <BankAccountListItem
-        bankAccount={deletedBankAccount}
-        deleteBankAccount={deleteBankAccount}
-      />
+      <BankAccountListItem bankAccount={deletedBankAccount} deleteBankAccount={deleteBankAccount} />
     );
     cy.contains("Wells Fargo").should("exist");
     cy.contains("(Deleted)").should("exist");

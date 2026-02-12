@@ -1,10 +1,6 @@
 import { MemoryRouter } from "react-router-dom";
 import NotificationsList from "./NotificationList";
-import {
-  NotificationResponseItem,
-  NotificationsType,
-  PaymentNotificationStatus,
-} from "../models";
+import { NotificationResponseItem, NotificationsType, PaymentNotificationStatus } from "../models";
 
 describe("NotificationsList", () => {
   const notifications: NotificationResponseItem[] = [
@@ -47,10 +43,7 @@ describe("NotificationsList", () => {
     const updateNotification = cy.stub();
     cy.mount(
       <MemoryRouter>
-        <NotificationsList
-          notifications={notifications}
-          updateNotification={updateNotification}
-        />
+        <NotificationsList notifications={notifications} updateNotification={updateNotification} />
       </MemoryRouter>
     );
     cy.get("[data-test=notifications-list]").should("exist");

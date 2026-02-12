@@ -29,9 +29,7 @@ describe("BankAccountList", () => {
 
   it("renders list of bank accounts", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />);
     cy.get("[data-test=bankaccount-list]").should("exist");
     cy.get("[data-test^=bankaccount-list-item-]").should("have.length", 2);
     cy.contains("Chase Bank").should("exist");
