@@ -30,10 +30,7 @@ describe("NotificationList", () => {
   it("renders list of notifications", () => {
     const updateNotification = cy.stub();
     cy.mount(
-      <NotificationList
-        notifications={notifications}
-        updateNotification={updateNotification}
-      />
+      <NotificationList notifications={notifications} updateNotification={updateNotification} />
     );
 
     cy.get("[data-test=notifications-list]").should("be.visible");
@@ -42,9 +39,7 @@ describe("NotificationList", () => {
 
   it("renders empty state when no notifications", () => {
     const updateNotification = cy.stub();
-    cy.mount(
-      <NotificationList notifications={[]} updateNotification={updateNotification} />
-    );
+    cy.mount(<NotificationList notifications={[]} updateNotification={updateNotification} />);
 
     cy.get("[data-test=notifications-list]").should("not.exist");
     cy.contains("No Notifications").should("be.visible");

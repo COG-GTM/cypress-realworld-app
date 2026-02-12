@@ -77,8 +77,12 @@ describe("TransactionCreateStepTwo", () => {
       />
     );
 
-    cy.get("[data-test=transaction-create-submit-request]").should("be.visible").and("contain", "Request");
-    cy.get("[data-test=transaction-create-submit-payment]").should("be.visible").and("contain", "Pay");
+    cy.get("[data-test=transaction-create-submit-request]")
+      .should("be.visible")
+      .and("contain", "Request");
+    cy.get("[data-test=transaction-create-submit-payment]")
+      .should("be.visible")
+      .and("contain", "Pay");
   });
 
   it("buttons are disabled when form is empty", () => {

@@ -178,7 +178,11 @@ describe("TransactionDetail", () => {
       </MemoryRouter>
     );
 
-    cy.get("[data-test=transaction-accept-request-tx-1]").should("be.visible").and("contain", "Accept Request");
-    cy.get("[data-test=transaction-reject-request-tx-1]").should("be.visible").and("contain", "Reject Request");
+    cy.get("[data-test=transaction-accept-request-tx-1]")
+      .should("be.visible")
+      .and("contain", "Accept Request");
+    cy.get("[data-test=transaction-reject-request-tx-1]")
+      .should("be.visible")
+      .and("contain", "Reject Request");
   });
 });

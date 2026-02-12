@@ -291,15 +291,27 @@ describe("Transaction Utils", () => {
   describe("isCommentNotification", () => {
     it("returns true for comment notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        commentId: "c1", isRead: false, createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        commentId: "c1",
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isCommentNotification(notification)).toBe(true);
     });
     it("returns false for like notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        likeId: "l1", isRead: false, createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        likeId: "l1",
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isCommentNotification(notification)).toBe(false);
     });
@@ -308,16 +320,27 @@ describe("Transaction Utils", () => {
   describe("isLikeNotification", () => {
     it("returns true for like notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        likeId: "l1", isRead: false, createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        likeId: "l1",
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isLikeNotification(notification)).toBe(true);
     });
     it("returns false for payment notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.received, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.received,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isLikeNotification(notification)).toBe(false);
     });
@@ -326,16 +349,27 @@ describe("Transaction Utils", () => {
   describe("isPaymentNotification", () => {
     it("returns true for payment notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.received, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.received,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentNotification(notification)).toBe(true);
     });
     it("returns false for like notification", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        likeId: "l1", isRead: false, createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        likeId: "l1",
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentNotification(notification)).toBe(false);
     });
@@ -344,17 +378,27 @@ describe("Transaction Utils", () => {
   describe("isPaymentRequestedNotification", () => {
     it("returns true for requested status", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.requested, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.requested,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentRequestedNotification(notification)).toBe(true);
     });
     it("returns false for received status", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.received, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.received,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentRequestedNotification(notification)).toBe(false);
     });
@@ -363,17 +407,27 @@ describe("Transaction Utils", () => {
   describe("isPaymentReceivedNotification", () => {
     it("returns true for received status", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.received, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.received,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentReceivedNotification(notification)).toBe(true);
     });
     it("returns false for requested status", () => {
       const notification = {
-        id: "1", uuid: "uuid-1", userId: "u1", transactionId: "t1",
-        status: PaymentNotificationStatus.requested, isRead: false,
-        createdAt: new Date(), modifiedAt: new Date(),
+        id: "1",
+        uuid: "uuid-1",
+        userId: "u1",
+        transactionId: "t1",
+        status: PaymentNotificationStatus.requested,
+        isRead: false,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
       };
       expect(isPaymentReceivedNotification(notification)).toBe(false);
     });

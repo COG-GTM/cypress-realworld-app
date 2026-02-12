@@ -16,27 +16,21 @@ describe("BankAccountItem", () => {
 
   it("renders bank account name", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />);
 
     cy.contains("Chase Bank").should("be.visible");
   });
 
   it("renders delete button for active accounts", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />);
 
     cy.get("[data-test=bankaccount-delete]").should("be.visible").and("contain", "Delete");
   });
 
   it("calls deleteBankAccount on delete click", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountItem bankAccount={bankAccount} deleteBankAccount={deleteBankAccount} />);
 
     cy.get("[data-test=bankaccount-delete]").click();
     cy.wrap(deleteBankAccount).should("have.been.calledWith", { id: "ba-1" });

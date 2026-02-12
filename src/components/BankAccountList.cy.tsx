@@ -29,9 +29,7 @@ describe("BankAccountList", () => {
 
   it("renders list of bank accounts", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />);
 
     cy.get("[data-test=bankaccount-list]").should("be.visible");
     cy.get("[data-test*=bankaccount-list-item]").should("have.length", 2);
@@ -41,9 +39,7 @@ describe("BankAccountList", () => {
 
   it("renders empty state when no bank accounts", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountList bankAccounts={[]} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={[]} deleteBankAccount={deleteBankAccount} />);
 
     cy.get("[data-test=bankaccount-list]").should("not.exist");
     cy.contains("No Bank Accounts").should("be.visible");
