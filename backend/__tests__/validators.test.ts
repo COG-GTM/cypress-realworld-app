@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isValid } from "shortid";
-import {
-  TransactionStatus,
-  TransactionRequestStatus,
-} from "../../src/models";
+import { TransactionStatus, TransactionRequestStatus } from "../../src/models";
 import { includes } from "lodash/fp";
 
 const TransactionStatusValues = Object.values(TransactionStatus);
