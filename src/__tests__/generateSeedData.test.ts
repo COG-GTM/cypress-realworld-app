@@ -12,7 +12,7 @@ import {
 } from "../../scripts/seedDataUtils";
 import { TDatabase } from "../../backend/database";
 
-describe.skip("Seed Database", () => {
+describe("Seed Database", () => {
   let database: TDatabase;
   beforeEach(() => {
     database = buildDatabase();
