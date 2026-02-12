@@ -478,19 +478,35 @@ export const createSeedNotifications = (
       const transactionsWithComments = getTransactionsWithComments(transactions, seedComments);
 
       const likeTransaction = sample(compact(getRandomTransactions(5, transactionsWithLikes)));
-      const like = getLikeByTransactionId(likeTransaction!.id, seedLikes);
-      const likeNotification = createFakeLikeNotification(user.id, likeTransaction!.id, like!.id);
+      let allNotifications: NotificationType[] = [];
+
+      if (likeTransaction) {
+        const like = getLikeByTransactionId(likeTransaction.id, seedLikes);
+        if (like) {
+          const likeNotification = createFakeLikeNotification(
+            user.id,
+            likeTransaction.id,
+            like.id
+          );
+          allNotifications.push(likeNotification);
+        }
+      }
 
       const commentTransaction = sample(
         compact(getRandomTransactions(5, transactionsWithComments))
       );
-      const comment = getCommentByTransactionId(commentTransaction!.id, seedComments);
-      // comment notification
-      const commentNotification = createFakeCommentNotification(
-        user.id,
-        commentTransaction!.id,
-        comment!.id
-      );
+
+      if (commentTransaction) {
+        const comment = getCommentByTransactionId(commentTransaction.id, seedComments);
+        if (comment) {
+          const commentNotification = createFakeCommentNotification(
+            user.id,
+            commentTransaction.id,
+            comment.id
+          );
+          allNotifications.push(commentNotification);
+        }
+      }
 
       // choose random transactions
       const randomTransactions = getRandomTransactions(notificationsPerUser - 2, transactions);
@@ -502,8 +518,6 @@ export const createSeedNotifications = (
       const paymentReceivedNotifications = randomTransactions.map((transaction) =>
         createFakePaymentNotification(user.id, transaction!, PaymentNotificationStatus.received)
       );
-
-      let allNotifications = [likeNotification, commentNotification];
 
       return flattenDeep(
         // @ts-ignore
