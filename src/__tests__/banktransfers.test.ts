@@ -7,16 +7,8 @@ import {
   getBankTransferBy,
   getBankTransfersBy,
   getBankTransferByTransactionId,
-  createTransaction,
 } from "../../backend/database";
-import {
-  User,
-  BankTransferType,
-  TransactionPayload,
-  TransactionStatus,
-  DefaultPrivacyLevel,
-} from "../../src/models";
-import { getFakeAmount } from "../../src/utils/transactionUtils";
+import { User, BankTransferType } from "../../src/models";
 
 describe("BankTransfers", () => {
   beforeEach(() => {
