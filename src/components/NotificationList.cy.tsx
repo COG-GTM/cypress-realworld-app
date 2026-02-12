@@ -1,9 +1,5 @@
 import NotificationsList from "./NotificationList";
-import {
-  NotificationResponseItem,
-  PaymentNotificationStatus,
-  NotificationsType,
-} from "../models";
+import { NotificationResponseItem, PaymentNotificationStatus, NotificationsType } from "../models";
 
 const paymentNotification: NotificationResponseItem = {
   id: "notification-1",

@@ -44,9 +44,11 @@ describe("NavBar", () => {
         />
       </MemoryRouter>
     );
-    cy.get("[data-test=sidenav-toggle]").click().then(() => {
-      expect(toggleDrawer).to.have.been.calledOnce;
-    });
+    cy.get("[data-test=sidenav-toggle]")
+      .click()
+      .then(() => {
+        expect(toggleDrawer).to.have.been.calledOnce;
+      });
   });
 
   it("shows notification badge count", () => {
@@ -54,11 +56,7 @@ describe("NavBar", () => {
       dataMachine("notifications").withConfig(
         {},
         {
-          results: [
-            { id: "1" },
-            { id: "2" },
-            { id: "3" },
-          ],
+          results: [{ id: "1" }, { id: "2" }, { id: "3" }],
           pageData: {},
           message: undefined,
         }

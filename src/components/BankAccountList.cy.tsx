@@ -29,9 +29,7 @@ const bankAccounts: BankAccount[] = [
 describe("BankAccountList", () => {
   it("renders list of bank accounts", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />);
     cy.get("[data-test=bankaccount-list]").should("exist");
     cy.get("[data-test=bankaccount-list-item-bank-1]").should("contain", "Chase Bank");
     cy.get("[data-test=bankaccount-list-item-bank-2]").should("contain", "Wells Fargo");
@@ -46,9 +44,7 @@ describe("BankAccountList", () => {
 
   it("handles delete action", () => {
     const deleteBankAccount = cy.stub();
-    cy.mount(
-      <BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />);
     cy.get("[data-test=bankaccount-list-item-bank-1]")
       .find("[data-test=bankaccount-delete]")
       .click()
