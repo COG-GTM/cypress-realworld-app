@@ -1,18 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
-vi.mock(
-  "../../src/aws-exports",
-  () => ({
-    default: {
-      Auth: {
-        Cognito: {
-          userPoolId: "us-east-1_TEST",
-        },
+vi.mock("../../src/aws-exports", () => ({
+  default: {
+    Auth: {
+      Cognito: {
+        userPoolId: "us-east-1_TEST",
       },
     },
-  }),
-  { virtual: true }
-);
+  },
+}));
 
 vi.mock("express-jwt", () => ({
   default: () => ({
