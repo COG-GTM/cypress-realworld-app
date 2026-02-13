@@ -147,19 +147,31 @@ describe("Transaction Utils", () => {
 
   describe("request status helpers", () => {
     test("isPendingRequestTransaction", () => {
-      expect(isPendingRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(true);
-      expect(isPendingRequestTransaction(fakeTransaction(TransactionRequestStatus.accepted))).toBe(false);
+      expect(isPendingRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(
+        true
+      );
+      expect(isPendingRequestTransaction(fakeTransaction(TransactionRequestStatus.accepted))).toBe(
+        false
+      );
       expect(isPendingRequestTransaction(fakeTransaction())).toBe(false);
     });
 
     test("isAcceptedRequestTransaction", () => {
-      expect(isAcceptedRequestTransaction(fakeTransaction(TransactionRequestStatus.accepted))).toBe(true);
-      expect(isAcceptedRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(false);
+      expect(isAcceptedRequestTransaction(fakeTransaction(TransactionRequestStatus.accepted))).toBe(
+        true
+      );
+      expect(isAcceptedRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(
+        false
+      );
     });
 
     test("isRejectedRequestTransaction", () => {
-      expect(isRejectedRequestTransaction(fakeTransaction(TransactionRequestStatus.rejected))).toBe(true);
-      expect(isRejectedRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(false);
+      expect(isRejectedRequestTransaction(fakeTransaction(TransactionRequestStatus.rejected))).toBe(
+        true
+      );
+      expect(isRejectedRequestTransaction(fakeTransaction(TransactionRequestStatus.pending))).toBe(
+        false
+      );
     });
   });
 

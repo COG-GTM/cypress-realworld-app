@@ -30,9 +30,7 @@ describe("BankAccountList", () => {
       } as any,
     ];
 
-    cy.mount(
-      <BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />
-    );
+    cy.mount(<BankAccountList bankAccounts={bankAccounts} deleteBankAccount={deleteBankAccount} />);
 
     cy.get("[data-test=bankaccount-list]").should("exist");
     cy.get("[data-test=bankaccount-list-item-ba1]").should("exist");

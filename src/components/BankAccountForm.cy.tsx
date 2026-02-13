@@ -7,11 +7,7 @@ describe("BankAccountForm", () => {
 
     cy.mount(
       <MemoryRouter>
-        <BankAccountForm
-          userId="user123"
-          createBankAccount={createBankAccount}
-          onboarding={true}
-        />
+        <BankAccountForm userId="user123" createBankAccount={createBankAccount} onboarding={true} />
       </MemoryRouter>
     );
 

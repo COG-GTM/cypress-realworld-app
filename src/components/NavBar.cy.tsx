@@ -22,7 +22,11 @@ describe("NavBar", () => {
 
     cy.mount(
       <MemoryRouter initialEntries={["/"]}>
-        <NavBar drawerOpen={false} toggleDrawer={toggleDrawer} notificationsService={notificationsService as any} />
+        <NavBar
+          drawerOpen={false}
+          toggleDrawer={toggleDrawer}
+          notificationsService={notificationsService as any}
+        />
       </MemoryRouter>
     );
 
@@ -56,7 +60,11 @@ describe("NavBar", () => {
 
     cy.mount(
       <MemoryRouter initialEntries={["/notifications"]}>
-        <NavBar drawerOpen={false} toggleDrawer={toggleDrawer} notificationsService={notificationsService as any} />
+        <NavBar
+          drawerOpen={false}
+          toggleDrawer={toggleDrawer}
+          notificationsService={notificationsService as any}
+        />
       </MemoryRouter>
     );
 

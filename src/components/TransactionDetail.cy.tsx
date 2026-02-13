@@ -1,5 +1,10 @@
 import TransactionDetail from "./TransactionDetail";
-import { TransactionResponseItem, TransactionRequestStatus, TransactionStatus, User } from "../models";
+import {
+  TransactionResponseItem,
+  TransactionRequestStatus,
+  TransactionStatus,
+  User,
+} from "../models";
 
 const currentUser: User = {
   id: "user2",

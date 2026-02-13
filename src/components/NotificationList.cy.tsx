@@ -32,7 +32,9 @@ describe("NotificationList", () => {
       } as any,
     ];
 
-    cy.mount(<NotificationList notifications={notifications} updateNotification={updateNotification} />);
+    cy.mount(
+      <NotificationList notifications={notifications} updateNotification={updateNotification} />
+    );
 
     cy.get("[data-test=notifications-list]").should("exist");
     cy.get("[data-test=notification-list-item-n1]").should("exist");

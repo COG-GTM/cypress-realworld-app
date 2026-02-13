@@ -52,7 +52,10 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
 
   useEffect(() => {
     if (dateRangeFilters && hasDateQueryFields(dateRangeFilters)) {
-      setCalendarValue([new Date(dateRangeFilters.dateRangeStart), new Date(dateRangeFilters.dateRangeEnd)]);
+      setCalendarValue([
+        new Date(dateRangeFilters.dateRangeStart),
+        new Date(dateRangeFilters.dateRangeEnd),
+      ]);
       return;
     }
 

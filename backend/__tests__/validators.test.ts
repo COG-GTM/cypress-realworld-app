@@ -10,11 +10,7 @@ import {
   isTransactionQSValidator,
 } from "../validators";
 
-import {
-  TransactionStatus,
-  TransactionRequestStatus,
-  NotificationsType,
-} from "../../src/models";
+import { TransactionStatus, TransactionRequestStatus, NotificationsType } from "../../src/models";
 
 describe("backend/validators", () => {
   it("sanitizeTransactionStatus: keeps valid values", async () => {
