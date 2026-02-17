@@ -19,10 +19,7 @@ import {
   useMediaQuery,
   Link,
 } from "@mui/material";
-import {
-  Menu as MenuIcon,
-  AttachMoney as AttachMoneyIcon,
-} from "@mui/icons-material";
+import { Menu as MenuIcon, AttachMoney as AttachMoneyIcon } from "@mui/icons-material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 
 import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
@@ -93,7 +90,6 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
       boxShadow: "none",
     },
   },
-
 }));
 
 interface NavBarProps {
