@@ -22,7 +22,11 @@ export interface NotificationBadgeProps {
 
 const NotificationBadge: React.FC<NotificationBadgeProps> = ({ notificationCount }) => {
   if (notificationCount === 0) {
-    return null;
+    return (
+      <span data-test="nav-top-notifications-count">
+        <NotificationsIcon />
+      </span>
+    );
   }
 
   return (

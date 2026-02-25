@@ -1,9 +1,11 @@
 import NotificationBadge from "./NotificationBadge";
 
 describe("NotificationBadge", () => {
-  it("should not render when notificationCount is zero", () => {
+  it("should hide the badge count when notificationCount is zero", () => {
     cy.mount(<NotificationBadge notificationCount={0} />);
-    cy.get("[data-test='nav-top-notifications-count']").should("not.exist");
+    cy.get("[data-test='nav-top-notifications-count']").should("exist");
+    cy.get(".MuiBadge-badge").should("not.exist");
+    cy.get("svg[data-testid='NotificationsIcon']").should("exist");
   });
 
   it("should display the correct count for 1 notification", () => {
