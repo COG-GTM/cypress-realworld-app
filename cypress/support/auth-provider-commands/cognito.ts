@@ -80,9 +80,8 @@ Cypress.Commands.add("loginByCognito", (username, password) => {
         }
       );
 
-      // give a few seconds for redirect to settle
-      // eslint-disable-next-line cypress/no-unnecessary-waiting
-      cy.wait(2000);
+      // Wait for redirect to settle by asserting on URL change
+      cy.url().should("not.include", "login");
 
       // verify we have made it passed the login screen
       cy.contains("Get Started").should("be.visible");
@@ -90,17 +89,8 @@ Cypress.Commands.add("loginByCognito", (username, password) => {
     {
       validate() {
         cy.visit("/");
-        /**
-         * NOTE: We recommend validating sessions by either validating
-         * localStorage or cookies values, or possibly accessing an
-         * endpoint to validate that the correct user is logged.
-         *
-         * This example is here for brevity to make sure
-         * our user is directly taken to the onboarding flow
-         * and not blocked by a login screen
-         */
-        // revalidate our session to make sure we are logged in
-        cy.contains("Get Started").should("be.visible");
+        // Validate presence of access token in localStorage
+        cy.window().its("localStorage").invoke("getItem", "authState").should("exist");
       },
     }
   );
