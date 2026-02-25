@@ -47,16 +47,19 @@ const AppGoogle: React.FC = () => {
 
   const [, , bankAccountsService] = useMachine(bankAccountsMachine);
 
-  // @ts-ignore
-  if (window.Cypress) {
-    useEffect(() => {
+  useEffect(() => {
+    // @ts-ignore
+    if (window.Cypress) {
       const { user, token } = JSON.parse(localStorage.getItem("googleCypress")!);
       authService.send("GOOGLE", {
         user,
         token,
       });
-    }, []);
-  } else {
+    }
+  }, []);
+
+  // @ts-ignore
+  if (!window.Cypress) {
     useGoogleLogin({
       clientId: process.env.VITE_GOOGLE_CLIENTID!,
       onSuccess: (res) => {

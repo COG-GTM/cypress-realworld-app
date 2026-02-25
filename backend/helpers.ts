@@ -70,6 +70,9 @@ export const verifyOktaToken = (req: Request, res: Response, next: NextFunction)
       .catch((err: any) => {
         // a validation failed, inspect the error
         console.log("error", err);
+        res.status(401).send({
+          error: "Unauthorized",
+        });
       });
   } else {
     res.status(401).send({

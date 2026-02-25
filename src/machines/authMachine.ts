@@ -4,6 +4,7 @@ import { httpClient } from "../utils/asyncUtils";
 import { history } from "../utils/historyUtils";
 import { User } from "../models";
 import { backendPort } from "../utils/portUtils";
+import { mapProviderUser } from "../utils/authProviderUtils";
 
 export interface AuthMachineSchema {
   states: {
@@ -165,14 +166,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
           });
       },
       getOktaUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Okta User fields to our User Model
-        const user = {
-          id: event.user.sub,
-          email: event.user.email,
-          firstName: event.user.given_name,
-          lastName: event.user.family_name,
-          username: event.user.preferred_username,
-        };
+        const user = mapProviderUser("okta", event.user);
 
         // Set Access Token in Local Storage for API calls
         localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
@@ -184,14 +178,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         return resp.data;
       },
       getGoogleUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Google User fields to our User Model
-        const user = {
-          id: event.user.googleId,
-          email: event.user.email,
-          firstName: event.user.givenName,
-          lastName: event.user.familyName,
-          avatar: event.user.imageUrl,
-        };
+        const user = mapProviderUser("google", event.user);
 
         // Set Google Access Token in Local Storage for API calls
         localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
@@ -199,13 +186,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         return Promise.resolve({ user });
       },
       getAuth0UserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Auth0 User fields to our User Model
-        const user = {
-          id: event.user.sub,
-          email: event.user.email,
-          firstName: event.user.nickname,
-          avatar: event.user.picture,
-        };
+        const user = mapProviderUser("auth0", event.user);
 
         // Set Auth0 Access Token in Local Storage for API calls
         localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
@@ -225,16 +206,12 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
         return await httpClient.post(`http://localhost:${backendPort}/logout`);
       },
       getCognitoUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Cognito User fields to our User Model
-        const ourUser = {
-          id: event.userSub,
-          email: event.email,
-        };
+        const user = mapProviderUser("cognito", event);
 
         // Set Access Token in Local Storage for API calls
         localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.accessTokenJwtString);
 
-        return Promise.resolve(ourUser);
+        return Promise.resolve({ user });
       },
     },
     actions: {
