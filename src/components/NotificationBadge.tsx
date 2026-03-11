@@ -19,17 +19,13 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({ notificationCount
       data-test="nav-top-notifications-link"
       size="large"
     >
-      {notificationCount > 0 ? (
-        <Badge
-          badgeContent={notificationCount}
-          data-test="nav-top-notifications-count"
-          classes={classes ? { badge: classes.customBadge } : undefined}
-        >
-          <NotificationsIcon />
-        </Badge>
-      ) : (
+      <Badge
+        badgeContent={notificationCount || undefined}
+        data-test="nav-top-notifications-count"
+        classes={classes ? { badge: classes.customBadge } : undefined}
+      >
         <NotificationsIcon />
-      )}
+      </Badge>
     </IconButton>
   );
 };
