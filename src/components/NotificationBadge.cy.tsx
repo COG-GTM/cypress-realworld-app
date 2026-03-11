@@ -2,14 +2,15 @@ import { MemoryRouter } from "react-router-dom";
 import NotificationBadge from "./NotificationBadge";
 
 describe("NotificationBadge", () => {
-  it("hides when notification count is zero", () => {
+  it("shows the bell icon but hides the badge count when notification count is zero", () => {
     cy.mount(
       <MemoryRouter>
         <NotificationBadge notificationCount={0} />
       </MemoryRouter>
     );
-    cy.get("[data-test=nav-top-notifications-link]").should("not.exist");
-    cy.get("[data-test=nav-top-notifications-count]").should("not.exist");
+    cy.get("[data-test=nav-top-notifications-link]").should("exist");
+    cy.get("[data-test=nav-top-notifications-count]").should("exist");
+    cy.get(".MuiBadge-badge").should("not.be.visible");
   });
 
   it("displays the correct count for a single notification", () => {

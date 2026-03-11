@@ -22,10 +22,6 @@ export interface NotificationBadgeProps {
 }
 
 const NotificationBadge: React.FC<NotificationBadgeProps> = ({ notificationCount }) => {
-  if (notificationCount === 0) {
-    return null;
-  }
-
   return (
     <StyledIconButton
       color="inherit"
@@ -35,7 +31,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({ notificationCount
       size="large"
     >
       <Badge
-        badgeContent={notificationCount}
+        badgeContent={notificationCount > 0 ? notificationCount : undefined}
         data-test="nav-top-notifications-count"
         classes={{ badge: classes.customBadge }}
       >
