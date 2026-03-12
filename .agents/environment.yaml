@@ -1,0 +1,26 @@
+initialize: |
+  npm install yarn@latest -g
+  yarn install
+maintenance: |
+  yarn install
+  yarn db:seed:dev
+knowledge:
+  - name: lint
+    contents: |
+      yarn lint
+  - name: test
+    contents: |
+      # Unit tests
+      yarn test:unit:ci
+      # Type checking
+      yarn types
+  - name: startup
+    contents: |
+      # Start dev server (frontend on :3000, backend API on :3001)
+      yarn dev
+  - name: notes
+    contents: |
+      # Node.js ^20.0.0 || ^22.0.0 required, Yarn Classic (v1) only
+      # List dev users: yarn list:dev:users
+      # Database is reseeded on every `yarn dev` start
+      # Seed DB manually: yarn db:seed
