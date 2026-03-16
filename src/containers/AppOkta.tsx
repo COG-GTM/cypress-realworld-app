@@ -4,8 +4,8 @@ import { styled } from "@mui/material/styles";
 import { useActor, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
 // @ts-ignore
-import { LoginCallback, SecureRoute, useOktaAuth, withOktaAuth } from "@okta/okta-react";
-import { Route, Routes } from "react-router-dom";
+import { LoginCallback, useOktaAuth, withOktaAuth } from "@okta/okta-react";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
 import { notificationsMachine } from "../machines/notificationsMachine";
@@ -84,7 +84,7 @@ const AppOkta: React.FC = () => {
       {authState.matches("unauthorized") && (
         <Routes>
           <Route path="/implicit/callback" element={<LoginCallback />} />
-          <Route path="/" element={<SecureRoute />} />
+          <Route path="*" element={<Navigate to="/implicit/callback" replace />} />
         </Routes>
       )}
 
