@@ -1,9 +1,9 @@
 import React from "react";
 import { Tabs, Tab } from "@mui/material";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function TransactionNavTabs() {
-  const match = useRouteMatch();
+  const location = useLocation();
 
   // Route Lookup for tabs
   const navUrls: any = {
@@ -13,17 +13,12 @@ export default function TransactionNavTabs() {
     "/personal": 2,
   };
 
-  // Set selected tab based on url
-  const [value, setValue] = React.useState(navUrls[match.url]);
-
-  const handleChange = (event: React.SyntheticEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
+  // Derive selected tab directly from current URL
+  const value = navUrls[location.pathname] ?? 0;
 
   return (
     <Tabs
       value={value}
-      onChange={handleChange}
       indicatorColor="secondary"
       textColor="inherit"
       centered

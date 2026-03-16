@@ -1,6 +1,6 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { useMachine } from "@xstate/react";
-import { Switch, Route } from "react-router";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
 import TransactionListFilters from "../components/TransactionListFilters";
 import TransactionContactsList from "../components/TransactionContactsList";
@@ -10,6 +10,7 @@ import TransactionPersonalList from "../components/TransactionPersonalList";
 import TransactionPublicList from "../components/TransactionPublicList";
 
 const TransactionsContainer: React.FC = () => {
+  const location = useLocation();
   const [currentFilters, sendFilterEvent] = useMachine(transactionFiltersMachine);
 
   const hasDateRangeFilter = currentFilters.matches({ dateRange: "filter" });
@@ -28,31 +29,21 @@ const TransactionsContainer: React.FC = () => {
     />
   );
 
-  return (
-    <Switch>
-      <Route exact path="/contacts">
-        <TransactionContactsList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-      <Route exact path="/personal">
-        <TransactionPersonalList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-      <Route exact path="/(public)?">
-        <TransactionPublicList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-    </Switch>
-  );
+  const filterProps = {
+    filterComponent: Filters,
+    dateRangeFilters: dateRangeFilters as TransactionDateRangePayload,
+    amountRangeFilters: amountRangeFilters as TransactionAmountRangePayload,
+  };
+
+  if (location.pathname === "/contacts") {
+    return <TransactionContactsList {...filterProps} />;
+  }
+
+  if (location.pathname === "/personal") {
+    return <TransactionPersonalList {...filterProps} />;
+  }
+
+  return <TransactionPublicList {...filterProps} />;
 };
 
 export default TransactionsContainer;
