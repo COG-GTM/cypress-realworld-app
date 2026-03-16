@@ -1,4 +1,5 @@
 import React from "react";
+import { useLocation } from "react-router-dom";
 import { useMachine } from "@xstate/react";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
 import TransactionListFilters from "../components/TransactionListFilters";
@@ -8,11 +9,8 @@ import { getDateQueryFields, getAmountQueryFields } from "../utils/transactionUt
 import TransactionPersonalList from "../components/TransactionPersonalList";
 import TransactionPublicList from "../components/TransactionPublicList";
 
-export interface TransactionsContainerProps {
-  tab?: "public" | "contacts" | "personal";
-}
-
-const TransactionsContainer: React.FC<TransactionsContainerProps> = ({ tab = "public" }) => {
+const TransactionsContainer: React.FC = () => {
+  const location = useLocation();
   const [currentFilters, sendFilterEvent] = useMachine(transactionFiltersMachine);
 
   const hasDateRangeFilter = currentFilters.matches({ dateRange: "filter" });
@@ -37,11 +35,11 @@ const TransactionsContainer: React.FC<TransactionsContainerProps> = ({ tab = "pu
     amountRangeFilters: amountRangeFilters as TransactionAmountRangePayload,
   };
 
-  if (tab === "contacts") {
+  if (location.pathname === "/contacts") {
     return <TransactionContactsList {...filterProps} />;
   }
 
-  if (tab === "personal") {
+  if (location.pathname === "/personal") {
     return <TransactionPersonalList {...filterProps} />;
   }
 
