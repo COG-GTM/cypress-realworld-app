@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router } from "react-router-dom";
+import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import { createTheme, StyledEngineProvider } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import App from "./containers/App";
@@ -49,11 +49,11 @@ const theme = createTheme({
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <Router history={history}>
+  <HistoryRouter history={history}>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <App />
       </ThemeProvider>
     </StyledEngineProvider>
-  </Router>
+  </HistoryRouter>
 );

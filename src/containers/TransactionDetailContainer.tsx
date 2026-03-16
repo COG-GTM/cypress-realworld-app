@@ -11,12 +11,8 @@ import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 export interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
-interface Params {
-  transactionId: string;
-}
-
 const TransactionDetailsContainer: React.FC<Props> = ({ authService }) => {
-  const { transactionId }: Params = useParams();
+  const { transactionId } = useParams<{ transactionId: string }>();
   const [authState] = useActor(authService);
   const [transactionDetailState, sendTransactionDetail] = useMachine(transactionDetailMachine);
   useEffect(() => {
