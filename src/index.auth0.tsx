@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router } from "react-router-dom";
+import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import {
   createTheme,
   ThemeProvider,
@@ -24,7 +24,7 @@ const theme = createTheme(
 
 /* istanbul ignore next */
 const onRedirectCallback = (appState: any) => {
-  history.replace((appState && appState.returnTo) || window.location.pathname);
+  history.push((appState && appState.returnTo) || window.location.pathname);
 };
 
 const root = createRoot(document.getElementById("root")!);
@@ -41,13 +41,13 @@ if (process.env.VITE_AUTH0) {
       onRedirectCallback={onRedirectCallback}
       cacheLocation="localstorage"
     >
-      <Router history={history}>
+      <HistoryRouter history={history}>
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
             <AppAuth0 />
           </ThemeProvider>
         </StyledEngineProvider>
-      </Router>
+      </HistoryRouter>
     </Auth0Provider>
   );
 } else {
