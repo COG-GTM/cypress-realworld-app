@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "2.2.4",
-    "@babel/core": "7.23.9",
+    "@babel/core": "^7.28.0",
     "@babel/plugin-syntax-flow": "^7.14.5",
     "@babel/plugin-transform-react-jsx": "^7.14.9",
     "@emotion/react": "^11.11.4",
@@ -33,14 +33,15 @@
     "axios": "0.28.1",
     "clsx": "1.2.1",
     "date-fns": "4.1.0",
+    "date-fns-tz": "^3.2.0",
     "detect-port": "^1.5.1",
     "dinero.js": "1.9.1",
     "formik": "2.4.6",
     "history": "^5.3.0",
     "postinstall-postinstall": "^2.1.0",
     "react": "18.2.0",
+    "react-calendar": "^6.0.0",
     "react-dom": "18.2.0",
-    "react-infinite-calendar": "2.3.1",
     "react-number-format": "4.9.4",
     "react-router": "^6.23.0",
     "react-router-dom": "^6.23.0",
@@ -53,11 +54,13 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
-    "@cypress/code-coverage": "^3.10.0-dev.1",
+    "@babel/preset-env": "^7.28.0",
+    "@cypress/code-coverage": "^3.14.5",
     "@cypress/instrument-cra": "1.4.0",
+    "@eslint/js": "^9.38.0",
     "@faker-js/faker": "6.1.2",
     "@percy/cli": "^1.27.4",
-    "@percy/cypress": "3.1.2",
+    "@percy/cypress": "3.1.6",
     "@playwright/test": "^1.56.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
@@ -90,20 +93,18 @@
     "@types/validator": "13.7.2",
     "@types/webpack-env": "1.16.4",
     "@types/yup": "0.29.13",
-    "@vitejs/plugin-react": "^4.0.2",
+    "@vitejs/plugin-react": "^5.0.1",
+    "babel-loader": "^10.0.0",
     "bcryptjs": "2.4.3",
     "chromedriver": "^142.0.1",
     "concurrently": "9.1.2",
     "connect-history-api-fallback": "1.6.0",
     "cors": "2.8.5",
     "cross-env": "7.0.3",
-    "cypress": "^14.3.2",
+    "cypress": "15.0.0",
     "dotenv": "16.0.0",
-    "eslint": "^8.44.0",
-    "eslint-config-prettier": "8.10.0",
-    "eslint-config-react-app": "^7.0.1",
-    "eslint-plugin-cypress": "3.5.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint": "^9.38.0",
+    "eslint-plugin-cypress": "^5.2.0",
     "express": "4.20.0",
     "express-jwt": "6.1.2",
     "express-paginate": "1.0.2",
@@ -134,10 +135,12 @@
     "start-server-and-test": "1.14.0",
     "ts-node": "10.9.2",
     "typescript": "5.8.3",
-    "vite": "^4.4.2",
+    "typescript-eslint": "^8.46.2",
+    "vite": "^7.1.3",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-istanbul": "^4.1.0",
-    "vitest": "^0.33.0"
+    "vitest": "^3.2.4",
+    "wait-on": "^8.0.3"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development concurrently yarn:start:react yarn:start:api:watch",
@@ -199,24 +202,7 @@
     "postinstall": "husky install && patch-package"
   },
   "engines": {
-    "node": "^18.0.0 || ^20.0.0 || ^22.0.0"
-  },
-  "eslintConfig": {
-    "env": {
-      "cypress/globals": true
-    },
-    "extends": [
-      "react-app",
-      "plugin:prettier/recommended",
-      "plugin:cypress/recommended"
-    ],
-    "plugins": [
-      "cypress",
-      "prettier"
-    ],
-    "rules": {
-      "no-unused-expressions": 0
-    }
+    "node": "^20.0.0 || ^22.0.0"
   },
   "husky": {
     "hooks": {
