@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router, withRouter } from "react-router-dom";
+import { unstable_HistoryRouter as HistoryRouter } from "react-router-dom";
 import {
   createTheme,
   ThemeProvider,
@@ -34,26 +34,20 @@ if (process.env.VITE_OKTA) {
     redirectUri: window.location.origin + "/implicit/callback",
   });
 
-  const AppWithRouter = withRouter(({ history }) => {
-    const restoreOriginalUri = (_oktaAuth, originalUri) =>
-      history.replace(toRelativeUrl(originalUri || "/", window.location.origin));
-
-    return (
-      <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
-        <AppOkta />
-      </Security>
-    );
-  });
+  const restoreOriginalUri = (_oktaAuth: any, originalUri: string) =>
+    history.replace(toRelativeUrl(originalUri || "/", window.location.origin));
 
   /* istanbul ignore next */
   root.render(
-    <Router history={history}>
+    <HistoryRouter history={history}>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
-          <AppWithRouter />
+          <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
+            <AppOkta />
+          </Security>
         </ThemeProvider>
       </StyledEngineProvider>
-    </Router>
+    </HistoryRouter>
   );
 } else {
   console.error("Okta is not configured.");
