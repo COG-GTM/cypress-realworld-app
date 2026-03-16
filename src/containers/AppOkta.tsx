@@ -5,7 +5,7 @@ import { useActor, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
 // @ts-ignore
 import { LoginCallback, useOktaAuth, withOktaAuth } from "@okta/okta-react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
 import { notificationsMachine } from "../machines/notificationsMachine";
@@ -32,6 +32,15 @@ if (window.Cypress) {
   // @ts-ignore
   window.authService = authService;
 }
+
+/* istanbul ignore next */
+const OktaSignInRedirect: React.FC = () => {
+  const { oktaAuth } = useOktaAuth();
+  useEffect(() => {
+    oktaAuth.signInWithRedirect();
+  }, [oktaAuth]);
+  return null;
+};
 
 /* istanbul ignore next */
 const AppOkta: React.FC = () => {
@@ -84,7 +93,7 @@ const AppOkta: React.FC = () => {
       {authState.matches("unauthorized") && (
         <Routes>
           <Route path="/implicit/callback" element={<LoginCallback />} />
-          <Route path="*" element={<Navigate to="/implicit/callback" replace />} />
+          <Route path="*" element={<OktaSignInRedirect />} />
         </Routes>
       )}
 
