@@ -13,17 +13,12 @@ export default function TransactionNavTabs() {
     "/personal": 2,
   };
 
-  // Set selected tab based on url
-  const [value, setValue] = React.useState(navUrls[location.pathname]);
-
-  const handleChange = (event: React.SyntheticEvent<{}>, newValue: number) => {
-    setValue(newValue);
-  };
+  // Derive selected tab directly from current URL
+  const value = navUrls[location.pathname] ?? 0;
 
   return (
     <Tabs
       value={value}
-      onChange={handleChange}
       indicatorColor="secondary"
       textColor="inherit"
       centered
