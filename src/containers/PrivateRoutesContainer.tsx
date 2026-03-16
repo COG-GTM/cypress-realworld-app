@@ -71,7 +71,7 @@ const PrivateRoutesContainer: React.FC<Props> = ({
           path="/"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              <TransactionsContainer />
+              <TransactionsContainer tab="public" />
             </PrivateRoute>
           }
         />
@@ -79,7 +79,7 @@ const PrivateRoutesContainer: React.FC<Props> = ({
           path="/public"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              <TransactionsContainer />
+              <TransactionsContainer tab="public" />
             </PrivateRoute>
           }
         />
@@ -87,7 +87,7 @@ const PrivateRoutesContainer: React.FC<Props> = ({
           path="/contacts"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              <TransactionsContainer />
+              <TransactionsContainer tab="contacts" />
             </PrivateRoute>
           }
         />
@@ -95,7 +95,7 @@ const PrivateRoutesContainer: React.FC<Props> = ({
           path="/personal"
           element={
             <PrivateRoute isLoggedIn={isLoggedIn}>
-              <TransactionsContainer />
+              <TransactionsContainer tab="personal" />
             </PrivateRoute>
           }
         />
