@@ -22,7 +22,21 @@ import {
   isTransactionPublicQSValidator,
 } from "./validators";
 import { getPaginatedItems } from "../src/utils/transactionUtils";
+import { Response } from "express";
 const router = express.Router();
+
+const buildPaginatedResponse = (res: Response, totalPages: number, paginatedItems: unknown[]) => {
+  res.status(200);
+  res.json({
+    pageData: {
+      page: res.locals.paginate.page,
+      limit: res.locals.paginate.limit,
+      hasNextPages: res.locals.paginate.hasNextPages(totalPages),
+      totalPages,
+    },
+    results: paginatedItems,
+  });
+};
 
 // Routes
 
@@ -45,16 +59,7 @@ router.get(
       transactions
     );
 
-    res.status(200);
-    res.json({
-      pageData: {
-        page: res.locals.paginate.page,
-        limit: res.locals.paginate.limit,
-        hasNextPages: res.locals.paginate.hasNextPages(totalPages),
-        totalPages,
-      },
-      results: paginatedItems,
-    });
+    buildPaginatedResponse(res, totalPages, paginatedItems);
   }
 );
 
@@ -77,16 +82,7 @@ router.get(
       transactions
     );
 
-    res.status(200);
-    res.json({
-      pageData: {
-        page: res.locals.paginate.page,
-        limit: res.locals.paginate.limit,
-        hasNextPages: res.locals.paginate.hasNextPages(totalPages),
-        totalPages,
-      },
-      results: paginatedItems,
-    });
+    buildPaginatedResponse(res, totalPages, paginatedItems);
   }
 );
 
@@ -120,16 +116,7 @@ router.get(
       isFirstPage ? publicTransactionsWithContacts : publicTransactions
     );
 
-    res.status(200);
-    res.json({
-      pageData: {
-        page: res.locals.paginate.page,
-        limit: res.locals.paginate.limit,
-        hasNextPages: res.locals.paginate.hasNextPages(totalPages),
-        totalPages,
-      },
-      results: paginatedItems,
-    });
+    buildPaginatedResponse(res, totalPages, paginatedItems);
   }
 );
 
