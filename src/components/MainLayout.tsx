@@ -34,7 +34,7 @@ const Root = styled("div")(({ theme }) => ({
   },
 
   [`& .${classes.appBarSpacer}`]: {
-    minHeight: theme.spacing(17),
+    minHeight: theme.spacing(19),
     [theme.breakpoints.up("sm")]: {
       minHeight: theme.spacing(20),
     },
