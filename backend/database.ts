@@ -521,6 +521,47 @@ export const savePayAppBalance = curry((sender: User, balance: number) =>
   updateUserById(get("id", sender), { balance })
 );
 
+const buildTransactionRecord = (
+  userId: User["id"],
+  transactionType: "payment" | "request",
+  transactionDetails: TransactionPayload,
+  senderPrivacyLevel: DefaultPrivacyLevel
+): Transaction => ({
+  id: shortid(),
+  uuid: v4(),
+  source: transactionDetails.source,
+  amount: transactionDetails.amount * 100,
+  description: transactionDetails.description,
+  receiverId: transactionDetails.receiverId,
+  senderId: userId,
+  privacyLevel: transactionDetails.privacyLevel || senderPrivacyLevel,
+  status: TransactionStatus.pending,
+  requestStatus: transactionType === "request" ? TransactionRequestStatus.pending : undefined,
+  createdAt: new Date(),
+  modifiedAt: new Date(),
+});
+
+const processPaymentTransaction = (sender: User, receiver: User, transaction: Transaction) => {
+  debitPayAppBalance(sender, transaction);
+  creditPayAppBalance(receiver, transaction);
+  updateTransactionById(transaction.id, {
+    status: TransactionStatus.complete,
+  });
+  createPaymentNotification(
+    transaction.receiverId,
+    transaction.id,
+    PaymentNotificationStatus.received
+  );
+};
+
+const processRequestTransaction = (transaction: Transaction) => {
+  createPaymentNotification(
+    transaction.receiverId,
+    transaction.id,
+    PaymentNotificationStatus.requested
+  );
+};
+
 export const createTransaction = (
   userId: User["id"],
   transactionType: "payment" | "request",
@@ -528,41 +569,19 @@ export const createTransaction = (
 ): Transaction => {
   const sender = getUserById(userId);
   const receiver = getUserById(transactionDetails.receiverId);
-  const transaction: Transaction = {
-    id: shortid(),
-    uuid: v4(),
-    source: transactionDetails.source,
-    amount: transactionDetails.amount * 100,
-    description: transactionDetails.description,
-    receiverId: transactionDetails.receiverId,
-    senderId: userId,
-    privacyLevel: transactionDetails.privacyLevel || sender.defaultPrivacyLevel,
-    status: TransactionStatus.pending,
-    requestStatus: transactionType === "request" ? TransactionRequestStatus.pending : undefined,
-    createdAt: new Date(),
-    modifiedAt: new Date(),
-  };
+  const transaction = buildTransactionRecord(
+    userId,
+    transactionType,
+    transactionDetails,
+    sender.defaultPrivacyLevel
+  );
 
   const savedTransaction = saveTransaction(transaction);
 
-  // if payment, debit sender's balance for payment amount
   if (isPayment(transaction)) {
-    debitPayAppBalance(sender, transaction);
-    creditPayAppBalance(receiver, transaction);
-    updateTransactionById(transaction.id, {
-      status: TransactionStatus.complete,
-    });
-    createPaymentNotification(
-      transaction.receiverId,
-      transaction.id,
-      PaymentNotificationStatus.received
-    );
+    processPaymentTransaction(sender, receiver, transaction);
   } else {
-    createPaymentNotification(
-      transaction.receiverId,
-      transaction.id,
-      PaymentNotificationStatus.requested
-    );
+    processRequestTransaction(transaction);
   }
 
   return savedTransaction;
