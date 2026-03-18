@@ -10,6 +10,7 @@ import {
   Paper,
   Badge,
   Theme,
+  Box,
 } from "@mui/material";
 import { ThumbUpAltOutlined as LikeIcon, CommentRounded as CommentIcon } from "@mui/icons-material";
 import { TransactionResponseItem } from "../models";
@@ -33,9 +34,18 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
   },
 
   [`& .${classes.paper}`]: {
-    padding: theme.spacing(0),
+    padding: theme.spacing(2),
     margin: "auto",
     width: "100%",
+    borderRadius: 16,
+    border: "1px solid #EBEBEB",
+    backgroundColor: "#ffffff",
+    cursor: "pointer",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
+      transform: "translateY(-2px)",
+    },
   },
 
   [`& .${classes.avatar}`]: {
@@ -49,15 +59,21 @@ const StyledListItem = styled(ListItem)(({ theme }) => ({
   },
 
   [`& .${classes.countIcons}`]: {
-    color: theme.palette.grey[400],
+    color: "#717171",
+    fontSize: 18,
   },
 
   [`& .${classes.countText}`]: {
-    color: theme.palette.grey[400],
+    color: "#717171",
     marginTop: 2,
     height: theme.spacing(2),
     width: theme.spacing(2),
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 600,
+    fontSize: 13,
   },
+
+  padding: "6px 0",
 }));
 
 type TransactionProps = {
@@ -66,9 +82,10 @@ type TransactionProps = {
 
 const SmallAvatar = styled(Avatar)(({ theme }: { theme: Theme }) => {
   return {
-    width: 22,
-    height: 22,
-    border: `2px solid ${theme.palette.background.paper}`,
+    width: 24,
+    height: 24,
+    border: `2px solid #ffffff`,
+    boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
   };
 });
 
@@ -104,7 +121,14 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
                   />
                 }
               >
-                <Avatar src={transaction.senderAvatar} />
+                <Avatar
+                  src={transaction.senderAvatar}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                    border: "2px solid #F7F7F7",
+                  }}
+                />
               </Badge>
             </ListItemAvatar>
           </Grid>
@@ -112,7 +136,15 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
             <Grid item xs container direction="column" spacing={2}>
               <Grid item xs>
                 <TransactionTitle transaction={transaction} />
-                <Typography variant="body2" color="textSecondary" gutterBottom>
+                <Typography
+                  variant="body2"
+                  gutterBottom
+                  sx={{
+                    color: "#717171",
+                    fontFamily: "'Nunito', sans-serif",
+                    fontSize: 13,
+                  }}
+                >
                   {transaction.description}
                 </Typography>
                 <Grid

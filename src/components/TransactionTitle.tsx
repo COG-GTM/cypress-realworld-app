@@ -14,25 +14,32 @@ const classes = {
 
 const StyledTypography = styled(Typography)(({ theme }) => ({
   [`&.${classes.title}`]: {
-    fontSize: 18,
+    fontSize: 15,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 600,
     [theme.breakpoints.down("md")]: {
       fontSize: theme.typography.fontSize,
     },
   },
 
   [`& .${classes.titleAction}`]: {
-    fontSize: 18,
+    fontSize: 15,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 500,
+    color: "#717171",
     [theme.breakpoints.down("md")]: {
       fontSize: theme.typography.fontSize,
     },
   },
 
   [`& .${classes.titleName}`]: {
-    fontSize: 18,
+    fontSize: 15,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 700,
     [theme.breakpoints.down("md")]: {
       fontSize: theme.typography.fontSize,
     },
-    color: "#1A202C",
+    color: "#222222",
   },
 }));
 

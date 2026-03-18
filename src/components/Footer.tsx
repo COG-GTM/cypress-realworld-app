@@ -1,30 +1,42 @@
 import React from "react";
-import { Container, Typography } from "@mui/material";
-
-import CypressLogo from "../components/SvgCypressLogo";
+import { Container, Typography, Box } from "@mui/material";
 
 export default function Footer() {
   return (
     <Container maxWidth="sm" style={{ marginTop: 50 }}>
-      <Typography variant="body2" color="textSecondary" align="center">
-        Built by
-        <a
-          style={{ textDecoration: "none" }}
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://cypress.io"
+      <Box
+        sx={{
+          borderTop: "1px solid #EBEBEB",
+          paddingTop: 3,
+          paddingBottom: 3,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="body2"
+          align="center"
+          sx={{
+            fontFamily: "'Nunito', sans-serif",
+            color: "#717171",
+            fontSize: 13,
+            fontWeight: 500,
+          }}
         >
-          <CypressLogo
+          Built with care by{" "}
+          <a
             style={{
-              marginTop: -2,
-              marginLeft: 5,
-              height: "20px",
-              width: "55px",
-              verticalAlign: "middle",
+              textDecoration: "none",
+              color: "#FF385C",
+              fontWeight: 700,
             }}
-          />
-        </a>
-      </Typography>
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://cypress.io"
+          >
+            Cypress
+          </a>
+        </Typography>
+      </Box>
     </Container>
   );
 }

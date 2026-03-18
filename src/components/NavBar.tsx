@@ -29,8 +29,6 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 
 import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
 import TransactionNavTabs from "./TransactionNavTabs";
-import RWALogo from "./SvgRwaLogo";
-import RWALogoIcon from "./SvgRwaIconLogo";
 
 const drawerWidth = 240;
 
@@ -49,10 +47,18 @@ const classes = {
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   [`& .${classes.toolbar}`]: {
-    paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24,
+    paddingLeft: 16,
+    minHeight: 80,
+    display: "flex",
+    alignItems: "center",
   },
 
   [`&.${classes.appBar}`]: {
+    backgroundColor: "#ffffff",
+    color: "#222222",
+    boxShadow: "none",
+    borderBottom: "1px solid #EBEBEB",
     transition: theme.transitions.create(["width", "margin"], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -78,27 +84,35 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
   },
 
   [`& .${classes.logo}`]: {
-    color: "white",
+    color: "#FF385C",
     verticalAlign: "bottom",
   },
 
   [`& .${classes.newTransactionButton}`]: {
-    fontSize: 16,
-    backgroundColor: "#00C853",
-    paddingTop: 5,
-    paddingBottom: 5,
-    paddingRight: 20,
-    fontWeight: "bold",
+    fontSize: 14,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 700,
+    backgroundColor: "#FF385C",
+    color: "#ffffff",
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingLeft: 24,
+    paddingRight: 24,
+    borderRadius: 24,
+    textTransform: "none",
+    letterSpacing: 0,
+    boxShadow: "none",
     "&:hover": {
-      backgroundColor: "#4CAF50",
-      borderColor: "#00C853",
-      boxShadow: "none",
+      backgroundColor: "#E31C5F",
+      boxShadow: "0 2px 8px rgba(255, 56, 92, 0.3)",
     },
   },
 
   [`& .${classes.customBadge}`]: {
-    backgroundColor: "red",
+    backgroundColor: "#FF385C",
     color: "white",
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 700,
   },
 }));
 
@@ -132,50 +146,76 @@ const NavBar: React.FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notifications
         <IconButton
           data-test="sidenav-toggle"
           edge="start"
-          color="inherit"
           aria-label="open drawer"
           onClick={() => toggleDrawer()}
           size="large"
+          sx={{
+            color: "#222222",
+            marginRight: 1,
+            borderRadius: "50%",
+            "&:hover": { backgroundColor: "#F7F7F7" },
+          }}
         >
           <MenuIcon data-test="drawer-icon" />
         </IconButton>
         <Typography
           component="h1"
           variant="h6"
-          color="inherit"
           noWrap
           className={classes.title}
           data-test="app-name-logo"
+          sx={{ fontFamily: "'Nunito', sans-serif", fontWeight: 800 }}
         >
           <Link
             to="/"
-            style={{ color: "#fff", textDecoration: "none" }}
+            style={{ color: "#FF385C", textDecoration: "none" }}
             component={RouterLink}
             underline="hover"
           >
             {xsBreakpoint ? (
-              <RWALogoIcon className={classes.logo} />
+              <span
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: 800,
+                  fontFamily: "'Nunito', sans-serif",
+                }}
+              >
+                RWA
+              </span>
             ) : (
-              <RWALogo className={classes.logo} />
+              <span
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: 800,
+                  fontFamily: "'Nunito', sans-serif",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Real World App
+              </span>
             )}
           </Link>
         </Typography>
         <Button
           className={classes.newTransactionButton}
           variant="contained"
-          color="inherit"
           component={RouterLink}
           to="/transaction/new"
           data-test="nav-top-new-transaction"
+          disableElevation
         >
-          <AttachMoneyIcon /> New
+          <AttachMoneyIcon sx={{ fontSize: 18, marginRight: 0.5 }} /> New
         </Button>
         <IconButton
-          color="inherit"
           component={RouterLink}
           to="/notifications"
           data-test="nav-top-notifications-link"
           size="large"
+          sx={{
+            color: "#222222",
+            marginLeft: 1,
+            "&:hover": { backgroundColor: "#F7F7F7" },
+          }}
         >
           <Badge
             badgeContent={allNotifications ? allNotifications.length : undefined}

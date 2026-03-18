@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { styled } from "@mui/material/styles";
-import { Paper, Button, ListSubheader, Grid } from "@mui/material";
+import { Paper, Button, ListSubheader, Grid, Box } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { isEmpty } from "lodash/fp";
 
@@ -19,6 +19,9 @@ const classes = {
 const StyledPaper = styled(Paper)(({ theme }) => ({
   [`&.${classes.paper}`]: {
     paddingLeft: theme.spacing(1),
+    paddingRight: theme.spacing(1),
+    backgroundColor: "transparent",
+    boxShadow: "none",
   },
 }));
 
@@ -45,9 +48,23 @@ const TransactionList: React.FC<TransactionListProps> = ({
   const showSkeleton = isLoading && isEmpty(pagination);
 
   return (
-    <StyledPaper className={classes.paper}>
+    <StyledPaper className={classes.paper} elevation={0}>
       {filterComponent}
-      <ListSubheader component="div">{header}</ListSubheader>
+      <ListSubheader
+        component="div"
+        sx={{
+          fontFamily: "'Nunito', sans-serif",
+          fontWeight: 800,
+          fontSize: 22,
+          color: "#222222",
+          backgroundColor: "transparent",
+          lineHeight: "48px",
+          paddingBottom: 1,
+          letterSpacing: "-0.2px",
+        }}
+      >
+        {header}
+      </ListSubheader>
       {showSkeleton && <SkeletonList />}
       {transactions.length > 0 && (
         <TransactionInfiniteList
@@ -74,9 +91,22 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 <Button
                   data-test="transaction-list-empty-create-transaction-button"
                   variant="contained"
-                  color="primary"
                   component={RouterLink}
                   to="/transaction/new"
+                  disableElevation
+                  sx={{
+                    backgroundColor: "#FF385C",
+                    color: "#ffffff",
+                    borderRadius: 6,
+                    fontFamily: "'Nunito', sans-serif",
+                    fontWeight: 700,
+                    textTransform: "none",
+                    padding: "10px 24px",
+                    fontSize: 14,
+                    "&:hover": {
+                      backgroundColor: "#E31C5F",
+                    },
+                  }}
                 >
                   Create A Transaction
                 </Button>

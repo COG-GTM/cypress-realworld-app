@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Paper, Grid } from "@mui/material";
+import { Paper, Grid, Box } from "@mui/material";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
 import TransactionListDateRangeFilter from "./TransactionDateRangeFilter";
 import TransactionListAmountRangeFilter from "./TransactionListAmountRangeFilter";
@@ -18,6 +18,38 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     display: "flex",
     overflow: "auto",
     flexDirection: "column",
+    backgroundColor: "transparent",
+    boxShadow: "none",
+    "& .MuiChip-root": {
+      borderRadius: 24,
+      fontFamily: "'Nunito', sans-serif",
+      fontWeight: 600,
+      fontSize: 13,
+      border: "1px solid #DDDDDD",
+      backgroundColor: "#ffffff",
+      color: "#222222",
+      padding: "4px 8px",
+      height: 36,
+      transition: "all 0.2s ease",
+      "&:hover": {
+        backgroundColor: "#F7F7F7",
+        borderColor: "#222222",
+      },
+    },
+    "& .MuiButton-root": {
+      borderRadius: 24,
+      fontFamily: "'Nunito', sans-serif",
+      fontWeight: 600,
+      fontSize: 13,
+      textTransform: "none",
+      border: "1px solid #DDDDDD",
+      color: "#222222",
+      padding: "6px 16px",
+      "&:hover": {
+        backgroundColor: "#F7F7F7",
+        borderColor: "#222222",
+      },
+    },
   },
 }));
 
