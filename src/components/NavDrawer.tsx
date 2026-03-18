@@ -16,6 +16,7 @@ import {
   Grid,
   Avatar,
   Typography,
+  Box,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import {
@@ -47,7 +48,7 @@ const classes = {
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   [`& .${classes.toolbar}`]: {
-    paddingRight: 24, // keep right padding when drawer closed
+    paddingRight: 24,
   },
 
   [`& .${classes.toolbarIcon}`]: {
@@ -62,6 +63,8 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
     position: "relative",
     whiteSpace: "nowrap",
     width: drawerWidth,
+    backgroundColor: "#ffffff",
+    borderRight: "1px solid #EBEBEB",
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
@@ -82,7 +85,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   },
 
   [`& .${classes.userProfile}`]: {
-    padding: theme.spacing(2),
+    padding: theme.spacing(2.5),
   },
 
   [`& .${classes.userProfileHidden}`]: {
@@ -91,6 +94,9 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 
   [`& .${classes.avatar}`]: {
     marginRight: theme.spacing(2),
+    width: 48,
+    height: 48,
+    border: "2px solid #FF385C",
   },
 
   [`& .${classes.accountBalance}`]: {
@@ -98,7 +104,9 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
   },
 
   [`& .${classes.amount}`]: {
-    fontWeight: "bold",
+    fontWeight: 800,
+    fontFamily: "'Nunito', sans-serif",
+    color: "#222222",
   },
 
   [`& .${classes.accountBalanceHidden}`]: {
@@ -107,6 +115,28 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 
   [`& .${classes.cypressLogo}`]: {
     width: "40%",
+  },
+
+  "& .MuiListItem-root": {
+    borderRadius: 12,
+    margin: "2px 8px",
+    width: "auto",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      backgroundColor: "#F7F7F7",
+    },
+  },
+
+  "& .MuiListItemIcon-root": {
+    color: "#717171",
+    minWidth: 40,
+  },
+
+  "& .MuiListItemText-primary": {
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 600,
+    fontSize: 14,
+    color: "#222222",
   },
 }));
 
@@ -237,16 +267,25 @@ const NavDrawer: React.FC<Props> = ({
             <>
               <Typography
                 variant="subtitle1"
-                color="textPrimary"
                 data-test="sidenav-user-full-name"
+                sx={{
+                  fontFamily: "'Nunito', sans-serif",
+                  fontWeight: 700,
+                  color: "#222222",
+                  fontSize: 15,
+                }}
               >
                 {currentUser.firstName} {head(currentUser.lastName)}
               </Typography>
               <Typography
                 variant="subtitle2"
-                color="inherit"
                 gutterBottom
                 data-test="sidenav-username"
+                sx={{
+                  fontFamily: "'Nunito', sans-serif",
+                  color: "#717171",
+                  fontSize: 13,
+                }}
               >
                 @{currentUser.username}
               </Typography>
@@ -264,29 +303,45 @@ const NavDrawer: React.FC<Props> = ({
       >
         <Grid item>
           {currentUser && (
-            <>
+            <Box
+              sx={{
+                background: "linear-gradient(135deg, #FF385C 0%, #E31C5F 100%)",
+                borderRadius: 3,
+                padding: "12px 20px",
+                marginBottom: 1,
+              }}
+            >
               <Typography
                 variant="h6"
-                color="textPrimary"
                 className={classes.amount}
                 data-test="sidenav-user-balance"
+                sx={{ color: "#ffffff !important", fontSize: 20 }}
               >
                 {currentUser.balance ? formatAmount(currentUser.balance) : formatAmount(0)}
               </Typography>
-              <Typography variant="subtitle2" color="inherit" gutterBottom>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{
+                  fontFamily: "'Nunito', sans-serif",
+                  color: "rgba(255,255,255,0.85)",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
                 Account Balance
               </Typography>
-            </>
+            </Box>
           )}
         </Grid>
         <Grid item>
-          <Divider />
+          <Divider sx={{ borderColor: "#EBEBEB" }} />
         </Grid>
         <Grid item>
           <List>{mainListItems(toggleDrawer, showTemporaryDrawer)}</List>
         </Grid>
         <Grid item>
-          <Divider />
+          <Divider sx={{ borderColor: "#EBEBEB" }} />
         </Grid>
         <Grid item>
           <List>{secondaryListItems(signOut)}</List>

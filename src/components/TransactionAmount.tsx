@@ -13,19 +13,29 @@ const classes = {
 
 const StyledTypography = styled(Typography)(({ theme }) => ({
   [`&.${classes.amountPositive}`]: {
-    fontSize: 24,
+    fontSize: 18,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 800,
     [theme.breakpoints.down("md")]: {
       fontSize: theme.typography.body1.fontSize,
     },
-    color: "#4CAF50",
+    color: "#008A05",
+    backgroundColor: "rgba(0, 138, 5, 0.08)",
+    padding: "4px 12px",
+    borderRadius: 20,
   },
 
   [`&.${classes.amountNegative}`]: {
-    fontSize: 24,
+    fontSize: 18,
+    fontFamily: "'Nunito', sans-serif",
+    fontWeight: 800,
     [theme.breakpoints.down("md")]: {
       fontSize: theme.typography.body1.fontSize,
     },
-    color: "red",
+    color: "#C13515",
+    backgroundColor: "rgba(193, 53, 21, 0.08)",
+    padding: "4px 12px",
+    borderRadius: 20,
   },
 })) as typeof Typography;
 

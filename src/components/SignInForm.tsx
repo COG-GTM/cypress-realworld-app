@@ -17,7 +17,6 @@ import {
 import { Formik, Form, Field, FieldProps } from "formik";
 import { string, object } from "yup";
 
-import RWALogo from "./SvgRwaLogo";
 import Footer from "./Footer";
 import { SignInPayload } from "../models";
 import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
@@ -49,11 +48,11 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   },
 
   [`& .${classes.logo}`]: {
-    color: theme.palette.primary.main,
+    color: "#FF385C",
   },
 
   [`& .${classes.form}`]: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
 
@@ -63,6 +62,27 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 
   [`& .${classes.alertMessage}`]: {
     marginBottom: theme.spacing(2),
+    borderRadius: 12,
+  },
+
+  "& .MuiTextField-root": {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 12,
+      fontFamily: "'Nunito', sans-serif",
+      "&:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#222222",
+      },
+      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#222222",
+        borderWidth: 2,
+      },
+    },
+    "& .MuiInputLabel-root": {
+      fontFamily: "'Nunito', sans-serif",
+      "&.Mui-focused": {
+        color: "#222222",
+      },
+    },
   },
 })) as typeof Container;
 
@@ -90,9 +110,29 @@ const SignInForm: React.FC<Props> = ({ authService }) => {
           </Alert>
         )}
         <div>
-          <RWALogo className={classes.logo} />
+          <Typography
+            component="span"
+            sx={{
+              fontFamily: "'Nunito', sans-serif",
+              fontWeight: 800,
+              fontSize: 32,
+              color: "#FF385C",
+              letterSpacing: "-0.5px",
+            }}
+          >
+            Real World App
+          </Typography>
         </div>
-        <Typography component="h1" variant="h5">
+        <Typography
+          component="h1"
+          variant="h5"
+          sx={{
+            fontFamily: "'Nunito', sans-serif",
+            fontWeight: 700,
+            color: "#222222",
+            marginTop: 1,
+          }}
+        >
           Sign in
         </Typography>
         <Formik
@@ -143,20 +183,52 @@ const SignInForm: React.FC<Props> = ({ authService }) => {
                 control={
                   <Field name={"remember"}>
                     {({ field }: FieldProps) => {
-                      return <Checkbox color="primary" data-test="signin-remember-me" {...field} />;
+                      return (
+                        <Checkbox
+                          data-test="signin-remember-me"
+                          {...field}
+                          sx={{
+                            color: "#717171",
+                            "&.Mui-checked": { color: "#FF385C" },
+                          }}
+                        />
+                      );
                     }}
                   </Field>
                 }
-                label="Remember me"
+                label={
+                  <Typography
+                    sx={{ fontFamily: "'Nunito', sans-serif", fontSize: 14, color: "#222222" }}
+                  >
+                    Remember me
+                  </Typography>
+                }
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
                 className={classes.submit}
                 data-test="signin-submit"
                 disabled={!isValid || isSubmitting}
+                disableElevation
+                sx={{
+                  backgroundColor: "#FF385C",
+                  color: "#ffffff",
+                  borderRadius: 3,
+                  fontFamily: "'Nunito', sans-serif",
+                  fontWeight: 700,
+                  textTransform: "none",
+                  padding: "12px 24px",
+                  fontSize: 16,
+                  "&:hover": {
+                    backgroundColor: "#E31C5F",
+                  },
+                  "&.Mui-disabled": {
+                    backgroundColor: "#FFB8C6",
+                    color: "#ffffff",
+                  },
+                }}
               >
                 Sign In
               </Button>
@@ -165,7 +237,16 @@ const SignInForm: React.FC<Props> = ({ authService }) => {
                   {/*<Link to="/forgotpassword">Forgot password?</Link>*/}
                 </Grid>
                 <Grid item>
-                  <Link data-test="signup" to="/signup">
+                  <Link
+                    data-test="signup"
+                    to="/signup"
+                    style={{
+                      fontFamily: "'Nunito', sans-serif",
+                      color: "#FF385C",
+                      fontWeight: 600,
+                      textDecoration: "underline",
+                    }}
+                  >
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

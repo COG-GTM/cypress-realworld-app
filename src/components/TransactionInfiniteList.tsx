@@ -58,7 +58,6 @@ const TransactionInfiniteList: React.FC<TransactionListProps> = ({
       return (
         <div key={key} style={style}>
           <TransactionItem transaction={transaction} />
-          <Divider variant={isMobile ? "fullWidth" : "inset"} />
         </div>
       );
     }
@@ -81,7 +80,7 @@ const TransactionInfiniteList: React.FC<TransactionListProps> = ({
             onRowsRendered={onRowsRendered}
             height={isXsBreakpoint ? removePx(theme.spacing(74)) : removePx(theme.spacing(88))}
             width={isXsBreakpoint ? removePx(theme.spacing(38)) : removePx(theme.spacing(90))}
-            rowHeight={isXsBreakpoint ? removePx(theme.spacing(28)) : removePx(theme.spacing(16))}
+            rowHeight={isXsBreakpoint ? removePx(theme.spacing(28)) : removePx(theme.spacing(18))}
             rowRenderer={rowRenderer}
           />
         </div>

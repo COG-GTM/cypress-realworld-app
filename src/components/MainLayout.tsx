@@ -34,9 +34,9 @@ const Root = styled("div")(({ theme }) => ({
   },
 
   [`& .${classes.appBarSpacer}`]: {
-    minHeight: theme.spacing(13),
+    minHeight: theme.spacing(19),
     [theme.breakpoints.up("sm")]: {
-      minHeight: theme.spacing(14),
+      minHeight: theme.spacing(20),
     },
   },
 
@@ -44,12 +44,13 @@ const Root = styled("div")(({ theme }) => ({
     flexGrow: 1,
     height: "100vh",
     overflow: "auto",
+    backgroundColor: "#ffffff",
   },
 
   [`& .${classes.container}`]: {
     minHeight: "77vh",
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
     [theme.breakpoints.up("sm")]: {
       paddingTop: theme.spacing(4),
       padding: theme.spacing(4),
