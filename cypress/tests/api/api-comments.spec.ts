@@ -40,6 +40,17 @@ describe("Comments API", function () {
         expect(response.body.comments).to.be.an("array").that.has.length(1);
       });
     });
+
+    it("errors when getting comments with invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
   });
 
   context("POST /comments/:transactionId", function () {
@@ -49,6 +60,95 @@ describe("Comments API", function () {
         content: "This is my comment",
       }).then((response) => {
         expect(response.status).to.eq(200);
+      });
+    });
+
+    it("errors when creating comment with invalid transactionId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+        body: {
+          content: "This is my comment",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
+
+    it("errors when missing content", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
+
+    it("errors when content is not a string", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          content: 12345,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(1);
+      });
+    });
+
+    it("errors when invalid transactionId and missing content", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.eq(2);
+      });
+    });
+  });
+
+  context("unauthenticated", function () {
+    let transactionId: string;
+
+    beforeEach(function () {
+      cy.task("db:seed");
+
+      cy.database("find", "comments").then((comment: Comment) => {
+        transactionId = comment.transactionId;
+      });
+
+      cy.clearCookie("connect.sid");
+    });
+
+    it("is denied access to GET /comments/:transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    it("is denied access to POST /comments/:transactionId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          content: "test",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
       });
     });
   });
