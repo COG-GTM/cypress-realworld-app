@@ -125,6 +125,8 @@ describe("Comments API", function () {
       cy.database("find", "comments").then((comment: Comment) => {
         transactionId = comment.transactionId;
       });
+
+      cy.clearCookie("connect.sid");
     });
 
     it("is denied access to GET /comments/:transactionId", function () {
