@@ -41,7 +41,7 @@ describe("Comments API", function () {
       });
     });
 
-    it("errors when invalid transactionId", function () {
+    it("errors when getting comments with invalid transactionId", function () {
       cy.request({
         method: "GET",
         url: `${apiComments}/1234`,
@@ -63,7 +63,7 @@ describe("Comments API", function () {
       });
     });
 
-    it("errors when invalid transactionId", function () {
+    it("errors when creating comment with invalid transactionId", function () {
       cy.request({
         method: "POST",
         url: `${apiComments}/1234`,
