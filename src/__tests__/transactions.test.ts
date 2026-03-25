@@ -210,23 +210,29 @@ describe("Transactions", () => {
     expect(transaction.comments).toBeDefined();
   });
 
-  it.skip("should create a payment and withdrawal (bank transfer) for remaining balance", () => {
+  it("should create a payment and withdrawal (bank transfer) for remaining balance", () => {
     const sender: User = getAllUsers()[0];
     const receiver: User = getAllUsers()[1];
     const senderBankAccount = getBankAccountsByUserId(sender.id)[0];
-    const firstPaymentAmount = 1000;
-    const secondPaymentAmount = 500;
+
+    // Capture original balances before mutations (lowdb objects are mutable refs)
+    const originalSenderBalance = sender.balance;
+    const originalReceiverBalance = receiver.balance;
+
+    // createTransaction multiplies amount by 100 (converts to cents).
+    // To exceed sender's balance, we pass an amount that after *100 exceeds sender.balance (cents).
+    const firstPaymentPayloadAmount = Math.floor(originalSenderBalance / 100) + 10;
+    const secondPaymentPayloadAmount = 5;
 
     const receiverTransactions = getTransactionsByUserId(receiver.id);
     expect(receiverTransactions.length).toBeGreaterThan(1);
 
-    console.log("sender balance:", sender.balance + 1000);
     const paymentDetails: TransactionPayload = {
       source: senderBankAccount.id!,
       senderId: sender.id,
       receiverId: receiver.id,
       description: `Payment: ${sender.id} to ${receiver.id}`,
-      amount: sender.balance + firstPaymentAmount,
+      amount: firstPaymentPayloadAmount,
       privacyLevel: DefaultPrivacyLevel.public,
       status: TransactionStatus.pending,
     };
@@ -241,15 +247,17 @@ describe("Transactions", () => {
 
     const withdrawal = getBankTransferByTransactionId(transaction.id);
     expect(withdrawal.type).toBe(BankTransferType.withdrawal);
-    expect(withdrawal.amount).toBe(firstPaymentAmount);
+    // Withdrawal amount = stored transaction amount (cents) - sender's original balance (cents)
+    const expectedFirstWithdrawal = firstPaymentPayloadAmount * 100 - originalSenderBalance;
+    expect(withdrawal.amount).toBe(expectedFirstWithdrawal);
 
-    // second transaction - $500
+    // Second transaction when sender balance is 0 — any amount exceeds balance
     const secondPaymentDetails: TransactionPayload = {
       source: senderBankAccount.id!,
       senderId: sender.id,
       receiverId: receiver.id,
       description: `Payment: ${sender.id} to ${receiver.id}`,
-      amount: secondPaymentAmount,
+      amount: secondPaymentPayloadAmount,
       privacyLevel: DefaultPrivacyLevel.public,
       status: TransactionStatus.pending,
     };
@@ -263,26 +271,31 @@ describe("Transactions", () => {
 
     const secondWithdrawal = getBankTransferByTransactionId(secondTransaction.id);
     expect(secondWithdrawal.type).toBe(BankTransferType.withdrawal);
-    expect(secondWithdrawal.amount).toBe(secondPaymentAmount);
+    // Sender balance is 0, so entire amount becomes withdrawal
+    expect(secondWithdrawal.amount).toBe(secondPaymentPayloadAmount * 100);
 
     // Verify Deposit Transactions for Receiver
     const updatedReceiverTransactions = getTransactionsByUserId(receiver.id);
-
     expect(updatedReceiverTransactions.length).toBe(receiverTransactions.length + 2);
 
-    // Verify Receiver's Updated App Balance
+    // Verify Receiver's Updated App Balance (credited with both transaction amounts in cents)
     const updatedReceiver: User = getAllUsers()[1];
     expect(updatedReceiver.balance).toBe(
-      receiver.balance + firstPaymentAmount + secondPaymentAmount
+      originalReceiverBalance + firstPaymentPayloadAmount * 100 + secondPaymentPayloadAmount * 100
     );
   });
 
-  it.skip("should create a request and withdrawal (bank transfer) for remaining balance", () => {
+  it("should create a request and withdrawal (bank transfer) for remaining balance", () => {
     const sender: User = getAllUsers()[0];
     const receiver: User = getAllUsers()[1];
     const senderBankAccount = getBankAccountsByUserId(sender.id)[0];
-    const requestAmount = 100;
+    const requestPayloadAmount = 100;
 
+    // Capture original balances before mutations (lowdb objects are mutable refs)
+    const originalSenderBalance = sender.balance;
+    const originalReceiverBalance = receiver.balance;
+
+    const senderTransactions = getTransactionsByUserId(sender.id);
     const receiverTransactions = getTransactionsByUserId(receiver.id);
     expect(receiverTransactions.length).toBeGreaterThan(1);
 
@@ -291,7 +304,7 @@ describe("Transactions", () => {
       senderId: sender.id,
       receiverId: receiver.id,
       description: `Request: ${sender.id} to ${receiver.id}`,
-      amount: requestAmount,
+      amount: requestPayloadAmount,
       privacyLevel: DefaultPrivacyLevel.public,
       status: TransactionStatus.pending,
     };
@@ -304,21 +317,22 @@ describe("Transactions", () => {
     const edits: Partial<Transaction> = {
       requestStatus: TransactionRequestStatus.accepted,
     };
+    // Accepting the request debits the receiver and credits the sender
     updateTransactionById(transaction.id, edits);
 
     const updatedTransaction = getTransactionById(transaction.id);
     expect(updatedTransaction.requestStatus).toEqual("accepted");
 
+    // Receiver is debited: balance decreases by requestPayloadAmount * 100 (cents)
     const updatedReceiver: User = getAllUsers()[1];
-    expect(updatedReceiver.balance).toBe(receiver.balance + requestAmount);
+    expect(updatedReceiver.balance).toBe(originalReceiverBalance - requestPayloadAmount * 100);
 
-    // Verify Deposit Transactions for Sender
-    const updatedSenderTransactions = getTransactionsByUserId(sender.id);
+    // Verify transaction count for receiver (debited party, transaction receiverId matches)
+    const updatedReceiverTransactions = getTransactionsByUserId(receiver.id);
+    expect(updatedReceiverTransactions.length).toBe(receiverTransactions.length + 1);
 
-    expect(updatedSenderTransactions.length).toBe(receiverTransactions.length + 2);
-
-    // Verify Sender's Updated App Balance
+    // Sender is credited: balance increases by requestPayloadAmount * 100 (cents)
     const updatedSender: User = getAllUsers()[0];
-    expect(updatedSender.balance).toBe(sender.balance - requestAmount);
+    expect(updatedSender.balance).toBe(originalSenderBalance + requestPayloadAmount * 100);
   });
 });
