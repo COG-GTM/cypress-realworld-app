@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { Paper, Typography } from "@mui/material";
 import { NotificationUpdatePayload } from "../models";
 import NotificationList from "../components/NotificationList";
@@ -28,15 +28,15 @@ export interface Props {
 }
 
 const NotificationsContainer: React.FC<Props> = ({ authService, notificationsService }) => {
-  const [authState] = useActor(authService);
-  const [notificationsState, sendNotifications] = useActor(notificationsService);
+  const authState = useSelector(authService, (s: any) => s);
+  const notificationsState = useSelector(notificationsService, (s: any) => s);
 
   useEffect(() => {
-    sendNotifications({ type: "FETCH" });
-  }, [authState, sendNotifications]);
+    notificationsService.send({ type: "FETCH" });
+  }, [authState, notificationsService]);
 
   const updateNotification = (payload: NotificationUpdatePayload) =>
-    sendNotifications({ type: "UPDATE", ...payload });
+    notificationsService.send({ type: "UPDATE", ...payload });
 
   return (
     <StyledPaper className={classes.paper}>

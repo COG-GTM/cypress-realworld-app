@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import type { AnyActorRef } from "xstate";
 import { isEmpty } from "lodash/fp";
-import { useActor, useMachine } from "@xstate/react";
+import { useSelector, useMachine } from "@xstate/react";
 
 import { userOnboardingMachine } from "../machines/userOnboardingMachine";
 import BankAccountForm from "../components/BankAccountForm";
@@ -28,15 +28,15 @@ export interface Props {
 const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsService }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
-  const [bankAccountsState, sendBankAccounts] = useActor(bankAccountsService);
-  const [authState, sendAuth] = useActor(authService);
+  const bankAccountsState = useSelector(bankAccountsService, (s: any) => s);
+  const authState = useSelector(authService, (s: any) => s);
   const [userOnboardingState, sendUserOnboarding] = useMachine(userOnboardingMachine);
 
   const currentUser = authState?.context?.user;
 
   useEffect(() => {
-    sendBankAccounts({ type: "FETCH" });
-  }, [sendBankAccounts]);
+    bankAccountsService.send({ type: "FETCH" });
+  }, [bankAccountsService]);
 
   const noBankAccounts =
     bankAccountsState?.matches("success.withoutData") &&
@@ -51,7 +51,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
   const nextStep = () => sendUserOnboarding({ type: "NEXT" });
 
   const createBankAccountWithNextStep = (payload: any) => {
-    sendBankAccounts({ type: "CREATE", ...payload });
+    bankAccountsService.send({ type: "CREATE", ...payload });
     nextStep();
   };
 
@@ -102,7 +102,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
           <Grid item>
             <Button
               style={{ paddingRight: "80%" }}
-              onClick={/* istanbul ignore next */ () => sendAuth({ type: "LOGOUT" })}
+              onClick={/* istanbul ignore next */ () => authService.send({ type: "LOGOUT" })}
               color="secondary"
               data-test="user-onboarding-logout"
             >

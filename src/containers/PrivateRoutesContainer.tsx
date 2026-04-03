@@ -9,7 +9,7 @@ import NotificationsContainer from "./NotificationsContainer";
 import BankAccountsContainer from "./BankAccountsContainer";
 import TransactionCreateContainer from "./TransactionCreateContainer";
 import TransactionDetailContainer from "./TransactionDetailContainer";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import UserOnboardingContainer from "./UserOnboardingContainer";
 
 export interface Props {
@@ -27,11 +27,9 @@ const PrivateRoutesContainer: React.FC<Props> = ({
   snackbarService,
   bankAccountsService,
 }) => {
-  const [, sendNotifications] = useActor(notificationsService);
-
   useEffect(() => {
-    sendNotifications({ type: "FETCH" });
-  }, [sendNotifications]);
+    notificationsService.send({ type: "FETCH" });
+  }, [notificationsService]);
 
   return (
     <MainLayout notificationsService={notificationsService} authService={authService}>

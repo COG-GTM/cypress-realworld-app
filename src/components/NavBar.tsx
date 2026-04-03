@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import {
   AppBar,
   Toolbar,
@@ -105,7 +105,7 @@ const NavBar: React.FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notifications
   const match = useLocation();
 
   const theme = useTheme();
-  const [notificationsState] = useActor(notificationsService);
+  const notificationsState = useSelector(notificationsService, (s: any) => s);
 
   const allNotifications = notificationsState?.context?.results;
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));

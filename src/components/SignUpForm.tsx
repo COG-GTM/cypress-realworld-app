@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import type { AnyActorRef } from "xstate";
 import { Link } from "react-router-dom";
 import { Button, Container, CssBaseline, TextField, Grid, Box, Typography } from "@mui/material";
@@ -59,7 +59,7 @@ export interface Props {
 }
 
 const SignUpForm: React.FC<Props> = ({ authService }) => {
-  const [, sendAuth] = useActor(authService);
+  useSelector(authService, (s: any) => s); // subscribe to keep component in sync
   const initialValues: SignUpPayload & { confirmPassword: string } = {
     firstName: "",
     lastName: "",
@@ -68,7 +68,8 @@ const SignUpForm: React.FC<Props> = ({ authService }) => {
     confirmPassword: "",
   };
 
-  const signUpPending = (payload: SignUpPayload) => sendAuth({ type: "SIGNUP", ...payload });
+  const signUpPending = (payload: SignUpPayload) =>
+    authService.send({ type: "SIGNUP", ...payload });
 
   return (
     <StyledContainer component="main" maxWidth="xs">

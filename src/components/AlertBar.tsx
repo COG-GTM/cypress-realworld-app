@@ -1,7 +1,7 @@
 import React from "react";
 import { Snackbar } from "@mui/material";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { Alert } from "@mui/material";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const AlertBar: React.FC<Props> = ({ snackbarService }) => {
-  const [snackbarState] = useActor(snackbarService);
+  const snackbarState = useSelector(snackbarService, (s: any) => s);
 
   return (
     <Snackbar

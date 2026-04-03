@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useMachine, useActor } from "@xstate/react";
+import { useMachine, useSelector } from "@xstate/react";
 import { useParams } from "react-router-dom";
 import TransactionDetail from "../components/TransactionDetail";
 import { Transaction } from "../models";
@@ -16,7 +16,7 @@ interface Params {
 
 const TransactionDetailsContainer: React.FC<Props> = ({ authService }) => {
   const { transactionId }: Params = useParams();
-  const [authState] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const [transactionDetailState, sendTransactionDetail] = useMachine(transactionDetailMachine);
   useEffect(() => {
     sendTransactionDetail({ type: "FETCH", transactionId });

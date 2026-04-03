@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { useActor, useMachine } from "@xstate/react";
+import { useSelector, useMachine } from "@xstate/react";
 import { Container, CssBaseline } from "@mui/material";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
@@ -40,7 +40,7 @@ const Root = styled("div")(({ theme }) => ({
 
 /* istanbul ignore next */
 const AppGoogle: React.FC = () => {
-  const [authState] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const [, , notificationsService] = useMachine(notificationsMachine);
 
   const [, , snackbarService] = useMachine(snackbarMachine);
@@ -51,10 +51,7 @@ const AppGoogle: React.FC = () => {
   if (window.Cypress) {
     useEffect(() => {
       const { user, token } = JSON.parse(localStorage.getItem("googleCypress")!);
-      authService.send("GOOGLE", {
-        user,
-        token,
-      });
+      authService.send({ type: "GOOGLE", user, token });
     }, []);
   } else {
     useGoogleLogin({
@@ -62,7 +59,7 @@ const AppGoogle: React.FC = () => {
       onSuccess: (res) => {
         console.log("onSuccess", res);
         // @ts-ignore
-        authService.send("GOOGLE", { user: res.profileObj, token: res.tokenId });
+        authService.send({ type: "GOOGLE", user: res.profileObj, token: res.tokenId });
       },
       cookiePolicy: "single_host_origin",
       isSignedIn: true,

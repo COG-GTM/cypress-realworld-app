@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -70,14 +70,14 @@ export interface Props {
 }
 
 const SignInForm: React.FC<Props> = ({ authService }) => {
-  const [authState, sendAuth] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const initialValues: SignInPayload = {
     username: "",
     password: "",
     remember: undefined,
   };
 
-  const signInPending = (payload: SignInPayload) => sendAuth({ type: "LOGIN", ...payload });
+  const signInPending = (payload: SignInPayload) => authService.send({ type: "LOGIN", ...payload });
 
   return (
     <StyledContainer component="main" maxWidth="xs">

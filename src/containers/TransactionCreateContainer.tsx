@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useMachine, useActor } from "@xstate/react";
+import { useMachine, useSelector } from "@xstate/react";
 import { User, TransactionPayload } from "../models";
 import TransactionCreateStepOne from "../components/TransactionCreateStepOne";
 import TransactionCreateStepTwo from "../components/TransactionCreateStepTwo";
@@ -17,8 +17,7 @@ export interface Props {
 }
 
 const TransactionCreateContainer: React.FC<Props> = ({ authService, snackbarService }) => {
-  const [authState] = useActor(authService);
-  const [, sendSnackbar] = useActor(snackbarService);
+  const authState = useSelector(authService, (s: any) => s);
 
   const [createTransactionState, sendCreateTransaction, createTransactionService] =
     useMachine(createTransactionMachine);
@@ -43,7 +42,8 @@ const TransactionCreateContainer: React.FC<Props> = ({ authService, snackbarServ
   };
   const userListSearch = debounce(200, (payload: any) => sendUsers({ type: "FETCH", ...payload }));
 
-  const showSnackbar = (payload: SnackbarContext) => sendSnackbar({ type: "SHOW", ...payload });
+  const showSnackbar = (payload: SnackbarContext) =>
+    snackbarService.send({ type: "SHOW", ...payload });
 
   let activeStep;
   if (createTransactionState.matches("stepTwo")) {

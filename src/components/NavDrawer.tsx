@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { head } from "lodash/fp";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import clsx from "clsx";
 import {
   useMediaQuery,
@@ -196,11 +196,11 @@ const NavDrawer: React.FC<Props> = ({
   authService,
 }) => {
   const theme = useTheme();
-  const [authState, sendAuth] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const showTemporaryDrawer = useMediaQuery(theme.breakpoints.only("xs"));
 
   const currentUser = authState?.context?.user;
-  const signOut = () => sendAuth({ type: "LOGOUT" });
+  const signOut = () => authService.send({ type: "LOGOUT" });
 
   return (
     <StyledDrawer

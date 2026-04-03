@@ -3,7 +3,7 @@ import { styled } from "@mui/material/styles";
 import { Paper, Typography, Grid } from "@mui/material";
 import UserSettingsForm from "../components/UserSettingsForm";
 import type { AnyActorRef } from "xstate";
-import { useActor } from "@xstate/react";
+import { useSelector } from "@xstate/react";
 import PersonalSettingsIllustration from "../components/SvgUndrawPersonalSettingsKihd";
 
 const PREFIX = "UserSettingsContainer";
@@ -26,10 +26,10 @@ export interface Props {
 }
 
 const UserSettingsContainer: React.FC<Props> = ({ authService }) => {
-  const [authState, sendAuth] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
 
   const currentUser = authState?.context?.user;
-  const updateUser = (payload: any) => sendAuth({ type: "UPDATE", ...payload });
+  const updateUser = (payload: any) => authService.send({ type: "UPDATE", ...payload });
 
   return (
     <StyledPaper className={classes.paper}>
