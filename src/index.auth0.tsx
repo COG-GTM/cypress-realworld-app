@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import {
   createTheme,
   ThemeProvider,
@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { Auth0Provider } from "@auth0/auth0-react";
 import AppAuth0 from "./containers/AppAuth0";
-import { history } from "./utils/historyUtils";
 
 const theme = createTheme(
   adaptV4Theme({
@@ -24,7 +23,7 @@ const theme = createTheme(
 
 /* istanbul ignore next */
 const onRedirectCallback = (appState: any) => {
-  history.replace((appState && appState.returnTo) || window.location.pathname);
+  window.location.replace((appState && appState.returnTo) || window.location.pathname);
 };
 
 const root = createRoot(document.getElementById("root")!);
@@ -41,13 +40,13 @@ if (process.env.VITE_AUTH0) {
       onRedirectCallback={onRedirectCallback}
       cacheLocation="localstorage"
     >
-      <Router history={history}>
+      <BrowserRouter>
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
             <AppAuth0 />
           </ThemeProvider>
         </StyledEngineProvider>
-      </Router>
+      </BrowserRouter>
     </Auth0Provider>
   );
 } else {

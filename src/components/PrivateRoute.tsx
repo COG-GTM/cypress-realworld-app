@@ -1,29 +1,12 @@
 import React from "react";
-import { Route, Redirect, RouteProps } from "react-router-dom";
+import { Navigate, Outlet } from "react-router";
 
-interface IPrivateRouteProps extends RouteProps {
+interface IPrivateRouteProps {
   isLoggedIn: boolean;
 }
 
-function PrivateRoute({ isLoggedIn, children, ...rest }: IPrivateRouteProps) {
-  return (
-    <Route
-      {...rest}
-      render={({ location }) =>
-        isLoggedIn ? (
-          children
-        ) : (
-          /* istanbul ignore next */
-          <Redirect
-            to={{
-              pathname: "/signin",
-              state: { from: location },
-            }}
-          />
-        )
-      }
-    />
-  );
+function PrivateRoute({ isLoggedIn }: IPrivateRouteProps) {
+  return isLoggedIn ? <Outlet /> : <Navigate to="/signin" />;
 }
 
 export default PrivateRoute;

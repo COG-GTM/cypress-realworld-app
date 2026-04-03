@@ -1,7 +1,6 @@
 import { Machine, assign, interpret, State } from "xstate";
 import { omit } from "lodash/fp";
 import { httpClient } from "../utils/asyncUtils";
-import { history } from "../utils/historyUtils";
 import { User } from "../models";
 import { backendPort } from "../utils/portUtils";
 
@@ -150,14 +149,14 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       performSignup: async (ctx, event) => {
         const payload = omit("type", event);
         const resp = await httpClient.post(`http://localhost:${backendPort}/users`, payload);
-        history.push("/signin");
+        window.location.href = "/signin";
         return resp.data;
       },
       performLogin: async (ctx, event) => {
         return await httpClient
           .post(`http://localhost:${backendPort}/login`, event)
           .then(({ data }) => {
-            history.push("/");
+            window.location.href = "/";
             return data;
           })
           .catch((error) => {
@@ -239,7 +238,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
     },
     actions: {
       redirectHomeAfterLogin: async (ctx, event) => {
-        if (history.location.pathname === "/signin") {
+        if (window.location.pathname === "/signin") {
           /* istanbul ignore next */
           window.location.pathname = "/";
         }

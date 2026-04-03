@@ -1,10 +1,9 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import { createTheme, StyledEngineProvider } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import App from "./containers/App";
-import { history } from "./utils/historyUtils";
 
 const theme = createTheme({
   palette: {
@@ -49,11 +48,11 @@ const theme = createTheme({
 const root = createRoot(document.getElementById("root")!);
 
 root.render(
-  <Router history={history}>
+  <BrowserRouter>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <App />
       </ThemeProvider>
     </StyledEngineProvider>
-  </Router>
+  </BrowserRouter>
 );

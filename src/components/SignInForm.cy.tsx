@@ -1,5 +1,5 @@
 import { interpret } from "xstate";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import SignInForm from "./SignInForm";
 import { authMachine } from "../machines/authMachine";
 
