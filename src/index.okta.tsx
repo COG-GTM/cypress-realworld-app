@@ -36,7 +36,7 @@ if (process.env.VITE_OKTA) {
   const AppWithRouter = () => {
     const navigate = useNavigate();
     const restoreOriginalUri = (_oktaAuth: any, originalUri: string) =>
-      navigate(toRelativeUrl(originalUri || "/", window.location.origin));
+      navigate(toRelativeUrl(originalUri || "/", window.location.origin), { replace: true });
 
     return (
       <Security oktaAuth={oktaAuth} restoreOriginalUri={restoreOriginalUri}>
