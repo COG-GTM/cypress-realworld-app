@@ -293,7 +293,6 @@ export const removeBankAccountById = (bankAccountId: string) => {
 // Note: Balance transfers from/to bank accounts is a future feature,
 // but some of the backend database functionality is already implemented here.
 
-/* istanbul ignore next */
 export const getBankTransferBy = (key: string, value: any) =>
   getBy(BANK_TRANSFER_TABLE, key, value);
 
@@ -302,7 +301,6 @@ export const getBankTransfersBy = (key: string, value: any) =>
 
 export const getBankTransfersByUserId = (userId: string) => getBankTransfersBy("userId", userId);
 
-/* istanbul ignore next */
 export const createBankTransfer = (bankTransferDetails: BankTransferPayload) => {
   const bankTransfer: BankTransfer = {
     id: shortid(),
@@ -316,7 +314,6 @@ export const createBankTransfer = (bankTransferDetails: BankTransferPayload) => 
   return savedBankTransfer;
 };
 
-/* istanbul ignore next */
 const saveBankTransfer = (bankTransfer: BankTransfer): BankTransfer => {
   db.get(BANK_TRANSFER_TABLE).push(bankTransfer).write();
 
@@ -492,7 +489,6 @@ export const debitPayAppBalance = (user: User, transaction: Transaction) => {
   if (hasSufficientFunds(user, transaction)) {
     flow(getChargeAmount, savePayAppBalance(user))(user, transaction);
   } else {
-    /* istanbul ignore next */
     flow(
       getTransferAmount(user),
       createBankTransferWithdrawal(user, transaction),
@@ -505,7 +501,6 @@ export const debitPayAppBalance = (user: User, transaction: Transaction) => {
 export const creditPayAppBalance = (user: User, transaction: Transaction) =>
   flow(getPayAppCreditedAmount, savePayAppBalance(user))(user, transaction);
 
-/* istanbul ignore next */
 export const createBankTransferWithdrawal = curry(
   (sender: User, transaction: Transaction, transferAmount: number) =>
     createBankTransfer({

@@ -202,4 +202,56 @@ describe("Users API", function () {
       });
     });
   });
+
+  context("Error Paths", function () {
+    it("should return 401 for GET /users when not authenticated", function () {
+      cy.request({
+        method: "GET",
+        url: apiUsers,
+        failOnStatusCode: false,
+        headers: { Cookie: "" },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    it("should return 422 when searching with missing q parameter", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiUsers}/search`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating user with missing required fields", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiUsers}`,
+        failOnStatusCode: false,
+        body: {
+          notAUserField: "not a user field",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 401 for PATCH /users/:userId when not authenticated", function () {
+      cy.request({
+        method: "PATCH",
+        url: `${apiUsers}/test-user-id`,
+        failOnStatusCode: false,
+        headers: { Cookie: "" },
+        body: {
+          firstName: "Test",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+  });
 });
