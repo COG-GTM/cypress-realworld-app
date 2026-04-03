@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Link as RouterLink, useHistory } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router";
 import { Paper, Typography, Grid, Avatar, Box, Button } from "@mui/material";
 import {
   BaseActionObject,
@@ -49,7 +49,7 @@ export interface TransactionCreateStepThreeProps {
 const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
   createTransactionService,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [createTransactionState, sendCreateTransaction] = useActor(createTransactionService);
 
@@ -131,7 +131,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
               /* istanbul ignore next */
               onClick={() => {
                 sendCreateTransaction("RESET");
-                history.push("/transaction/new");
+                navigate("/transaction/new");
               }}
               data-test="new-transaction-create-another-transaction"
             >

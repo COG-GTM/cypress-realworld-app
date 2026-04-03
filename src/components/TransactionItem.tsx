@@ -1,6 +1,6 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 import {
   ListItem,
   Typography,
@@ -73,10 +73,10 @@ const SmallAvatar = styled(Avatar)(({ theme }: { theme: Theme }) => {
 });
 
 const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const showTransactionDetail = (transactionId: string) => {
-    history.push(`/transaction/${transactionId}`);
+    navigate(`/transaction/${transactionId}`);
   };
 
   return (

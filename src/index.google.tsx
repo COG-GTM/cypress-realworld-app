@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { Router } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import {
   createTheme,
   ThemeProvider,
@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 
 import AppGoogle from "./containers/AppGoogle";
-import { history } from "./utils/historyUtils";
 
 const theme = createTheme(
   adaptV4Theme({
@@ -27,13 +26,13 @@ const root = createRoot(document.getElementById("root")!);
 if (process.env.VITE_GOOGLE) {
   /* istanbul ignore next */
   root.render(
-    <Router history={history}>
+    <BrowserRouter>
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <AppGoogle />
         </ThemeProvider>
       </StyledEngineProvider>
-    </Router>
+    </BrowserRouter>
   );
 } else {
   console.error("Google is not configured.");

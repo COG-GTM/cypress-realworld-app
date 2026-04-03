@@ -1,9 +1,9 @@
 import React from "react";
 import { Tabs, Tab } from "@mui/material";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link, useLocation } from "react-router";
 
 export default function TransactionNavTabs() {
-  const match = useRouteMatch();
+  const location = useLocation();
 
   // Route Lookup for tabs
   const navUrls: any = {
@@ -14,7 +14,7 @@ export default function TransactionNavTabs() {
   };
 
   // Set selected tab based on url
-  const [value, setValue] = React.useState(navUrls[match.url]);
+  const [value, setValue] = React.useState(navUrls[location.pathname]);
 
   const handleChange = (event: React.SyntheticEvent<{}>, newValue: number) => {
     setValue(newValue);

@@ -1,6 +1,6 @@
 import React from "react";
 import { useMachine } from "@xstate/react";
-import { Switch, Route } from "react-router";
+import { Routes, Route } from "react-router";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
 import TransactionListFilters from "../components/TransactionListFilters";
 import TransactionContactsList from "../components/TransactionContactsList";
@@ -29,29 +29,48 @@ const TransactionsContainer: React.FC = () => {
   );
 
   return (
-    <Switch>
-      <Route exact path="/contacts">
-        <TransactionContactsList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-      <Route exact path="/personal">
-        <TransactionPersonalList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-      <Route exact path="/(public)?">
-        <TransactionPublicList
-          filterComponent={Filters}
-          dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
-          amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
-        />
-      </Route>
-    </Switch>
+    <Routes>
+      <Route
+        path="/contacts"
+        element={
+          <TransactionContactsList
+            filterComponent={Filters}
+            dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
+            amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
+          />
+        }
+      />
+      <Route
+        path="/personal"
+        element={
+          <TransactionPersonalList
+            filterComponent={Filters}
+            dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
+            amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
+          />
+        }
+      />
+      <Route
+        index
+        element={
+          <TransactionPublicList
+            filterComponent={Filters}
+            dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
+            amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
+          />
+        }
+      />
+      <Route
+        path="/public"
+        element={
+          <TransactionPublicList
+            filterComponent={Filters}
+            dateRangeFilters={dateRangeFilters as TransactionDateRangePayload}
+            amountRangeFilters={amountRangeFilters as TransactionAmountRangePayload}
+          />
+        }
+      />
+    </Routes>
   );
 };
 
