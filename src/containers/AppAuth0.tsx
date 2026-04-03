@@ -1,7 +1,7 @@
 /* istanbul ignore next */
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { useActor, useMachine } from "@xstate/react";
+import { useSelector, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
@@ -35,7 +35,7 @@ if (window.Cypress) {
 const AppAuth0: React.FC = () => {
   const { isAuthenticated, user, getAccessTokenSilently } = useAuth0();
 
-  const [authState] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const [, , notificationsService] = useMachine(notificationsMachine);
 
   const [, , snackbarService] = useMachine(snackbarMachine);
@@ -45,7 +45,7 @@ const AppAuth0: React.FC = () => {
   useEffect(() => {
     (async function waitForToken() {
       const token = await getAccessTokenSilently();
-      authService.send("AUTH0", { user, token });
+      authService.send({ type: "AUTH0", user, token });
     })();
   }, [isAuthenticated, user, getAccessTokenSilently]);
 

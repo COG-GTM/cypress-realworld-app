@@ -1,7 +1,7 @@
 /* istanbul ignore next */
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { useActor, useMachine } from "@xstate/react";
+import { useSelector, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
 // @ts-ignore
 import { LoginCallback, SecureRoute, useOktaAuth, withOktaAuth } from "@okta/okta-react";
@@ -37,7 +37,7 @@ if (window.Cypress) {
 const AppOkta: React.FC = () => {
   const { authState: oktaAuthState, oktaAuth: oktaAuthService } = useOktaAuth();
 
-  const [authState] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const [, , notificationsService] = useMachine(notificationsMachine);
 
   const [, , snackbarService] = useMachine(snackbarMachine);
@@ -48,16 +48,13 @@ const AppOkta: React.FC = () => {
   if (window.Cypress && process.env.VITE_OKTA_PROGRAMMATIC) {
     useEffect(() => {
       const okta = JSON.parse(localStorage.getItem("oktaCypress")!);
-      authService.send("OKTA", {
-        user: okta.user,
-        token: okta.token,
-      });
+      authService.send({ type: "OKTA", user: okta.user, token: okta.token });
     }, []);
   } else {
     useEffect(() => {
       if (oktaAuthState.isAuthenticated) {
         oktaAuthService.getUser().then((user: any) => {
-          authService.send("OKTA", { user, token: oktaAuthState.accessToken });
+          authService.send({ type: "OKTA", user, token: oktaAuthState.accessToken });
         });
       }
     }, [oktaAuthState, oktaAuthService]);

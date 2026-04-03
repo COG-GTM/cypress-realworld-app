@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Interpreter } from "xstate";
-import { useActor } from "@xstate/react";
+import type { AnyActorRef } from "xstate";
+import { useSelector } from "@xstate/react";
 import { Link } from "react-router-dom";
 import {
   Button,
@@ -20,7 +20,6 @@ import { string, object } from "yup";
 import RWALogo from "./SvgRwaLogo";
 import Footer from "./Footer";
 import { SignInPayload } from "../models";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 import { Alert } from "@mui/material";
 
 const validationSchema = object({
@@ -67,18 +66,18 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 })) as typeof Container;
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
+  authService: AnyActorRef;
 }
 
 const SignInForm: React.FC<Props> = ({ authService }) => {
-  const [authState, sendAuth] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const initialValues: SignInPayload = {
     username: "",
     password: "",
     remember: undefined,
   };
 
-  const signInPending = (payload: SignInPayload) => sendAuth({ type: "LOGIN", ...payload });
+  const signInPending = (payload: SignInPayload) => authService.send({ type: "LOGIN", ...payload });
 
   return (
     <StyledContainer component="main" maxWidth="xs">

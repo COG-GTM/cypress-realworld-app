@@ -1,18 +1,10 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
-import { useActor } from "@xstate/react";
+import type { AnyActorRef } from "xstate";
+import { useSelector } from "@xstate/react";
 import { Paper, Typography } from "@mui/material";
 import { NotificationUpdatePayload } from "../models";
 import NotificationList from "../components/NotificationList";
-import { DataContext, DataSchema, DataEvents } from "../machines/dataMachine";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 
 const PREFIX = "NotificationsContainer";
 
@@ -31,26 +23,20 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  notificationsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  notificationsService: AnyActorRef;
 }
 
 const NotificationsContainer: React.FC<Props> = ({ authService, notificationsService }) => {
-  const [authState] = useActor(authService);
-  const [notificationsState, sendNotifications] = useActor(notificationsService);
+  const authState = useSelector(authService, (s: any) => s);
+  const notificationsState = useSelector(notificationsService, (s: any) => s);
 
   useEffect(() => {
-    sendNotifications({ type: "FETCH" });
-  }, [authState, sendNotifications]);
+    notificationsService.send({ type: "FETCH" });
+  }, [authState, notificationsService]);
 
   const updateNotification = (payload: NotificationUpdatePayload) =>
-    sendNotifications({ type: "UPDATE", ...payload });
+    notificationsService.send({ type: "UPDATE", ...payload });
 
   return (
     <StyledPaper className={classes.paper}>

@@ -1,6 +1,6 @@
-import { Machine } from "xstate";
+import { createMachine } from "xstate";
 
-export const drawerMachine = Machine(
+export const drawerMachine = createMachine(
   {
     id: "drawer",
     type: "parallel",
@@ -11,7 +11,7 @@ export const drawerMachine = Machine(
           closed: {
             on: {
               TOGGLE_DESKTOP: "open",
-              OPEN_DESKTOP: { target: "open", cond: "shouldOpenDesktop" },
+              OPEN_DESKTOP: { target: "open", guard: "shouldOpenDesktop" },
             },
           },
           open: {
@@ -37,10 +37,8 @@ export const drawerMachine = Machine(
   },
   {
     guards: {
-      shouldOpenDesktop: (context, event, guardMeta) => {
-        return (
-          guardMeta.state.history?.context.aboveSmallBreakpoint !== context.aboveSmallBreakpoint
-        );
+      shouldOpenDesktop: ({ context }) => {
+        return true;
       },
     },
   }

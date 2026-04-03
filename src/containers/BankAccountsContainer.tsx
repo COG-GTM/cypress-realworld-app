@@ -1,30 +1,16 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { useActor } from "@xstate/react";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
+import { useSelector } from "@xstate/react";
+import type { AnyActorRef } from "xstate";
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 import { Grid, Button, Paper, Typography } from "@mui/material";
 
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
-import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
 import BankAccountForm from "../components/BankAccountForm";
 import BankAccountList from "../components/BankAccountList";
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  bankAccountsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  bankAccountsService: AnyActorRef;
 }
 const PREFIX = "BankAccountsContainer";
 
@@ -44,22 +30,22 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const BankAccountsContainer: React.FC<Props> = ({ authService, bankAccountsService }) => {
   const match = useRouteMatch();
 
-  const [authState] = useActor(authService);
-  const [bankAccountsState, sendBankAccounts] = useActor(bankAccountsService);
+  const authState = useSelector(authService, (s: any) => s);
+  const bankAccountsState = useSelector(bankAccountsService, (s: any) => s);
 
   const currentUser = authState?.context.user;
 
   const createBankAccount = (payload: any) => {
-    sendBankAccounts({ type: "CREATE", ...payload });
+    bankAccountsService.send({ type: "CREATE", ...payload });
   };
 
   const deleteBankAccount = (payload: any) => {
-    sendBankAccounts({ type: "DELETE", ...payload });
+    bankAccountsService.send({ type: "DELETE", ...payload });
   };
 
   useEffect(() => {
-    sendBankAccounts("FETCH");
-  }, [sendBankAccounts]);
+    bankAccountsService.send({ type: "FETCH" });
+  }, [bankAccountsService]);
 
   if (match.url === "/bankaccounts/new" && currentUser?.id) {
     return (

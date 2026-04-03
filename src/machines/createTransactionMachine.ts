@@ -1,27 +1,19 @@
 import { omit } from "lodash/fp";
-import { Machine, assign } from "xstate";
+import { createMachine, assign, sendTo, fromPromise } from "xstate";
 import { dataMachine } from "./dataMachine";
 import { httpClient } from "../utils/asyncUtils";
 import { User, TransactionCreatePayload } from "../models";
 import { authService } from "./authMachine";
 import { backendPort } from "../utils/portUtils";
 
-export interface CreateTransactionMachineSchema {
-  states: {
-    stepOne: {};
-    stepTwo: {};
-    stepThree: {};
-  };
-}
-
-const transactionDataMachine = dataMachine("transactionData").withConfig({
-  services: {
-    createData: async (ctx, event: any) => {
-      const payload = omit("type", event);
+const transactionDataMachine = dataMachine("transactionData").provide({
+  actors: {
+    createData: fromPromise(async ({ input }: { input: any }) => {
+      const payload = omit("type", input.event);
       const resp = await httpClient.post(`http://localhost:${backendPort}/transactions`, payload);
-      authService.send("REFRESH");
+      authService.send({ type: "REFRESH" });
       return resp.data;
-    },
+    }),
   },
 });
 
@@ -36,14 +28,14 @@ export interface CreateTransactionMachineContext {
   transactionDetails: TransactionCreatePayload;
 }
 
-export const createTransactionMachine = Machine<
-  CreateTransactionMachineContext,
-  CreateTransactionMachineSchema,
-  CreateTransactionMachineEvents
->(
+export const createTransactionMachine = createMachine(
   {
     id: "createTransaction",
     initial: "stepOne",
+    types: {} as {
+      context: CreateTransactionMachineContext;
+      events: CreateTransactionMachineEvents;
+    },
     states: {
       stepOne: {
         entry: "clearContext",
@@ -56,10 +48,12 @@ export const createTransactionMachine = Machine<
         invoke: {
           id: "transactionDataMachine",
           src: transactionDataMachine,
-          autoForward: true,
         },
         on: {
-          CREATE: "stepThree",
+          CREATE: {
+            target: "stepThree",
+            actions: sendTo("transactionDataMachine", ({ event }) => event),
+          },
         },
       },
       stepThree: {
@@ -72,14 +66,14 @@ export const createTransactionMachine = Machine<
   },
   {
     actions: {
-      setSenderAndReceiver: assign((ctx, event: any) => ({
-        sender: event.sender,
-        receiver: event.receiver,
+      setSenderAndReceiver: assign(({ event }) => ({
+        sender: (event as any).sender,
+        receiver: (event as any).receiver,
       })),
-      setTransactionDetails: assign((ctx, event: any) => ({
-        transactionDetails: event,
+      setTransactionDetails: assign(({ event }) => ({
+        transactionDetails: event as any,
       })),
-      clearContext: assign((ctx, event: any) => ({})),
+      clearContext: assign(() => ({})),
     },
   }
 );

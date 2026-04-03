@@ -1,28 +1,15 @@
 import React from "react";
 import { Snackbar } from "@mui/material";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
-import { SnackbarContext, SnackbarSchema, SnackbarEvents } from "../machines/snackbarMachine";
-import { useActor } from "@xstate/react";
+import type { AnyActorRef } from "xstate";
+import { useSelector } from "@xstate/react";
 import { Alert } from "@mui/material";
 
 interface Props {
-  snackbarService: Interpreter<
-    SnackbarContext,
-    SnackbarSchema,
-    SnackbarEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, SnackbarEvents, BaseActionObject, ServiceMap>
-  >;
+  snackbarService: AnyActorRef;
 }
 
 const AlertBar: React.FC<Props> = ({ snackbarService }) => {
-  const [snackbarState] = useActor(snackbarService);
+  const snackbarState = useSelector(snackbarService, (s: any) => s);
 
   return (
     <Snackbar

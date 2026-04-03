@@ -1,23 +1,5 @@
-import { Machine, assign } from "xstate";
+import { createMachine, assign } from "xstate";
 import { concat } from "lodash/fp";
-
-export interface DataSchema {
-  states: {
-    idle: {};
-    loading: {};
-    updating: {};
-    creating: {};
-    deleting: {};
-    success: {
-      states: {
-        unknown: {};
-        withData: {};
-        withoutData: {};
-      };
-    };
-    failure: {};
-  };
-}
 
 type SuccessEvent = { type: "SUCCESS"; results: any[]; pageData: object };
 type FailureEvent = { type: "FAILURE"; message: string };
@@ -36,10 +18,11 @@ export interface DataContext {
 }
 
 export const dataMachine = (machineId: string) =>
-  Machine<DataContext, DataSchema, DataEvents>(
+  createMachine(
     {
       id: machineId,
       initial: "idle",
+      types: {} as { context: DataContext; events: DataEvents },
       context: {
         pageData: {},
         results: [],
@@ -57,6 +40,7 @@ export const dataMachine = (machineId: string) =>
         loading: {
           invoke: {
             src: "fetchData",
+            input: ({ context, event }) => ({ context, event }),
             onDone: { target: "success" },
             onError: { target: "failure", actions: "setMessage" },
           },
@@ -64,6 +48,7 @@ export const dataMachine = (machineId: string) =>
         updating: {
           invoke: {
             src: "updateData",
+            input: ({ context, event }) => ({ context, event }),
             onDone: { target: "loading" },
             onError: { target: "failure", actions: "setMessage" },
           },
@@ -71,6 +56,7 @@ export const dataMachine = (machineId: string) =>
         creating: {
           invoke: {
             src: "createData",
+            input: ({ context, event }) => ({ context, event }),
             onDone: { target: "loading" },
             onError: { target: "failure", actions: "setMessage" },
           },
@@ -78,6 +64,7 @@ export const dataMachine = (machineId: string) =>
         deleting: {
           invoke: {
             src: "deleteData",
+            input: ({ context, event }) => ({ context, event }),
             onDone: { target: "loading" },
             onError: { target: "failure", actions: "setMessage" },
           },
@@ -93,9 +80,7 @@ export const dataMachine = (machineId: string) =>
           initial: "unknown",
           states: {
             unknown: {
-              on: {
-                "": [{ target: "withData", cond: "hasData" }, { target: "withoutData" }],
-              },
+              always: [{ target: "withData", guard: "hasData" }, { target: "withoutData" }],
             },
             withData: {},
             withoutData: {},
@@ -111,22 +96,24 @@ export const dataMachine = (machineId: string) =>
     },
     {
       actions: {
-        setResults: assign((ctx: DataContext, event: any) => ({
+        setResults: assign(({ context, event }) => ({
           results:
-            event.data && event.data.pageData && event.data.pageData.page > 1
-              ? concat(ctx.results, event.data.results)
-              : event.data.results,
+            (event as any).output &&
+            (event as any).output.pageData &&
+            (event as any).output.pageData.page > 1
+              ? concat(context.results, (event as any).output.results)
+              : (event as any).output.results,
         })),
-        setPageData: assign((ctx: DataContext, event: any) => ({
-          pageData: event.data.pageData,
+        setPageData: assign(({ event }) => ({
+          pageData: (event as any).output.pageData,
         })),
 
-        setMessage: /* istanbul ignore next */ assign((ctx, event: any) => ({
-          message: event.message,
+        setMessage: /* istanbul ignore next */ assign(({ event }) => ({
+          message: (event as any).error?.message || (event as any).message,
         })),
       },
       guards: {
-        hasData: (ctx: DataContext, event) => !!ctx.results && ctx.results.length > 0,
+        hasData: ({ context }) => !!context.results && context.results.length > 0,
       },
     }
   );

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import { useActor, useMachine } from "@xstate/react";
+import { useSelector, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
 
 import { snackbarMachine } from "../machines/snackbarMachine";
@@ -36,7 +36,7 @@ if (window.Cypress) {
 }
 
 const AppCognito: React.FC = /* istanbul ignore next */ () => {
-  const [authState] = useActor(authService);
+  const authState = useSelector(authService, (s: any) => s);
   const [, , notificationsService] = useMachine(notificationsMachine);
 
   const [, , snackbarService] = useMachine(snackbarMachine);
@@ -53,7 +53,8 @@ const AppCognito: React.FC = /* istanbul ignore next */ () => {
       fetchAuthSession().then((authSession) => {
         if (authSession && authSession.tokens && authSession.tokens.accessToken) {
           const { tokens, userSub } = authSession;
-          authService.send("COGNITO", {
+          authService.send({
+            type: "COGNITO",
             accessTokenJwtString: tokens!.accessToken.toString(),
             userSub: userSub!,
             email: tokens!.idToken!.payload.email,
@@ -66,7 +67,7 @@ const AppCognito: React.FC = /* istanbul ignore next */ () => {
   }, [isLoggedIn]);
 
   useEffect(() => {
-    authService.onEvent(async (event) => {
+    const subscription = authService.on("*", async (event: any) => {
       if (
         event.type === "done.invoke.performLogout" ||
         // we want the client-side app to discard its JWTs even if server-side errors out:

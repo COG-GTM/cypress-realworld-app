@@ -1,14 +1,8 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
-import { useActor } from "@xstate/react";
+import type { AnyActorRef } from "xstate";
+import { useSelector } from "@xstate/react";
 import {
   AppBar,
   Toolbar,
@@ -27,7 +21,6 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 
-import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
 import TransactionNavTabs from "./TransactionNavTabs";
 import RWALogo from "./SvgRwaLogo";
 import RWALogoIcon from "./SvgRwaIconLogo";
@@ -105,20 +98,14 @@ const StyledAppBar = styled(AppBar)(({ theme }) => ({
 interface NavBarProps {
   drawerOpen: boolean;
   toggleDrawer: Function;
-  notificationsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  notificationsService: AnyActorRef;
 }
 
 const NavBar: React.FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notificationsService }) => {
   const match = useLocation();
 
   const theme = useTheme();
-  const [notificationsState] = useActor(notificationsService);
+  const notificationsState = useSelector(notificationsService, (s: any) => s);
 
   const allNotifications = notificationsState?.context?.results;
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));
