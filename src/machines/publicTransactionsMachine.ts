@@ -1,16 +1,17 @@
 import { isEmpty, omit } from "lodash/fp";
+import { fromPromise } from "xstate";
 import { dataMachine } from "./dataMachine";
 import { httpClient } from "../utils/asyncUtils";
 import { backendPort } from "../utils/portUtils";
 
-export const publicTransactionsMachine = dataMachine("publicTransactions").withConfig({
-  services: {
-    fetchData: async (ctx, event: any) => {
-      const payload = omit("type", event);
+export const publicTransactionsMachine = dataMachine("publicTransactions").provide({
+  actors: {
+    fetchData: fromPromise(async ({ input }: { input: any }) => {
+      const payload = omit("type", input.event);
       const resp = await httpClient.get(`http://localhost:${backendPort}/transactions/public`, {
         params: !isEmpty(payload) ? payload : undefined,
       });
       return resp.data;
-    },
+    }),
   },
 });

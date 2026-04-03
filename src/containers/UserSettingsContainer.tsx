@@ -2,8 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { Paper, Typography, Grid } from "@mui/material";
 import UserSettingsForm from "../components/UserSettingsForm";
-import { Interpreter } from "xstate";
-import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
+import type { AnyActorRef } from "xstate";
 import { useActor } from "@xstate/react";
 import PersonalSettingsIllustration from "../components/SvgUndrawPersonalSettingsKihd";
 
@@ -23,7 +22,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
+  authService: AnyActorRef;
 }
 
 const UserSettingsContainer: React.FC<Props> = ({ authService }) => {

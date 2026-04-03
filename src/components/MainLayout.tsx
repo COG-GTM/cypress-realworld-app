@@ -1,20 +1,12 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import { useMachine } from "@xstate/react";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
+import type { AnyActorRef } from "xstate";
 import { Container, Grid, useMediaQuery, useTheme } from "@mui/material";
 
 import Footer from "./Footer";
 import NavBar from "./NavBar";
 import NavDrawer from "./NavDrawer";
-import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 import { drawerMachine } from "../machines/drawerMachine";
 
 const PREFIX = "MainLayout";
@@ -59,14 +51,8 @@ const Root = styled("div")(({ theme }) => ({
 
 interface Props {
   children: React.ReactNode;
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  notificationsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  notificationsService: AnyActorRef;
 }
 
 const MainLayout: React.FC<Props> = ({ children, notificationsService, authService }) => {
@@ -79,14 +65,14 @@ const MainLayout: React.FC<Props> = ({ children, notificationsService, authServi
   const desktopDrawerOpen = drawerState?.matches({ desktop: "open" });
   const mobileDrawerOpen = drawerState?.matches({ mobile: "open" });
   const toggleDesktopDrawer = () => {
-    sendDrawer("TOGGLE_DESKTOP");
+    sendDrawer({ type: "TOGGLE_DESKTOP" });
   };
   const toggleMobileDrawer = () => {
-    sendDrawer("TOGGLE_MOBILE");
+    sendDrawer({ type: "TOGGLE_MOBILE" });
   };
 
-  const openDesktopDrawer = (payload: any) => sendDrawer("OPEN_DESKTOP", payload);
-  const closeMobileDrawer = () => sendDrawer("CLOSE_MOBILE");
+  const openDesktopDrawer = (payload: any) => sendDrawer({ type: "OPEN_DESKTOP", ...payload });
+  const closeMobileDrawer = () => sendDrawer({ type: "CLOSE_MOBILE" });
 
   useEffect(() => {
     if (!desktopDrawerOpen && aboveSmallBreakpoint) {

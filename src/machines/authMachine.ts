@@ -1,25 +1,9 @@
-import { Machine, assign, interpret, State } from "xstate";
+import { createMachine, assign, createActor, fromPromise } from "xstate";
 import { omit } from "lodash/fp";
 import { httpClient } from "../utils/asyncUtils";
 import { history } from "../utils/historyUtils";
 import { User } from "../models";
 import { backendPort } from "../utils/portUtils";
-
-export interface AuthMachineSchema {
-  states: {
-    unauthorized: {};
-    signup: {};
-    loading: {};
-    updating: {};
-    logout: {};
-    refreshing: {};
-    google: {};
-    authorized: {};
-    auth0: {};
-    cognito: {};
-    okta: {};
-  };
-}
 
 export type AuthMachineEvents =
   | { type: "LOGIN" }
@@ -37,10 +21,11 @@ export interface AuthMachineContext {
   message?: string;
 }
 
-export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMachineEvents>(
+export const authMachine = createMachine(
   {
     id: "authentication",
     initial: "unauthorized",
+    types: {} as { context: AuthMachineContext; events: AuthMachineEvents },
     context: {
       user: undefined,
       message: undefined,
@@ -60,6 +45,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       signup: {
         invoke: {
           src: "performSignup",
+          input: ({ event }) => ({ event }),
           onDone: { target: "unauthorized", actions: "onSuccess" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -67,6 +53,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       loading: {
         invoke: {
           src: "performLogin",
+          input: ({ event }) => ({ event }),
           onDone: { target: "authorized", actions: "onSuccess" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -74,6 +61,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       updating: {
         invoke: {
           src: "updateProfile",
+          input: ({ event }) => ({ event }),
           onDone: { target: "refreshing" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -81,6 +69,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       refreshing: {
         invoke: {
           src: "getUserProfile",
+          input: () => ({}),
           onDone: { target: "authorized", actions: "setUserProfile" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -91,6 +80,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       google: {
         invoke: {
           src: "getGoogleUserProfile",
+          input: ({ event }) => ({ event }),
           onDone: { target: "authorized", actions: "setUserProfile" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -101,6 +91,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       logout: {
         invoke: {
           src: "performLogout",
+          input: () => ({}),
           onDone: { target: "unauthorized" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -116,6 +107,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       auth0: {
         invoke: {
           src: "getAuth0UserProfile",
+          input: ({ event }) => ({ event }),
           onDone: { target: "authorized", actions: "setUserProfile" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -126,6 +118,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       okta: {
         invoke: {
           src: "getOktaUserProfile",
+          input: ({ event }) => ({ event }),
           onDone: { target: "authorized", actions: "setUserProfile" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -136,6 +129,7 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
       cognito: {
         invoke: {
           src: "getCognitoUserProfile",
+          input: ({ event }) => ({ event }),
           onDone: { target: "authorized", actions: "setUserProfile" },
           onError: { target: "unauthorized", actions: "onError" },
         },
@@ -146,16 +140,16 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
     },
   },
   {
-    services: {
-      performSignup: async (ctx, event) => {
-        const payload = omit("type", event);
+    actors: {
+      performSignup: fromPromise(async ({ input }: { input: any }) => {
+        const payload = omit("type", input.event);
         const resp = await httpClient.post(`http://localhost:${backendPort}/users`, payload);
         history.push("/signin");
         return resp.data;
-      },
-      performLogin: async (ctx, event) => {
+      }),
+      performLogin: fromPromise(async ({ input }: { input: any }) => {
         return await httpClient
-          .post(`http://localhost:${backendPort}/login`, event)
+          .post(`http://localhost:${backendPort}/login`, input.event)
           .then(({ data }) => {
             history.push("/");
             return data;
@@ -163,119 +157,125 @@ export const authMachine = Machine<AuthMachineContext, AuthMachineSchema, AuthMa
           .catch((error) => {
             throw new Error("Username or password is invalid");
           });
-      },
-      getOktaUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Okta User fields to our User Model
-        const user = {
-          id: event.user.sub,
-          email: event.user.email,
-          firstName: event.user.given_name,
-          lastName: event.user.family_name,
-          username: event.user.preferred_username,
-        };
+      }),
+      getOktaUserProfile: /* istanbul ignore next */ fromPromise(
+        async ({ input }: { input: any }) => {
+          const event = input.event;
+          // Map Okta User fields to our User Model
+          const user = {
+            id: event.user.sub,
+            email: event.user.email,
+            firstName: event.user.given_name,
+            lastName: event.user.family_name,
+            username: event.user.preferred_username,
+          };
 
-        // Set Access Token in Local Storage for API calls
-        localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
+          // Set Access Token in Local Storage for API calls
+          localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
 
-        return Promise.resolve({ user });
-      },
-      getUserProfile: async (ctx, event) => {
+          return { user };
+        }
+      ),
+      getUserProfile: fromPromise(async ({ input }: { input: any }) => {
         const resp = await httpClient.get(`http://localhost:${backendPort}/checkAuth`);
         return resp.data;
-      },
-      getGoogleUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Google User fields to our User Model
-        const user = {
-          id: event.user.googleId,
-          email: event.user.email,
-          firstName: event.user.givenName,
-          lastName: event.user.familyName,
-          avatar: event.user.imageUrl,
-        };
+      }),
+      getGoogleUserProfile: /* istanbul ignore next */ fromPromise(
+        async ({ input }: { input: any }) => {
+          const event = input.event;
+          // Map Google User fields to our User Model
+          const user = {
+            id: event.user.googleId,
+            email: event.user.email,
+            firstName: event.user.givenName,
+            lastName: event.user.familyName,
+            avatar: event.user.imageUrl,
+          };
 
-        // Set Google Access Token in Local Storage for API calls
-        localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
+          // Set Google Access Token in Local Storage for API calls
+          localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
 
-        return Promise.resolve({ user });
-      },
-      getAuth0UserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Auth0 User fields to our User Model
-        const user = {
-          id: event.user.sub,
-          email: event.user.email,
-          firstName: event.user.nickname,
-          avatar: event.user.picture,
-        };
+          return { user };
+        }
+      ),
+      getAuth0UserProfile: /* istanbul ignore next */ fromPromise(
+        async ({ input }: { input: any }) => {
+          const event = input.event;
+          // Map Auth0 User fields to our User Model
+          const user = {
+            id: event.user.sub,
+            email: event.user.email,
+            firstName: event.user.nickname,
+            avatar: event.user.picture,
+          };
 
-        // Set Auth0 Access Token in Local Storage for API calls
-        localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
+          // Set Auth0 Access Token in Local Storage for API calls
+          localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.token);
 
-        return Promise.resolve({ user });
-      },
-      updateProfile: async (ctx, event: any) => {
-        const payload = omit("type", event);
+          return { user };
+        }
+      ),
+      updateProfile: fromPromise(async ({ input }: { input: any }) => {
+        const payload = omit("type", input.event);
         const resp = await httpClient.patch(
           `http://localhost:${backendPort}/users/${payload.id}`,
           payload
         );
         return resp.data;
-      },
-      performLogout: async (ctx, event) => {
+      }),
+      performLogout: fromPromise(async ({ input }: { input: any }) => {
         localStorage.removeItem("authState");
         return await httpClient.post(`http://localhost:${backendPort}/logout`);
-      },
-      getCognitoUserProfile: /* istanbul ignore next */ (ctx, event: any) => {
-        // Map Cognito User fields to our User Model
-        const ourUser = {
-          id: event.userSub,
-          email: event.email,
-        };
+      }),
+      getCognitoUserProfile: /* istanbul ignore next */ fromPromise(
+        async ({ input }: { input: any }) => {
+          const event = input.event;
+          // Map Cognito User fields to our User Model
+          const ourUser = {
+            id: event.userSub,
+            email: event.email,
+          };
 
-        // Set Access Token in Local Storage for API calls
-        localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.accessTokenJwtString);
+          // Set Access Token in Local Storage for API calls
+          localStorage.setItem(process.env.VITE_AUTH_TOKEN_NAME!, event.accessTokenJwtString);
 
-        return Promise.resolve(ourUser);
-      },
+          return ourUser;
+        }
+      ),
     },
     actions: {
-      redirectHomeAfterLogin: async (ctx, event) => {
+      redirectHomeAfterLogin: ({ context, event }) => {
         if (history.location.pathname === "/signin") {
           /* istanbul ignore next */
           window.location.pathname = "/";
         }
       },
-      resetUser: assign((ctx: any, event: any) => ({
+      resetUser: assign(() => ({
         user: undefined,
       })),
-      setUserProfile: assign((ctx: any, event: any) => ({
-        user: event.data.user,
+      setUserProfile: assign(({ event }) => ({
+        user: (event as any).output.user,
       })),
-      onSuccess: assign((ctx: any, event: any) => ({
-        user: event.data.user,
+      onSuccess: assign(({ event }) => ({
+        user: (event as any).output.user,
         message: undefined,
       })),
-      onError: assign((ctx: any, event: any) => ({
-        message: event.data.message,
+      onError: assign(({ event }) => ({
+        message: (event as any).error.message,
       })),
     },
   }
 );
 
 // @ts-ignore
-const stateDefinition = JSON.parse(localStorage.getItem("authState"));
+const stateDefinition = JSON.parse(localStorage.getItem("authState")!);
 
-let resolvedState;
-if (stateDefinition) {
-  const previousState = State.create(stateDefinition);
+export const authService = createActor(authMachine, {
+  ...(stateDefinition ? { snapshot: stateDefinition } : {}),
+});
 
-  // @ts-ignore
-  resolvedState = authMachine.resolveState(previousState);
-}
+authService.subscribe((snapshot) => {
+  localStorage.setItem("authState", JSON.stringify(snapshot));
+});
 
-export const authService = interpret(authMachine)
-  .onTransition((state) => {
-    if (state.changed) {
-      localStorage.setItem("authState", JSON.stringify(state));
-    }
-  })
-  .start(resolvedState);
+authService.start();

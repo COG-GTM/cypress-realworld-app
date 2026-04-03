@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { useActor } from "@xstate/react";
-import { Interpreter } from "xstate";
+import type { AnyActorRef } from "xstate";
 import { Link } from "react-router-dom";
 import { Button, Container, CssBaseline, TextField, Grid, Box, Typography } from "@mui/material";
 import { Formik, Form, Field, FieldProps } from "formik";
@@ -10,7 +10,6 @@ import { string, object, ref } from "yup";
 import RWALogo from "./SvgRwaLogo";
 import Footer from "./Footer";
 import { SignUpPayload } from "../models";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 
 const PREFIX = "SignUpForm";
 
@@ -56,7 +55,7 @@ const validationSchema = object({
 });
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
+  authService: AnyActorRef;
 }
 
 const SignUpForm: React.FC<Props> = ({ authService }) => {

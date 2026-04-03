@@ -1,18 +1,10 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
+import type { AnyActorRef } from "xstate";
 import { useActor } from "@xstate/react";
 import { Paper, Typography } from "@mui/material";
 import { NotificationUpdatePayload } from "../models";
 import NotificationList from "../components/NotificationList";
-import { DataContext, DataSchema, DataEvents } from "../machines/dataMachine";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 
 const PREFIX = "NotificationsContainer";
 
@@ -31,14 +23,8 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  notificationsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  notificationsService: AnyActorRef;
 }
 
 const NotificationsContainer: React.FC<Props> = ({ authService, notificationsService }) => {

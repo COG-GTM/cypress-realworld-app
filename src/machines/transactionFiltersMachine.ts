@@ -1,21 +1,4 @@
-import { Machine, assign } from "xstate";
-
-interface FilterSchema {
-  states: {
-    dateRange: {
-      states: {
-        none: {};
-        filter: {};
-      };
-    };
-    amountRange: {
-      states: {
-        none: {};
-        filter: {};
-      };
-    };
-  };
-}
+import { createMachine, assign } from "xstate";
 
 type DateFilterEvent = {
   type: "DATE_FILTER";
@@ -38,10 +21,11 @@ type FilterEvents =
 
 export interface FilterContext {}
 
-export const transactionFiltersMachine = Machine<FilterContext, FilterSchema, FilterEvents>(
+export const transactionFiltersMachine = createMachine(
   {
     id: "filters",
     type: "parallel",
+    types: {} as { context: FilterContext; events: FilterEvents },
     context: {},
     states: {
       dateRange: {
@@ -83,19 +67,19 @@ export const transactionFiltersMachine = Machine<FilterContext, FilterSchema, Fi
   },
   {
     actions: {
-      setDateRange: assign((ctx: FilterContext, event: any) => ({
-        dateRangeStart: event.dateRangeStart,
-        dateRangeEnd: event.dateRangeEnd,
+      setDateRange: assign(({ event }) => ({
+        dateRangeStart: (event as any).dateRangeStart,
+        dateRangeEnd: (event as any).dateRangeEnd,
       })),
-      resetDateRange: assign((ctx: FilterContext, event: any) => ({
+      resetDateRange: assign(() => ({
         dateRangeStart: undefined,
         dateRangeEnd: undefined,
       })),
-      setAmountRange: assign((ctx: FilterContext, event: any) => ({
-        amountMin: event.amountMin,
-        amountMax: event.amountMax,
+      setAmountRange: assign(({ event }) => ({
+        amountMin: (event as any).amountMin,
+        amountMax: (event as any).amountMax,
       })),
-      resetAmountRange: assign((ctx: FilterContext, event: any) => ({
+      resetAmountRange: assign(() => ({
         amountMin: undefined,
         amountMax: undefined,
       })),

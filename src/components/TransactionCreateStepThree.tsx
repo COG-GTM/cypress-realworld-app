@@ -2,18 +2,7 @@ import React from "react";
 import { styled } from "@mui/material/styles";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import { Paper, Typography, Grid, Avatar, Box, Button } from "@mui/material";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
-import {
-  CreateTransactionMachineContext,
-  CreateTransactionMachineEvents,
-  CreateTransactionMachineSchema,
-} from "../machines/createTransactionMachine";
+import type { AnyActorRef } from "xstate";
 import { useActor } from "@xstate/react";
 import { formatAmount } from "../utils/transactionUtils";
 
@@ -32,18 +21,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export interface TransactionCreateStepThreeProps {
-  createTransactionService: Interpreter<
-    CreateTransactionMachineContext,
-    CreateTransactionMachineSchema,
-    CreateTransactionMachineEvents,
-    any,
-    ResolveTypegenMeta<
-      TypegenDisabled,
-      CreateTransactionMachineEvents,
-      BaseActionObject,
-      ServiceMap
-    >
-  >;
+  createTransactionService: AnyActorRef;
 }
 
 const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
@@ -130,7 +108,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
               size="small"
               /* istanbul ignore next */
               onClick={() => {
-                sendCreateTransaction("RESET");
+                sendCreateTransaction({ type: "RESET" });
                 history.push("/transaction/new");
               }}
               data-test="new-transaction-create-another-transaction"

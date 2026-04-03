@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
 import { head } from "lodash/fp";
-import { Interpreter } from "xstate";
+import type { AnyActorRef } from "xstate";
 import { useActor } from "@xstate/react";
 import clsx from "clsx";
 import {
@@ -27,7 +27,6 @@ import {
 } from "@mui/icons-material";
 
 import { formatAmount } from "../utils/transactionUtils";
-import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 
 const PREFIX = "NavDrawer";
 
@@ -187,7 +186,7 @@ interface Props {
   closeMobileDrawer: () => void;
   toggleDrawer: () => void;
   drawerOpen: boolean;
-  authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
+  authService: AnyActorRef;
 }
 
 const NavDrawer: React.FC<Props> = ({
@@ -201,7 +200,7 @@ const NavDrawer: React.FC<Props> = ({
   const showTemporaryDrawer = useMediaQuery(theme.breakpoints.only("xs"));
 
   const currentUser = authState?.context?.user;
-  const signOut = () => sendAuth("LOGOUT");
+  const signOut = () => sendAuth({ type: "LOGOUT" });
 
   return (
     <StyledDrawer

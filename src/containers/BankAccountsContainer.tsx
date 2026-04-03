@@ -1,30 +1,16 @@
 import React, { useEffect } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor } from "@xstate/react";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
+import type { AnyActorRef } from "xstate";
 import { Link as RouterLink, useRouteMatch } from "react-router-dom";
 import { Grid, Button, Paper, Typography } from "@mui/material";
 
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
-import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
 import BankAccountForm from "../components/BankAccountForm";
 import BankAccountList from "../components/BankAccountList";
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  bankAccountsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  bankAccountsService: AnyActorRef;
 }
 const PREFIX = "BankAccountsContainer";
 
@@ -58,7 +44,7 @@ const BankAccountsContainer: React.FC<Props> = ({ authService, bankAccountsServi
   };
 
   useEffect(() => {
-    sendBankAccounts("FETCH");
+    sendBankAccounts({ type: "FETCH" });
   }, [sendBankAccounts]);
 
   if (match.url === "/bankaccounts/new" && currentUser?.id) {

@@ -11,32 +11,18 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import {
-  BaseActionObject,
-  Interpreter,
-  ResolveTypegenMeta,
-  ServiceMap,
-  TypegenDisabled,
-} from "xstate";
+import type { AnyActorRef } from "xstate";
 import { isEmpty } from "lodash/fp";
 import { useActor, useMachine } from "@xstate/react";
 
 import { userOnboardingMachine } from "../machines/userOnboardingMachine";
 import BankAccountForm from "../components/BankAccountForm";
-import { DataContext, DataEvents, DataSchema } from "../machines/dataMachine";
-import { AuthMachineContext, AuthMachineEvents, AuthMachineSchema } from "../machines/authMachine";
 import NavigatorIllustration from "../components/SvgUndrawNavigatorA479";
 import PersonalFinance from "../components/SvgUndrawPersonalFinanceTqcd";
 
 export interface Props {
-  authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
-  bankAccountsService: Interpreter<
-    DataContext,
-    DataSchema,
-    DataEvents,
-    any,
-    ResolveTypegenMeta<TypegenDisabled, DataEvents, BaseActionObject, ServiceMap>
-  >;
+  authService: AnyActorRef;
+  bankAccountsService: AnyActorRef;
 }
 
 const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsService }) => {
@@ -49,7 +35,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
   const currentUser = authState?.context?.user;
 
   useEffect(() => {
-    sendBankAccounts("FETCH");
+    sendBankAccounts({ type: "FETCH" });
   }, [sendBankAccounts]);
 
   const noBankAccounts =
@@ -62,7 +48,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
     (!userOnboardingState.matches("done") && noBankAccounts) ||
     false;
 
-  const nextStep = () => sendUserOnboarding("NEXT");
+  const nextStep = () => sendUserOnboarding({ type: "NEXT" });
 
   const createBankAccountWithNextStep = (payload: any) => {
     sendBankAccounts({ type: "CREATE", ...payload });
@@ -116,7 +102,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
           <Grid item>
             <Button
               style={{ paddingRight: "80%" }}
-              onClick={/* istanbul ignore next */ () => sendAuth("LOGOUT")}
+              onClick={/* istanbul ignore next */ () => sendAuth({ type: "LOGOUT" })}
               color="secondary"
               data-test="user-onboarding-logout"
             >

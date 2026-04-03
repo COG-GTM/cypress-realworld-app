@@ -1,17 +1,18 @@
 import { isEmpty, omit } from "lodash/fp";
+import { fromPromise } from "xstate";
 import { dataMachine } from "./dataMachine";
 import { httpClient } from "../utils/asyncUtils";
 import { backendPort } from "../utils/portUtils";
 
-export const usersMachine = dataMachine("users").withConfig({
-  services: {
-    fetchData: async (ctx, event: any) => {
-      const payload = omit("type", event);
+export const usersMachine = dataMachine("users").provide({
+  actors: {
+    fetchData: fromPromise(async ({ input }: { input: any }) => {
+      const payload = omit("type", input.event);
       let route = isEmpty(payload) ? "users" : "users/search";
       const resp = await httpClient.get(`http://localhost:${backendPort}/${route}`, {
         params: !isEmpty(payload) ? payload : undefined,
       });
       return resp.data;
-    },
+    }),
   },
 });
