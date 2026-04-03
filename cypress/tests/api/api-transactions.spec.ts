@@ -166,4 +166,173 @@ describe("Transactions API", function () {
       });
     });
   });
+
+  context("Error Paths", function () {
+    // Unauthenticated access
+    it("should return 401 when not authenticated for GET /transactions", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "GET",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    it("should return 401 when not authenticated for POST /transactions", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+          receiverId: "test",
+          description: "test",
+          amount: 100,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    it("should return 401 when not authenticated for PATCH /transactions/:id", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "PATCH",
+        url: `${apiTransactions}/test-id`,
+        failOnStatusCode: false,
+        body: {
+          requestStatus: "rejected",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    // Invalid transaction creation payloads
+    it("should return 422 when creating a payment with missing receiverId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+          description: "Test payment",
+          amount: 100,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating a payment with missing amount", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+          receiverId: ctx.receiver!.id,
+          description: "Test payment",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating a payment with invalid transactionType", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "invalid",
+          receiverId: ctx.receiver!.id,
+          description: "Test payment",
+          amount: 100,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating a payment with non-numeric amount", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+          receiverId: ctx.receiver!.id,
+          description: "Test payment",
+          amount: "not-a-number",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating a payment with missing description", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiTransactions}`,
+        failOnStatusCode: false,
+        body: {
+          transactionType: "payment",
+          receiverId: ctx.receiver!.id,
+          amount: 100,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    // Invalid IDs
+    it("should return 422 when transactionId is not a valid shortid for GET", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiTransactions}/invalid-id-format!!!`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when transactionId is not a valid shortid for PATCH", function () {
+      cy.request({
+        method: "PATCH",
+        url: `${apiTransactions}/invalid-id-format!!!`,
+        failOnStatusCode: false,
+        body: {
+          requestStatus: "rejected",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    // Invalid PATCH body
+    it("should return 422 when patching with invalid requestStatus", function () {
+      cy.request({
+        method: "PATCH",
+        url: `${apiTransactions}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          requestStatus: "invalid-status",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+  });
 });

@@ -146,4 +146,78 @@ describe("Bank Accounts API", function () {
       });
     });
   });
+
+  context("Error Paths", function () {
+    it("should return 422 when creating bank account with missing bankName", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+        body: {
+          accountNumber: "1234567890",
+          routingNumber: "123456789",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating bank account with missing accountNumber", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+        body: {
+          bankName: "Test Bank",
+          routingNumber: "123456789",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 422 when creating bank account with missing routingNumber", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+        body: {
+          bankName: "Test Bank",
+          accountNumber: "1234567890",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors.length).to.be.greaterThan(0);
+      });
+    });
+
+    it("should return 401 when not authenticated for GET /bankAccounts", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "GET",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+
+    it("should return 401 when not authenticated for POST /bankAccounts", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "POST",
+        url: `${apiBankAccounts}`,
+        failOnStatusCode: false,
+        body: {
+          bankName: "Test Bank",
+          accountNumber: "1234567890",
+          routingNumber: "123456789",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+  });
 });
