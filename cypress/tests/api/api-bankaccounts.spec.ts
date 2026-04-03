@@ -194,22 +194,22 @@ describe("Bank Accounts API", function () {
     });
 
     it("should return 401 when not authenticated for GET /bankAccounts", function () {
+      cy.clearCookies();
       cy.request({
         method: "GET",
         url: `${apiBankAccounts}`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
       }).then((response) => {
         expect(response.status).to.eq(401);
       });
     });
 
     it("should return 401 when not authenticated for POST /bankAccounts", function () {
+      cy.clearCookies();
       cy.request({
         method: "POST",
         url: `${apiBankAccounts}`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
         body: {
           bankName: "Test Bank",
           accountNumber: "1234567890",

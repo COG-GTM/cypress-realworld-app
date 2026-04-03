@@ -170,22 +170,22 @@ describe("Transactions API", function () {
   context("Error Paths", function () {
     // Unauthenticated access
     it("should return 401 when not authenticated for GET /transactions", function () {
+      cy.clearCookies();
       cy.request({
         method: "GET",
         url: `${apiTransactions}`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
       }).then((response) => {
         expect(response.status).to.eq(401);
       });
     });
 
     it("should return 401 when not authenticated for POST /transactions", function () {
+      cy.clearCookies();
       cy.request({
         method: "POST",
         url: `${apiTransactions}`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
         body: {
           transactionType: "payment",
           receiverId: "test",
@@ -198,11 +198,11 @@ describe("Transactions API", function () {
     });
 
     it("should return 401 when not authenticated for PATCH /transactions/:id", function () {
+      cy.clearCookies();
       cy.request({
         method: "PATCH",
         url: `${apiTransactions}/test-id`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
         body: {
           requestStatus: "rejected",
         },

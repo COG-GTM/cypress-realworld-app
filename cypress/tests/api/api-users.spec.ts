@@ -205,11 +205,11 @@ describe("Users API", function () {
 
   context("Error Paths", function () {
     it("should return 401 for GET /users when not authenticated", function () {
+      cy.clearCookies();
       cy.request({
         method: "GET",
         url: apiUsers,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
       }).then((response) => {
         expect(response.status).to.eq(401);
       });
@@ -241,11 +241,11 @@ describe("Users API", function () {
     });
 
     it("should return 401 for PATCH /users/:userId when not authenticated", function () {
+      cy.clearCookies();
       cy.request({
         method: "PATCH",
         url: `${apiUsers}/test-user-id`,
         failOnStatusCode: false,
-        headers: { Cookie: "" },
         body: {
           firstName: "Test",
         },
