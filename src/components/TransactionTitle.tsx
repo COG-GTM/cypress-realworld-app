@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Typography } from "@mui/material";
 import { TransactionResponseItem } from "../models";
@@ -36,7 +36,7 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const TransactionTitle: React.FC<{
+const TransactionTitle: FC<{
   transaction: TransactionResponseItem;
 }> = ({ transaction }) => {
   return (

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { List } from "@mui/material";
 
 import CommentListItem from "./CommentListItem";
@@ -8,7 +8,7 @@ export interface CommentsListProps {
   comments: Comment[];
 }
 
-const CommentsList: React.FC<CommentsListProps> = ({ comments }) => {
+const CommentsList: FC<CommentsListProps> = ({ comments }) => {
   return (
     <List data-test="comments-list">
       {comments &&

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 
 import { styled } from "@mui/material/styles";
 
@@ -60,7 +60,7 @@ const StyledListItem = styled(ListItem)({
   },
 });
 
-const NotificationListItem: React.FC<NotificationListItemProps> = ({
+const NotificationListItem: FC<NotificationListItemProps> = ({
   notification,
   updateNotification,
 }) => {

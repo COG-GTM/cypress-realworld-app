@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor } from "@xstate/react";
 import {
@@ -41,7 +42,7 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const BankAccountsContainer: React.FC<Props> = ({ authService, bankAccountsService }) => {
+const BankAccountsContainer: FC<Props> = ({ authService, bankAccountsService }) => {
   const match = useRouteMatch();
 
   const [authState] = useActor(authService);

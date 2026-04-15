@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC, MouseEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { head } from "lodash/fp";
 import { Interpreter } from "xstate";
@@ -113,7 +113,7 @@ const StyledDrawer = styled(Drawer)(({ theme }) => ({
 const drawerWidth = 240;
 
 export const mainListItems = (
-  toggleDrawer: ((event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void) | undefined,
+  toggleDrawer: ((event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>) => void) | undefined,
   showTemporaryDrawer: Boolean
 ) => (
   <div>
@@ -190,7 +190,7 @@ interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
 
-const NavDrawer: React.FC<Props> = ({
+const NavDrawer: FC<Props> = ({
   toggleDrawer,
   closeMobileDrawer,
   drawerOpen,

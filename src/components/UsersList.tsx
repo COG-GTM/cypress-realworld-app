@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { List } from "@mui/material";
 
 import UserListItem from "./UserListItem";
@@ -9,7 +9,7 @@ export interface UsersListProps {
   setReceiver: Function;
 }
 
-const UsersList: React.FC<UsersListProps> = ({ users, setReceiver }) => {
+const UsersList: FC<UsersListProps> = ({ users, setReceiver }) => {
   return (
     <List data-test="users-list">
       {users &&

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Switch, Route, Redirect } from "react-router-dom";
 import { useActor, useMachine } from "@xstate/react";
@@ -32,7 +32,7 @@ if (window.Cypress) {
   window.authService = authService;
 }
 
-const App: React.FC = () => {
+const App: FC = () => {
   const [authState] = useActor(authService);
   const [, , notificationsService] = useMachine(notificationsMachine);
 

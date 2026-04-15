@@ -1,9 +1,9 @@
-import React from "react";
+import type { FC, ReactNode } from "react";
 import { Box, Typography, Grid, colors } from "@mui/material";
 
 const { grey } = colors;
 
-const EmptyList: React.FC<{ entity: string; children?: React.ReactNode }> = ({
+const EmptyList: FC<{ entity: string; children?: ReactNode }> = ({
   entity,
   children,
 }) => {

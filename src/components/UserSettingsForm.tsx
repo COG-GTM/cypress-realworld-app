@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { TextField, Button, Grid } from "@mui/material";
 import { Formik, Form, Field, FieldProps } from "formik";
@@ -46,7 +46,7 @@ export interface UserSettingsProps {
   updateUser: Function;
 }
 
-const UserSettingsForm: React.FC<UserSettingsProps> = ({ userProfile, updateUser }) => {
+const UserSettingsForm: FC<UserSettingsProps> = ({ userProfile, updateUser }) => {
   const initialValues: UserSettingsPayload = {
     firstName: userProfile.firstName,
     lastName: userProfile.lastName,

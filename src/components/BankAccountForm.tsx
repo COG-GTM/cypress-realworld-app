@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { TextField, Button, Grid } from "@mui/material";
 import { Formik, Form, Field, FieldProps } from "formik";
@@ -49,7 +49,7 @@ export interface BankAccountFormProps {
   onboarding?: boolean;
 }
 
-const BankAccountForm: React.FC<BankAccountFormProps> = ({
+const BankAccountForm: FC<BankAccountFormProps> = ({
   userId,
   createBankAccount,
   onboarding,

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Link as RouterLink, useHistory } from "react-router-dom";
 import { Paper, Typography, Grid, Avatar, Box, Button } from "@mui/material";
@@ -46,7 +46,7 @@ export interface TransactionCreateStepThreeProps {
   >;
 }
 
-const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
+const TransactionCreateStepThree: FC<TransactionCreateStepThreeProps> = ({
   createTransactionService,
 }) => {
   const history = useHistory();

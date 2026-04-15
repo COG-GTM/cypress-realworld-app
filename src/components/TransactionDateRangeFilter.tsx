@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import type { FC, MouseEvent } from "react";
 import { styled } from "@mui/material/styles";
 import { format as formatDate } from "date-fns";
 import { Popover, Chip, useTheme, Drawer, Button, useMediaQuery, colors } from "@mui/material";
@@ -34,7 +35,7 @@ export type TransactionListDateRangeFilterProps = {
   resetDateRange: Function;
 };
 
-const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterProps> = ({
+const TransactionListDateRangeFilter: FC<TransactionListDateRangeFilterProps> = ({
   filterDateRange,
   dateRangeFilters,
   resetDateRange,
@@ -44,7 +45,7 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
   const queryHasDateFields = dateRangeFilters && hasDateQueryFields(dateRangeFilters);
   const [calendarValue, setCalendarValue] = useState<Value>(null);
 
-  const [dateRangeAnchorEl, setDateRangeAnchorEl] = React.useState<HTMLDivElement | null>(null);
+  const [dateRangeAnchorEl, setDateRangeAnchorEl] = useState<HTMLDivElement | null>(null);
 
   const onCalendarSelect = (val: Value) => {
     if (val && !(val instanceof Date)) {
@@ -59,7 +60,7 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
     }
   };
 
-  const handleDateRangeClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleDateRangeClick = (event: MouseEvent<HTMLDivElement>) => {
     setDateRangeAnchorEl(event.currentTarget);
   };
 

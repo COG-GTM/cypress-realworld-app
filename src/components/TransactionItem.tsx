@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useHistory } from "react-router";
 import {
@@ -72,7 +72,7 @@ const SmallAvatar = styled(Avatar)(({ theme }: { theme: Theme }) => {
   };
 });
 
-const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
+const TransactionItem: FC<TransactionProps> = ({ transaction }) => {
   const history = useHistory();
 
   const showTransactionDetail = (transactionId: string) => {

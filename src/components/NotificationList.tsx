@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { List } from "@mui/material";
 
 import NotificationListItem from "./NotificationListItem";
@@ -11,7 +11,7 @@ export interface NotificationsListProps {
   updateNotification: Function;
 }
 
-const NotificationsList: React.FC<NotificationsListProps> = ({
+const NotificationsList: FC<NotificationsListProps> = ({
   notifications,
   updateNotification,
 }) => {

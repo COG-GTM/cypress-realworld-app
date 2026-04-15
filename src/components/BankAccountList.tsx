@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { List } from "@mui/material";
 
 import { BankAccount } from "../models";
@@ -10,7 +10,7 @@ export interface BankAccountListProps {
   deleteBankAccount: Function;
 }
 
-const BankAccountList: React.FC<BankAccountListProps> = ({ bankAccounts, deleteBankAccount }) => {
+const BankAccountList: FC<BankAccountListProps> = ({ bankAccounts, deleteBankAccount }) => {
   return (
     <>
       {bankAccounts?.length > 0 ? (

@@ -1,4 +1,5 @@
-import React from "react";
+import { useState } from "react";
+import type { SyntheticEvent } from "react";
 import { Tabs, Tab } from "@mui/material";
 import { Link, useRouteMatch } from "react-router-dom";
 
@@ -14,9 +15,9 @@ export default function TransactionNavTabs() {
   };
 
   // Set selected tab based on url
-  const [value, setValue] = React.useState(navUrls[match.url]);
+  const [value, setValue] = useState(navUrls[match.url]);
 
-  const handleChange = (event: React.SyntheticEvent<{}>, newValue: number) => {
+  const handleChange = (event: SyntheticEvent<{}>, newValue: number) => {
     setValue(newValue);
   };
 

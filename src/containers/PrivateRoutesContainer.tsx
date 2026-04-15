@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { Switch } from "react-router";
 import {
   BaseActionObject,
@@ -47,7 +48,7 @@ export interface Props {
   >;
 }
 
-const PrivateRoutesContainer: React.FC<Props> = ({
+const PrivateRoutesContainer: FC<Props> = ({
   isLoggedIn,
   authService,
   notificationsService,

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { useMachine } from "@xstate/react";
 import { Switch, Route } from "react-router";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
@@ -9,7 +9,7 @@ import { getDateQueryFields, getAmountQueryFields } from "../utils/transactionUt
 import TransactionPersonalList from "../components/TransactionPersonalList";
 import TransactionPublicList from "../components/TransactionPublicList";
 
-const TransactionsContainer: React.FC = () => {
+const TransactionsContainer: FC = () => {
   const [currentFilters, sendFilterEvent] = useMachine(transactionFiltersMachine);
 
   const hasDateRangeFilter = currentFilters.matches({ dateRange: "filter" });

@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { useMachine, useActor } from "@xstate/react";
 import { User, TransactionPayload } from "../models";
 import TransactionCreateStepOne from "../components/TransactionCreateStepOne";
@@ -29,7 +30,7 @@ export interface Props {
   >;
 }
 
-const TransactionCreateContainer: React.FC<Props> = ({ authService, snackbarService }) => {
+const TransactionCreateContainer: FC<Props> = ({ authService, snackbarService }) => {
   const [authState] = useActor(authService);
   const [, sendSnackbar] = useActor(snackbarService);
 

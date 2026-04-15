@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor } from "@xstate/react";
 import { Interpreter } from "xstate";
@@ -59,7 +59,7 @@ export interface Props {
   authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
 }
 
-const SignUpForm: React.FC<Props> = ({ authService }) => {
+const SignUpForm: FC<Props> = ({ authService }) => {
   const [, sendAuth] = useActor(authService);
   const initialValues: SignUpPayload & { confirmPassword: string } = {
     firstName: "",

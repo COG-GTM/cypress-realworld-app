@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { useMachine, useActor } from "@xstate/react";
 import { useParams } from "react-router-dom";
 import TransactionDetail from "../components/TransactionDetail";
@@ -15,7 +16,7 @@ interface Params {
   transactionId: string;
 }
 
-const TransactionDetailsContainer: React.FC<Props> = ({ authService }) => {
+const TransactionDetailsContainer: FC<Props> = ({ authService }) => {
   const { transactionId }: Params = useParams();
   const [authState] = useActor(authService);
   const [transactionDetailState, sendTransactionDetail] = useMachine(transactionDetailMachine);

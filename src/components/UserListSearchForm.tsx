@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { TextField } from "@mui/material";
 
@@ -27,7 +28,7 @@ export interface UserListSearchFormProps {
   userListSearch: Function;
 }
 
-const UserListSearchForm: React.FC<UserListSearchFormProps> = ({ userListSearch }) => {
+const UserListSearchForm: FC<UserListSearchFormProps> = ({ userListSearch }) => {
   const inputEl = useRef<HTMLInputElement>(null);
 
   return (

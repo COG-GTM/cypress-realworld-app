@@ -1,4 +1,5 @@
-import React, { useEffect, ReactNode } from "react";
+import { useEffect } from "react";
+import type { FC, ReactNode } from "react";
 import { useMachine } from "@xstate/react";
 import {
   TransactionPagination,
@@ -15,7 +16,7 @@ export interface TransactionContactListProps {
   amountRangeFilters: TransactionAmountRangePayload;
 }
 
-const TransactionContactsList: React.FC<TransactionContactListProps> = ({
+const TransactionContactsList: FC<TransactionContactListProps> = ({
   filterComponent,
   dateRangeFilters,
   amountRangeFilters,

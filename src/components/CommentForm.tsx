@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { TextField } from "@mui/material";
 import { Formik, Form, Field, FieldProps } from "formik";
@@ -34,7 +34,7 @@ export interface CommentFormProps {
   transactionComment: (payload: object) => void;
 }
 
-const CommentForm: React.FC<CommentFormProps> = ({ transactionId, transactionComment }) => {
+const CommentForm: FC<CommentFormProps> = ({ transactionId, transactionComment }) => {
   const initialValues = { content: "" };
 
   return (

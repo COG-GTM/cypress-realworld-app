@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Paper, Typography, Grid } from "@mui/material";
 import UserSettingsForm from "../components/UserSettingsForm";
@@ -26,7 +26,7 @@ export interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
 
-const UserSettingsContainer: React.FC<Props> = ({ authService }) => {
+const UserSettingsContainer: FC<Props> = ({ authService }) => {
   const [authState, sendAuth] = useActor(authService);
 
   const currentUser = authState?.context?.user;

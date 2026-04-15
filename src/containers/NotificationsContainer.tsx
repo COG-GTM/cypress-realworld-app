@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import {
   BaseActionObject,
@@ -41,7 +42,7 @@ export interface Props {
   >;
 }
 
-const NotificationsContainer: React.FC<Props> = ({ authService, notificationsService }) => {
+const NotificationsContainer: FC<Props> = ({ authService, notificationsService }) => {
   const [authState] = useActor(authService);
   const [notificationsState, sendNotifications] = useActor(notificationsService);
 

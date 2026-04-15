@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import NumberFormat from "react-number-format";
 import { Formik, Form, Field, FieldProps } from "formik";
@@ -79,7 +80,7 @@ interface FormValues {
   receiverId: string;
 }
 
-const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
+const TransactionCreateStepTwo: FC<TransactionCreateStepTwoProps> = ({
   receiver,
   sender,
   createTransaction,

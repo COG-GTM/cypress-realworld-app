@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor, useMachine } from "@xstate/react";
 import { Container, CssBaseline } from "@mui/material";
@@ -39,7 +40,7 @@ const Root = styled("div")(({ theme }) => ({
 }));
 
 /* istanbul ignore next */
-const AppGoogle: React.FC = () => {
+const AppGoogle: FC = () => {
   const [authState] = useActor(authService);
   const [, , notificationsService] = useMachine(notificationsMachine);
 

@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
@@ -35,7 +36,7 @@ if (window.Cypress) {
   window.authService = authService;
 }
 
-const AppCognito: React.FC = /* istanbul ignore next */ () => {
+const AppCognito: FC = /* istanbul ignore next */ () => {
   const [authState] = useActor(authService);
   const [, , notificationsService] = useMachine(notificationsMachine);
 

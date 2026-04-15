@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Paper } from "@mui/material";
 import UsersList from "./UsersList";
@@ -27,7 +27,7 @@ export interface TransactionCreateStepOneProps {
   users: User[];
 }
 
-const TransactionCreateStepOne: React.FC<TransactionCreateStepOneProps> = ({
+const TransactionCreateStepOne: FC<TransactionCreateStepOneProps> = ({
   setReceiver,
   userListSearch,
   users,

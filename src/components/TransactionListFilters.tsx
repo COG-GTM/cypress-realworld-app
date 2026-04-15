@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Paper, Grid } from "@mui/material";
 import { TransactionDateRangePayload, TransactionAmountRangePayload } from "../models";
@@ -27,7 +27,7 @@ export type TransactionListFiltersProps = {
   amountRangeFilters: TransactionAmountRangePayload;
 };
 
-const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
+const TransactionListFilters: FC<TransactionListFiltersProps> = ({
   sendFilterEvent,
   dateRangeFilters,
   amountRangeFilters,

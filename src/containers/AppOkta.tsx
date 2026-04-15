@@ -1,5 +1,6 @@
 /* istanbul ignore next */
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor, useMachine } from "@xstate/react";
 import { CssBaseline } from "@mui/material";
@@ -34,7 +35,7 @@ if (window.Cypress) {
 }
 
 /* istanbul ignore next */
-const AppOkta: React.FC = () => {
+const AppOkta: FC = () => {
   const { authState: oktaAuthState, oktaAuth: oktaAuthService } = useOktaAuth();
 
   const [authState] = useActor(authService);

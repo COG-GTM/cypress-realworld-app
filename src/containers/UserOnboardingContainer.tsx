@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC } from "react";
 import {
   Button,
   Box,
@@ -39,7 +40,7 @@ export interface Props {
   >;
 }
 
-const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsService }) => {
+const UserOnboardingContainer: FC<Props> = ({ authService, bankAccountsService }) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
   const [bankAccountsState, sendBankAccounts] = useActor(bankAccountsService);

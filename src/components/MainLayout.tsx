@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+import type { FC, ReactNode } from "react";
 import { styled } from "@mui/material/styles";
 import { useMachine } from "@xstate/react";
 import {
@@ -58,7 +59,7 @@ const Root = styled("div")(({ theme }) => ({
 }));
 
 interface Props {
-  children: React.ReactNode;
+  children: ReactNode;
   authService: Interpreter<AuthMachineContext, AuthMachineSchema, AuthMachineEvents, any, any>;
   notificationsService: Interpreter<
     DataContext,
@@ -69,7 +70,7 @@ interface Props {
   >;
 }
 
-const MainLayout: React.FC<Props> = ({ children, notificationsService, authService }) => {
+const MainLayout: FC<Props> = ({ children, notificationsService, authService }) => {
   const theme = useTheme();
   const [drawerState, sendDrawer] = useMachine(drawerMachine);
 

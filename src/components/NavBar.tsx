@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import clsx from "clsx";
 import {
@@ -114,7 +114,7 @@ interface NavBarProps {
   >;
 }
 
-const NavBar: React.FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notificationsService }) => {
+const NavBar: FC<NavBarProps> = ({ drawerOpen, toggleDrawer, notificationsService }) => {
   const match = useLocation();
 
   const theme = useTheme();

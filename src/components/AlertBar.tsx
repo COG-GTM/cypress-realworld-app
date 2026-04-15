@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { Snackbar } from "@mui/material";
 import {
   BaseActionObject,
@@ -21,7 +21,7 @@ interface Props {
   >;
 }
 
-const AlertBar: React.FC<Props> = ({ snackbarService }) => {
+const AlertBar: FC<Props> = ({ snackbarService }) => {
   const [snackbarState] = useActor(snackbarService);
 
   return (

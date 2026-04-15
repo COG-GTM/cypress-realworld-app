@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { ListItem, ListItemText, ListItemAvatar, Avatar, Grid } from "@mui/material";
 
 import { User } from "../models";
@@ -9,7 +9,7 @@ export interface UserListItemProps {
   index: Number;
 }
 
-const UserListItem: React.FC<UserListItemProps> = ({ user, setReceiver, index }) => {
+const UserListItem: FC<UserListItemProps> = ({ user, setReceiver, index }) => {
   return (
     <ListItem data-test={`user-list-item-${user.id}`} onClick={() => setReceiver(user)}>
       <ListItemAvatar>

@@ -1,4 +1,4 @@
-import React from "react";
+import type { FC } from "react";
 import { styled } from "@mui/material/styles";
 import { Button, Typography, Grid, Avatar, Paper, IconButton } from "@mui/material";
 import { AvatarGroup } from "@mui/material";
@@ -99,7 +99,7 @@ type TransactionProps = {
   currentUser: User;
 };
 
-const TransactionDetail: React.FC<TransactionProps> = ({
+const TransactionDetail: FC<TransactionProps> = ({
   transaction,
   transactionLike,
   transactionComment,

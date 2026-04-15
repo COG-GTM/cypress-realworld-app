@@ -1,4 +1,5 @@
-import React from "react";
+import { useState } from "react";
+import type { FC, MouseEvent } from "react";
 import {
   Grid,
   Popover,
@@ -27,7 +28,7 @@ export type TransactionListAmountRangeFilterProps = {
   resetAmountRange: Function;
 };
 
-const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilterProps> = ({
+const TransactionListAmountRangeFilter: FC<TransactionListAmountRangeFilterProps> = ({
   filterAmountRange,
   amountRangeFilters,
   resetAmountRange,
@@ -36,11 +37,11 @@ const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilte
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));
 
   const initialAmountRange = [0, 100];
-  const [amountRangeValue, setAmountRangeValue] = React.useState<number[]>(initialAmountRange);
+  const [amountRangeValue, setAmountRangeValue] = useState<number[]>(initialAmountRange);
 
-  const [amountRangeAnchorEl, setAmountRangeAnchorEl] = React.useState<HTMLDivElement | null>(null);
+  const [amountRangeAnchorEl, setAmountRangeAnchorEl] = useState<HTMLDivElement | null>(null);
 
-  const handleAmountRangeClick = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleAmountRangeClick = (event: MouseEvent<HTMLDivElement>) => {
     setAmountRangeAnchorEl(event.currentTarget);
   };
 
