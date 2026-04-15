@@ -770,7 +770,7 @@
     json5 "^2.2.3"
     semver "^6.3.1"
 
-"@babel/core@^7.29.0":
+"@babel/core@^7.23.9", "@babel/core@^7.29.0":
   version "7.29.0"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.29.0.tgz#5286ad785df7f79d656e88ce86e650d16ca5f322"
   integrity sha512-CGOfOJqWjg2qW/Mb6zNsDm+u5vFQ8DxXfbM09z69p5Z6+mE1ikP2jUXw+j42Pf1XTYED2Rni5f95npYeuwMDQA==
@@ -1210,19 +1210,19 @@
   dependencies:
     "@babel/types" "^7.28.2"
 
+"@babel/parser@^7.23.9", "@babel/parser@^7.28.6", "@babel/parser@^7.29.0":
+  version "7.29.2"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.29.2.tgz#58bd50b9a7951d134988a1ae177a35ef9a703ba1"
+  integrity sha512-4GgRzy/+fsBa72/RZVJmGKPmZu9Byn8o4MoLpmNe1m8ZfYnz5emHLQz3U4gLud6Zwl0RZIcgiLD7Uq7ySFuDLA==
+  dependencies:
+    "@babel/types" "^7.29.0"
+
 "@babel/parser@^7.27.2", "@babel/parser@^7.28.0":
   version "7.28.0"
   resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.28.0.tgz#979829fbab51a29e13901e5a80713dbcb840825e"
   integrity sha512-jVZGvOxOuNSsuQuLRTh13nU0AogFlw32w/MT+LV6D3sP5WdbW61E77RnkbaO2dUvmPAYrBDJXGn5gGS6tH4j8g==
   dependencies:
     "@babel/types" "^7.28.0"
-
-"@babel/parser@^7.28.6", "@babel/parser@^7.29.0":
-  version "7.29.2"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.29.2.tgz#58bd50b9a7951d134988a1ae177a35ef9a703ba1"
-  integrity sha512-4GgRzy/+fsBa72/RZVJmGKPmZu9Byn8o4MoLpmNe1m8ZfYnz5emHLQz3U4gLud6Zwl0RZIcgiLD7Uq7ySFuDLA==
-  dependencies:
-    "@babel/types" "^7.29.0"
 
 "@babel/plugin-bugfix-firefox-class-in-computed-class-key@^7.28.5":
   version "7.28.5"
@@ -2630,6 +2630,11 @@
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.3.tgz#e45e384e4b8ec16bce2fd903af78450f6bf7ec98"
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
+
+"@istanbuljs/schema@^0.1.3":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@istanbuljs/schema/-/schema-0.1.6.tgz#8dc9afa2ac1506cb1a58f89940f1c124446c8df3"
+  integrity sha512-+Sg6GCR/wy1oSmQDFq4LQDAhm3ETKnorxN+y5nbLULOR3P0c14f2Wurzj3/xqPXtasLFfHd5iRFQ7AJt4KH2cw==
 
 "@jest/expect-utils@^29.7.0":
   version "29.7.0"
@@ -7400,6 +7405,14 @@ foreground-child@^2.0.0:
     cross-spawn "^7.0.0"
     signal-exit "^3.0.2"
 
+foreground-child@^3.3.0:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/foreground-child/-/foreground-child-3.3.1.tgz#32e8e9ed1b68a3497befb9ac2b6adf92a638576f"
+  integrity sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==
+  dependencies:
+    cross-spawn "^7.0.6"
+    signal-exit "^4.0.1"
+
 forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
@@ -7637,7 +7650,7 @@ glob-to-regexp@^0.4.1:
   resolved "https://registry.yarnpkg.com/glob-to-regexp/-/glob-to-regexp-0.4.1.tgz#c75297087c851b9a578bd217dd59a92f59fe546e"
   integrity sha512-lkX1HJXwyMcprw/5YUZc2s7DrpAiHB21/V+E1rHUrVNokkvB6bqMzT0VfV6/86ZNabt1k14YOIaT7nDvOX3Iiw==
 
-glob@^13.0.0, glob@^13.0.6:
+glob@^13.0.0, glob@^13.0.3, glob@^13.0.6:
   version "13.0.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-13.0.6.tgz#078666566a425147ccacfbd2e332deb66a2be71d"
   integrity sha512-Wjlyrolmm8uDpm/ogGyXZXb1Z+Ca2B8NbJwqBVg0axK9GbBeoS7yGV6vjXnYdGm6X53iehEuxxbyiKp8QmN4Vw==
@@ -8452,6 +8465,17 @@ istanbul-lib-instrument@^5.1.0:
     istanbul-lib-coverage "^3.2.0"
     semver "^6.3.0"
 
+istanbul-lib-instrument@^6.0.2:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-instrument/-/istanbul-lib-instrument-6.0.3.tgz#fa15401df6c15874bcb2105f773325d78c666765"
+  integrity sha512-Vtgk7L/R2JHyyGW07spoFlB8/lpjiOLTjMdms6AFMraYt3BaJauod/NGrfnVG/y4Ix1JEuMRPDPEj2ua+zz1/Q==
+  dependencies:
+    "@babel/core" "^7.23.9"
+    "@babel/parser" "^7.23.9"
+    "@istanbuljs/schema" "^0.1.3"
+    istanbul-lib-coverage "^3.2.0"
+    semver "^7.5.4"
+
 istanbul-lib-processinfo@^2.0.2:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/istanbul-lib-processinfo/-/istanbul-lib-processinfo-2.0.3.tgz#366d454cd0dcb7eb6e0e419378e60072c8626169"
@@ -8462,6 +8486,18 @@ istanbul-lib-processinfo@^2.0.2:
     istanbul-lib-coverage "^3.2.0"
     p-map "^3.0.0"
     rimraf "^3.0.0"
+    uuid "^8.3.2"
+
+istanbul-lib-processinfo@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/istanbul-lib-processinfo/-/istanbul-lib-processinfo-3.0.0.tgz#1b95ce9ccbac979a718de17ab33b940e2ce5b75f"
+  integrity sha512-P7nLXRRlo7Sqinty6lNa7+4o9jBUYGpqtejqCOZKfgXlRoxY/QArflcB86YO500Ahj4pDJEG34JjMRbQgePLnQ==
+  dependencies:
+    archy "^1.0.0"
+    cross-spawn "^7.0.3"
+    istanbul-lib-coverage "^3.2.0"
+    p-map "^3.0.0"
+    rimraf "^6.1.3"
     uuid "^8.3.2"
 
 istanbul-lib-report@^3.0.0:
@@ -9805,6 +9841,39 @@ nyc@15.1.0:
     test-exclude "^6.0.0"
     yargs "^15.0.2"
 
+nyc@18.0.0:
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/nyc/-/nyc-18.0.0.tgz#644c75c5cba4e8c571674016ac7f714fb143f20c"
+  integrity sha512-G5UyHinFkB1BxqGTrmZdB6uIYH0+v7ZnVssuflUDi+J+RhKWyAhRT1RCehBSI6jLFLuUUgFDyLt49mUtdO1XeQ==
+  dependencies:
+    "@istanbuljs/load-nyc-config" "^1.0.0"
+    "@istanbuljs/schema" "^0.1.2"
+    caching-transform "^4.0.0"
+    convert-source-map "^1.7.0"
+    decamelize "^1.2.0"
+    find-cache-dir "^3.2.0"
+    find-up "^4.1.0"
+    foreground-child "^3.3.0"
+    get-package-type "^0.1.0"
+    glob "^13.0.6"
+    istanbul-lib-coverage "^3.0.0"
+    istanbul-lib-hook "^3.0.0"
+    istanbul-lib-instrument "^6.0.2"
+    istanbul-lib-processinfo "^3.0.0"
+    istanbul-lib-report "^3.0.0"
+    istanbul-lib-source-maps "^4.0.0"
+    istanbul-reports "^3.0.2"
+    make-dir "^3.0.0"
+    node-preload "^0.2.1"
+    p-map "^3.0.0"
+    process-on-spawn "^1.0.0"
+    resolve-from "^5.0.0"
+    rimraf "^6.1.3"
+    signal-exit "^3.0.2"
+    spawn-wrap "^3.0.0"
+    test-exclude "^8.0.0"
+    yargs "^15.0.2"
+
 oauth4webapi@^3.8.5:
   version "3.8.5"
   resolved "https://registry.yarnpkg.com/oauth4webapi/-/oauth4webapi-3.8.5.tgz#4aa8a73f5c4644daf674a7c40497be910db99d3f"
@@ -10053,6 +10122,11 @@ package-hash@^4.0.0:
     hasha "^5.0.0"
     lodash.flattendeep "^4.4.0"
     release-zalgo "^1.0.0"
+
+package-json-from-dist@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/package-json-from-dist/-/package-json-from-dist-1.0.1.tgz#4f1471a010827a86f94cfd9b0727e36d267de505"
+  integrity sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==
 
 pacote@^21.0.0, pacote@^21.0.2, pacote@^21.5.0:
   version "21.5.0"
@@ -10866,6 +10940,14 @@ rimraf@^3.0.0, rimraf@^3.0.2:
   dependencies:
     glob "^7.1.3"
 
+rimraf@^6.1.3:
+  version "6.1.3"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-6.1.3.tgz#afbee236b3bd2be331d4e7ce4493bac1718981af"
+  integrity sha512-LKg+Cr2ZF61fkcaK1UdkH2yEBBKnYjTyWzTJT6KNPcSPaiT7HSdhtMXQuN5wkTX0Xu72KQ1l8S42rlmexS2hSA==
+  dependencies:
+    glob "^13.0.3"
+    package-json-from-dist "^1.0.1"
+
 rollup@^2.77.2:
   version "2.79.2"
   resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.79.2.tgz#f150e4a5db4b121a21a747d762f701e5e9f49090"
@@ -11042,7 +11124,7 @@ semver@^7.5.3:
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.1.tgz#abd5098d82b18c6c81f6074ff2647fd3e7220c9f"
   integrity sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==
 
-semver@^7.7.2, semver@^7.7.3, semver@^7.7.4:
+semver@^7.5.4, semver@^7.7.2, semver@^7.7.3, semver@^7.7.4:
   version "7.7.4"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.4.tgz#28464e36060e991fa7a11d0279d2d3f3b57a7e8a"
   integrity sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==
@@ -11366,6 +11448,19 @@ spawn-wrap@^2.0.0:
     signal-exit "^3.0.2"
     which "^2.0.1"
 
+spawn-wrap@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/spawn-wrap/-/spawn-wrap-3.0.0.tgz#8f8c3e69e7f6afcf9404beacaa3241f645d6ea5c"
+  integrity sha512-z+s5vv4KzFPJVddGab0xX2n7kQPGMdNUX5l9T8EJqsXdKTWpcxmAqWHpsgHEXoC1taGBCc7b79bi62M5kdbrxQ==
+  dependencies:
+    cross-spawn "^7.0.6"
+    foreground-child "^2.0.0"
+    is-windows "^1.0.2"
+    make-dir "^3.0.0"
+    rimraf "^6.1.3"
+    signal-exit "^3.0.2"
+    which "^2.0.1"
+
 spdx-exceptions@^2.1.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/spdx-exceptions/-/spdx-exceptions-2.5.0.tgz#5d607d27fc806f66d7b64a766650fa890f04ed66"
@@ -11622,6 +11717,15 @@ test-exclude@^6.0.0:
     "@istanbuljs/schema" "^0.1.2"
     glob "^7.1.4"
     minimatch "^3.0.4"
+
+test-exclude@^8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/test-exclude/-/test-exclude-8.0.0.tgz#85891add3fa46bb822b1b1579c7f8c9a3d04ebd8"
+  integrity sha512-ZOffsNrXYggvU1mDGHk54I96r26P8SyMjO5slMKSc7+IWmtB/MQKnEC2fP51imB3/pT6YK5cT5E8f+Dd9KdyOQ==
+  dependencies:
+    "@istanbuljs/schema" "^0.1.2"
+    glob "^13.0.6"
+    minimatch "^10.2.2"
 
 text-table@~0.2.0:
   version "0.2.0"
