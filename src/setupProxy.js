@@ -6,7 +6,7 @@ module.exports = function (app) {
     createProxyMiddleware({
       target: `http://localhost:${process.env.BACKEND_PORT}`,
       changeOrigin: true,
-      pathFilter: ["/login", "/callback", "/logout", "/checkAuth", "graphql"],
+      pathFilter: ["/login", "/callback", "/logout", "/checkAuth", "/graphql"],
     })
   );
 };
