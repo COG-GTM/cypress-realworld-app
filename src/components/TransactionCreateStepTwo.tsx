@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { Formik, Form, Field, FieldProps } from "formik";
 import { string, object, number } from "yup";
 import { Paper, Typography, Button, Grid, Container, Avatar, Box, TextField } from "@mui/material";
@@ -47,7 +47,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   const { inputRef, onChange, ...other } = props;
 
   return (
-    <NumberFormat
+    <NumericFormat
       {...other}
       getInputRef={inputRef}
       onValueChange={(values) => {
@@ -59,7 +59,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
         });
       }}
       thousandSeparator
-      isNumericString
+      valueIsNumericString
       prefix="$"
     />
   );
