@@ -116,7 +116,7 @@
     "http-proxy-middleware": "3.0.5",
     "husky": "9.1.7",
     "istanbul-lib-coverage": "3.2.2",
-    "jsdom": "^22.1.0",
+    "jsdom": "29.0.2",
     "json": "11.0.0",
     "jwks-rsa": "4.0.1",
     "lowdb": "1.0.0",
