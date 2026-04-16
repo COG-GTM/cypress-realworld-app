@@ -80,7 +80,7 @@
     "@types/lodash": "4.17.24",
     "@types/lowdb": "2.0.3",
     "@types/morgan": "1.9.10",
-    "@types/node": "^22.15.0",
+    "@types/node": "^25.6.0",
     "@types/passport": "1.0.17",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
