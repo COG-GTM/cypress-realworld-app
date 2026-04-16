@@ -2,15 +2,11 @@ import { describe, expect, it, beforeEach } from "vitest";
 import {
   seedDatabase,
   getAllUsers,
-  getBankAccountsByUserId,
-  createTransaction,
-  getTransactionById,
   getTransactionByIdForApi,
   formatTransactionForApiResponse,
   formatTransactionsForApiResponse,
   getAllTransactionsForUserByObj,
   getTransactionsForUserByObj,
-  getTransactionsForUserContacts,
   getPublicTransactionsByQuery,
   getUnreadNotificationsByUserId,
   formatNotificationForApiResponse,
@@ -21,21 +17,11 @@ import {
   createComment,
   createLikes,
   createComments,
-  getNotificationsByUserId,
   getLikesByTransactionId,
   getCommentsByTransactionId,
   getTransactionsByUserId,
-  getUserById,
 } from "../../backend/database";
-import {
-  User,
-  Transaction,
-  TransactionStatus,
-  DefaultPrivacyLevel,
-  PaymentNotificationStatus,
-  TransactionPayload,
-} from "../models";
-import { getFakeAmount } from "../utils/transactionUtils";
+import { User, Transaction, PaymentNotificationStatus } from "../models";
 
 describe("Transactions API Formatting", () => {
   beforeEach(() => {
