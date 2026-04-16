@@ -104,7 +104,7 @@
     "eslint": "^9.38.0",
     "eslint-plugin-cypress": "^6.3.1",
     "express": "5.2.1",
-    "express-jwt": "6.1.2",
+    "express-jwt": "8.5.1",
     "express-paginate": "1.0.2",
     "express-session": "1.19.0",
     "express-validator": "6.15.0",
