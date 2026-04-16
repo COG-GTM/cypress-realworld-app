@@ -114,7 +114,7 @@
     "graphql-playground-middleware-express": "^1.7.23",
     "graphql-tools": "9.0.27",
     "http-proxy-middleware": "0.19.1",
-    "husky": "7.0.4",
+    "husky": "9.1.7",
     "istanbul-lib-coverage": "3.2.2",
     "jsdom": "^22.1.0",
     "json": "11.0.0",
@@ -191,7 +191,7 @@
     "build": "vite build",
     "codesandbox:start:api": "yarn tsnode:not-instrumented --files backend/app.ts",
     "codesandbox:start": "NODE_ENV=development TSC_COMPILE_ON_ERROR=true concurrently \"vite\" yarn:start:api:codesandbox",
-    "postinstall": "husky install && patch-package"
+    "postinstall": "husky && patch-package"
   },
   "engines": {
     "node": "^20.0.0 || ^22.0.0"
