@@ -4199,10 +4199,12 @@
   resolved "https://registry.yarnpkg.com/@types/detect-port/-/detect-port-1.3.5.tgz#deecde143245989dee0e82115f3caba5ee0ea747"
   integrity sha512-Rf3/lB9WkDfIL9eEKaSYKc+1L/rNVYBjThk22JTqQw0YozXarX8YljFAz+HCoC6h4B4KwCMsBPZHaFezwT4BNA==
 
-"@types/dinero.js@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@types/dinero.js/-/dinero.js-1.9.0.tgz#e11356764339e3d361d38bd54910282b106dc321"
-  integrity sha512-H2XdE6N/A2wJ/TJhGqeHDMUhCaey2R/Lcq9ichGBncKsFGvqrroXZWPNdDkCcgQOBPoCD4n9QuSBUC/35wuJiw==
+"@types/dinero.js@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/dinero.js/-/dinero.js-2.0.0.tgz#81cc2d58dfb855951d314d93b0cc7dc786f84c9a"
+  integrity sha512-hurUZwUL8hlk9U1GsJeCk8+vQsRfU1ISU3osm0Pn1cJMfYC1cVQZ1gzNKz54CnucWQzAcUCHKsFAsJFCvMYnpw==
+  dependencies:
+    dinero.js "*"
 
 "@types/eslint-scope@^3.7.7":
   version "3.7.7"
@@ -4405,12 +4407,12 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.24.tgz#4ae334fc62c0e915ca8ed8e35dcc6d4eeb29215f"
   integrity sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==
 
-"@types/lowdb@1.0.11":
-  version "1.0.11"
-  resolved "https://registry.yarnpkg.com/@types/lowdb/-/lowdb-1.0.11.tgz#d8336a635ea0dbd48a7f6f62fb9fccc5ec358ae3"
-  integrity sha512-h99VMxvTuz+VsXUVCCJo4dsps4vbkXwvU71TpmxDoiBU24bJ0VBygIHgmMm+UPoQIFihmV6euRik4z8J7XDJWg==
+"@types/lowdb@2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/lowdb/-/lowdb-2.0.3.tgz#e736b30db623794eeefdef67b32f6ef548edd162"
+  integrity sha512-YZUXD9jLt2aLsi0FIeL490JQ3r//Osp9OZYJLTbhRk2cJjrrtFmD0DvZ+GeFOjMlVB6l8AWT2/80ufJR94dQBA==
   dependencies:
-    "@types/lodash" "*"
+    lowdb "*"
 
 "@types/lowdb@<2":
   version "1.0.15"
@@ -6542,6 +6544,11 @@ diff@^5.1.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/diff/-/diff-5.2.0.tgz#26ded047cd1179b78b9537d5ef725503ce1ae531"
   integrity sha512-uIFDxqpRZGZ6ThOk84hEfqWoHx2devRFvpTZcTHur85vImfaxUbTW9Ryh4CpCuDnToOP1CEtXKIgytHBPVff5A==
+
+dinero.js@*:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/dinero.js/-/dinero.js-2.0.2.tgz#a78494dda8dbff72144ac6e57c7b1cf16911170e"
+  integrity sha512-d+4egJTvNinkb66KSed11Daqz6MWaOHzyalLu6h3p+BLrsmwKFjHjvOKivOWeM7WyoX89te+xx4cKI6zrDtCfQ==
 
 dinero.js@1.9.1:
   version "1.9.1"
@@ -9312,6 +9319,13 @@ loupe@^3.1.0, loupe@^3.1.4:
   resolved "https://registry.yarnpkg.com/loupe/-/loupe-3.2.0.tgz#174073ba8e0a1d0d5e43cc08626ed8a19403c344"
   integrity sha512-2NCfZcT5VGVNX9mSZIxLRkEAegDGBpuQZBy13desuHeVORmBDyAET4TkJr4SjqQy3A8JDofMN6LpkK8Xcm/dlw==
 
+lowdb@*:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/lowdb/-/lowdb-7.0.1.tgz#7354a684547d76206b1c730b9434604235b125e5"
+  integrity sha512-neJAj8GwF0e8EpycYIDFqEPcx9Qz4GUho20jWFR7YiFeXzF1YMLdxB36PypcTSPMA+4+LvgyMacYhlr18Zlymw==
+  dependencies:
+    steno "^4.0.2"
+
 lowdb@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/lowdb/-/lowdb-1.0.0.tgz#5243be6b22786ccce30e50c9a33eac36b20c8064"
@@ -11853,6 +11867,11 @@ steno@^0.4.1:
   integrity sha512-EEHMVYHNXFHfGtgjNITnka0aHhiAlo93F7z2/Pwd+g0teG9CnM3JIINM7hVVB5/rhw9voufD7Wukwgtw2uqh6w==
   dependencies:
     graceful-fs "^4.1.3"
+
+steno@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/steno/-/steno-4.0.2.tgz#9bd9b0ffc226a1f9436f29132c8b8e7199d22c50"
+  integrity sha512-yhPIQXjrlt1xv7dyPQg2P17URmXbuM5pdGkpiMB3RenprfiBlvK415Lctfe0eshk90oA7/tNq7WEiMK8RSP39A==
 
 stop-iteration-iterator@^1.0.0:
   version "1.1.0"
