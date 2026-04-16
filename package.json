@@ -50,7 +50,7 @@
     "uuid": "^13.0.0",
     "webpack": "5",
     "xstate": "^5.30.0",
-    "yup": "0.32.11"
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
