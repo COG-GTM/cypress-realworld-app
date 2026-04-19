@@ -44,7 +44,7 @@ describe("Comments API", function () {
     it("errors when invalid transactionId", function () {
       cy.request({
         method: "GET",
-        url: `${apiComments}/1234`,
+        url: `${apiComments}/!!!invalid!!!`,
         failOnStatusCode: false,
       }).then((response) => {
         expect(response.status).to.eq(422);
@@ -77,7 +77,7 @@ describe("Comments API", function () {
     it("errors when invalid transactionId", function () {
       cy.request({
         method: "POST",
-        url: `${apiComments}/1234`,
+        url: `${apiComments}/!!!invalid!!!`,
         failOnStatusCode: false,
         body: {
           content: "This is my comment",
