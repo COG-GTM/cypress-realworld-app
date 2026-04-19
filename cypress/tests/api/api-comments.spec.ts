@@ -53,7 +53,7 @@ describe("Comments API", function () {
     });
 
     it("errors when not authenticated", function () {
-      cy.logout();
+      cy.clearCookies();
       cy.request({
         method: "GET",
         url: `${apiComments}/${ctx.transactionId}`,
@@ -115,7 +115,7 @@ describe("Comments API", function () {
     });
 
     it("errors when not authenticated", function () {
-      cy.logout();
+      cy.clearCookies();
       cy.request({
         method: "POST",
         url: `${apiComments}/${ctx.transactionId}`,
