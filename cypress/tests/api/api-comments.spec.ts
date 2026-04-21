@@ -40,6 +40,17 @@ describe("Comments API", function () {
         expect(response.body.comments).to.be.an("array").that.has.length(1);
       });
     });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array").that.has.length(1);
+      });
+    });
   });
 
   context("POST /comments/:transactionId", function () {
@@ -49,6 +60,48 @@ describe("Comments API", function () {
         content: "This is my comment",
       }).then((response) => {
         expect(response.status).to.eq(200);
+      });
+    });
+
+    it("errors when invalid transactionId", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/1234`,
+        failOnStatusCode: false,
+        body: {
+          content: "This is my comment",
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
+      });
+    });
+
+    it("errors when content is missing from POST body", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {},
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array").that.has.length(1);
+      });
+    });
+
+    it("errors when content is not a string", function () {
+      const transactionId = ctx.transactionId!;
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${transactionId}`,
+        failOnStatusCode: false,
+        body: {
+          content: 12345,
+        },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors).to.be.an("array");
       });
     });
   });
