@@ -103,7 +103,7 @@ describe("Comments API", function () {
       }).then((response) => {
         expect(response.status).to.eq(422);
         expect(response.body.errors).to.be.an("array").and.not.be.empty;
-        expect(response.body.errors[0]).to.have.property("path", "content");
+        expect(response.body.errors[0]).to.have.property("param", "content");
       });
     });
 
