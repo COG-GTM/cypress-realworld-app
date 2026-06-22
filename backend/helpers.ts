@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { set } from "lodash";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import jwt from "express-jwt";
+import { expressjwt as jwt } from "express-jwt";
 import jwksRsa from "jwks-rsa";
 
 // @ts-ignore
@@ -91,9 +91,9 @@ const awsCognitoJwtConfig = {
   algorithms: ["RS256"],
 };
 
-export const checkAuth0Jwt = jwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
-export const checkCognitoJwt = jwt(awsCognitoJwtConfig).unless({ path: ["/testData/*"] });
-export const checkGoogleJwt = jwt(googleJwtConfig).unless({ path: ["/testData/*"] });
+export const checkAuth0Jwt = jwt(auth0JwtConfig as Parameters<typeof jwt>[0]).unless({ path: ["/testData/*"] });
+export const checkCognitoJwt = jwt(awsCognitoJwtConfig as Parameters<typeof jwt>[0]).unless({ path: ["/testData/*"] });
+export const checkGoogleJwt = jwt(googleJwtConfig as Parameters<typeof jwt>[0]).unless({ path: ["/testData/*"] });
 
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
