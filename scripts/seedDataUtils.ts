@@ -203,7 +203,10 @@ export const createTransaction = (
   const createdAt = faker.date.past();
   const modifiedAt = faker.date.recent();
 
-  const status = faker.helpers.arrayElement([TransactionStatus.pending, TransactionStatus.complete]);
+  const status = faker.helpers.arrayElement([
+    TransactionStatus.pending,
+    TransactionStatus.complete,
+  ]);
 
   let requestStatus = "";
 
