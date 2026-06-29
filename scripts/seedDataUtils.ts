@@ -148,8 +148,8 @@ export const createContact = (userId: User["id"], contactUserId: User["id"]) => 
 });
 
 // returns a random user other than the one passed in
-export const getOtherRandomUser = curry(
-  (seedUsers: User[], userId: User["id"]): User => flow(reject(["id", userId]), sample)(seedUsers)
+export const getOtherRandomUser = curry((seedUsers: User[], userId: User["id"]): User =>
+  flow(reject(["id", userId]), sample)(seedUsers)
 );
 
 export const randomContactsForUser = curry((seedUsers: User[], user: User) =>
@@ -443,8 +443,7 @@ export const createFakeCommentNotification = (
 
 const getTransactionsWithLikes = (transactions: Transaction[], seedLikes: Like[]) =>
   intersectionWith(
-    ({ id: transactionId }, { transactionId: likeTransactionId }) =>
-      isEqual(transactionId, likeTransactionId),
+    (a: Transaction, b: Like) => isEqual(a.id, b.transactionId),
     transactions,
     seedLikes
   );
@@ -454,8 +453,7 @@ const getLikeByTransactionId = (transactionId: Transaction["id"], seedLikes: Lik
 
 const getTransactionsWithComments = (transactions: Transaction[], seedComments: Comment[]) =>
   intersectionWith(
-    ({ id: transactionId }, { transactionId: commentTransactionId }) =>
-      isEqual(transactionId, commentTransactionId),
+    (a: Transaction, b: Comment) => isEqual(a.id, b.transactionId),
     transactions,
     seedComments
   );
