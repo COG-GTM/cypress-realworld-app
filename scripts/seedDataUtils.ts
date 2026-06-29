@@ -441,22 +441,27 @@ export const createFakeCommentNotification = (
   modifiedAt: faker.date.recent(),
 });
 
-const getTransactionsWithLikes = (transactions: Transaction[], seedLikes: Like[]) =>
+const getTransactionsWithLikes = (transactions: Transaction[], seedLikes: Like[]): Transaction[] =>
   intersectionWith(
-    (a: Transaction, b: Like) => isEqual(a.id, b.transactionId),
+    (a: Transaction, b: Transaction | Like) =>
+      isEqual(a.id, "transactionId" in b ? b.transactionId : b.id),
     transactions,
     seedLikes
-  );
+  ) as unknown as Transaction[];
 
 const getLikeByTransactionId = (transactionId: Transaction["id"], seedLikes: Like[]) =>
   find({ transactionId }, seedLikes) as Like;
 
-const getTransactionsWithComments = (transactions: Transaction[], seedComments: Comment[]) =>
+const getTransactionsWithComments = (
+  transactions: Transaction[],
+  seedComments: Comment[]
+): Transaction[] =>
   intersectionWith(
-    (a: Transaction, b: Comment) => isEqual(a.id, b.transactionId),
+    (a: Transaction, b: Transaction | Comment) =>
+      isEqual(a.id, "transactionId" in b ? b.transactionId : b.id),
     transactions,
     seedComments
-  );
+  ) as unknown as Transaction[];
 
 const getCommentByTransactionId = (transactionId: Transaction["id"], seedComments: Comment[]) =>
   find({ transactionId }, seedComments) as Comment;
