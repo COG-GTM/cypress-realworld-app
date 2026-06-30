@@ -581,11 +581,13 @@ export const updateTransactionById = (transactionId: string, edits: Partial<Tran
   const sender = getUserById(senderId);
   const receiver = getUserById(receiverId);
 
+  const finalEdits = { ...edits };
+
   // if payment, debit sender's balance for payment amount
   if (isRequestTransaction(transaction)) {
     debitPayAppBalance(receiver, transaction);
     creditPayAppBalance(sender, transaction);
-    edits.status = TransactionStatus.complete;
+    finalEdits.status = TransactionStatus.complete;
 
     createPaymentNotification(
       transaction.senderId,
@@ -594,7 +596,7 @@ export const updateTransactionById = (transactionId: string, edits: Partial<Tran
     );
   }
 
-  db.get(TRANSACTION_TABLE).find(transaction).assign(edits).write();
+  db.get(TRANSACTION_TABLE).find(transaction).assign(finalEdits).write();
 };
 
 // Likes
@@ -624,14 +626,13 @@ export const createLikes = (userId: string, transactionId: string) => {
 
   const like = createLike(userId, transactionId);
 
-  /* istanbul ignore next */
-  if (userId !== senderId || userId !== receiverId) {
+  if (userId !== senderId && userId !== receiverId) {
     createLikeNotification(senderId, transactionId, like.id);
     createLikeNotification(receiverId, transactionId, like.id);
   } else if (userId === senderId) {
-    createLikeNotification(senderId, transactionId, like.id);
-  } else {
     createLikeNotification(receiverId, transactionId, like.id);
+  } else {
+    createLikeNotification(senderId, transactionId, like.id);
   }
 };
 
@@ -671,14 +672,13 @@ export const createComments = (userId: string, transactionId: string, content: s
 
   const comment = createComment(userId, transactionId, content);
 
-  /* istanbul ignore next */
-  if (userId !== senderId || userId !== receiverId) {
+  if (userId !== senderId && userId !== receiverId) {
     createCommentNotification(senderId, transactionId, comment.id);
     createCommentNotification(receiverId, transactionId, comment.id);
   } else if (userId === senderId) {
-    createCommentNotification(senderId, transactionId, comment.id);
-  } else {
     createCommentNotification(receiverId, transactionId, comment.id);
+  } else {
+    createCommentNotification(senderId, transactionId, comment.id);
   }
 };
 
