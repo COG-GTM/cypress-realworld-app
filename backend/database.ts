@@ -672,14 +672,13 @@ export const createComments = (userId: string, transactionId: string, content: s
 
   const comment = createComment(userId, transactionId, content);
 
-  /* istanbul ignore next */
-  if (userId !== senderId || userId !== receiverId) {
+  if (userId !== senderId && userId !== receiverId) {
     createCommentNotification(senderId, transactionId, comment.id);
     createCommentNotification(receiverId, transactionId, comment.id);
   } else if (userId === senderId) {
-    createCommentNotification(senderId, transactionId, comment.id);
-  } else {
     createCommentNotification(receiverId, transactionId, comment.id);
+  } else {
+    createCommentNotification(senderId, transactionId, comment.id);
   }
 };
 
