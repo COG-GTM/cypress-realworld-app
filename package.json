@@ -34,7 +34,7 @@
     "clsx": "2.1.1",
     "date-fns": "4.4.0",
     "date-fns-tz": "^3.2.0",
-    "detect-port": "^1.5.1",
+    "detect-port": "^1.6.1",
     "dinero.js": "1.9.1",
     "formik": "2.4.9",
     "history": "4.10.1",
@@ -55,7 +55,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@babel/preset-env": "^7.29.7",
-    "@cypress/code-coverage": "^3.14.7",
+    "@cypress/code-coverage": "4.0.3",
     "@cypress/instrument-cra": "1.4.0",
     "@eslint/js": "^9.39.4",
     "@faker-js/faker": "6.1.2",
