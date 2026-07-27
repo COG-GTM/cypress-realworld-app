@@ -142,6 +142,9 @@ export const getAllByObj = (entity: keyof DbSchema, query: object) => {
 export const cleanSearchQuery = (query: string) => query.replace(/[^a-zA-Z0-9]/g, "");
 
 export const setupSearch = curry((items: object[], options: {}, query: string) => {
+  if (!query) {
+    return [];
+  }
   const fuse = new Fuse(items, options);
   return fuse.search(query);
 });
