@@ -42,7 +42,7 @@ const UserListSearchForm: React.FC<UserListSearchFormProps> = ({ userListSearch 
           placeholder="Search..."
           id="user-list-search-input"
           inputRef={inputEl}
-          slotProps={{ htmlInput: { "data-test": "user-list-search-input" } }}
+          inputProps={{ "data-test": "user-list-search-input" }}
           onFocus={() => {
             if (null !== inputEl.current) {
               inputEl.current.value = "";

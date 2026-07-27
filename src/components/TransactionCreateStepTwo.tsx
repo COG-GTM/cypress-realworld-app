@@ -142,9 +142,9 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     data-test={"transaction-create-amount-input"}
                     error={(touched || value !== initialValue) && Boolean(error)}
                     helperText={touched || value !== initialValue ? error : ""}
-                    slotProps={{
-                      input: { inputComponent: NumberFormatCustom as any },
-                      htmlInput: { id: "amount" },
+                    InputProps={{
+                      inputComponent: NumberFormatCustom as any,
+                      inputProps: { id: "amount" },
                     }}
                     {...field}
                   />
