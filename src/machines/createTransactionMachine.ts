@@ -26,9 +26,7 @@ const transactionDataMachine = dataMachine("transactionData").withConfig({
 });
 
 export type CreateTransactionMachineEvents =
-  | { type: "SET_USERS" }
-  | { type: "CREATE" }
-  | { type: "RESET" };
+  { type: "SET_USERS" } | { type: "CREATE" } | { type: "RESET" };
 
 export interface CreateTransactionMachineContext {
   sender: User;
