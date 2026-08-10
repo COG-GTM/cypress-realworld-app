@@ -66,6 +66,18 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Express 5 exposes req.query as a lazy getter, so middleware that writes into it
+// (express-paginate defaults, express-validator query sanitizers) has no effect.
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", {
+    value: req.query,
+    writable: true,
+    configurable: true,
+    enumerable: true,
+  });
+  next();
+});
+
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
 /* istanbul ignore next */
