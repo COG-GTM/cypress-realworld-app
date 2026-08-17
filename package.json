@@ -96,7 +96,7 @@
     "babel-loader": "^10.1.1",
     "bcryptjs": "3.0.3",
     "concurrently": "10.0.5",
-    "connect-history-api-fallback": "1.6.0",
+    "connect-history-api-fallback": "2.0.0",
     "cors": "2.8.6",
     "cross-env": "10.1.0",
     "cypress": "15.20.1",
