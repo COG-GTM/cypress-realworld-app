@@ -5,6 +5,7 @@ import setupProxy from "../src/setupProxy";
 import { frontendPort } from "../src/utils/portUtils";
 
 const app = express();
+app.disable("x-powered-by");
 
 setupProxy(app);
 
