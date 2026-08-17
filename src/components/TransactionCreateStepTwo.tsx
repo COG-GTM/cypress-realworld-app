@@ -39,31 +39,33 @@ const validationSchema = object({
 });
 
 interface NumberFormatCustomProps {
-  inputRef: (el: HTMLInputElement) => void;
-  onChange: (event: { target: { value: string } }) => void;
+  name: string;
+  onChange: (event: { target: { name: string; value: string } }) => void;
 }
 
-function NumberFormatCustom(props: NumberFormatCustomProps) {
-  const { inputRef, onChange, ...other } = props;
+const NumberFormatCustom = React.forwardRef<HTMLInputElement, NumberFormatCustomProps>(
+  function NumberFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
 
-  return (
-    <NumericFormat
-      {...other}
-      getInputRef={inputRef}
-      onValueChange={(values) => {
-        onChange({
-          target: {
-            ...other,
-            value: values.value,
-          },
-        });
-      }}
-      thousandSeparator
-      valueIsNumericString
-      prefix="$"
-    />
-  );
-}
+    return (
+      <NumericFormat
+        {...other}
+        getInputRef={ref}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        valueIsNumericString
+        prefix="$"
+      />
+    );
+  }
+);
 
 export interface TransactionCreateStepTwoProps {
   receiver: User;
