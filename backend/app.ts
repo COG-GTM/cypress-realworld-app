@@ -1,4 +1,5 @@
 import express from "express";
+import { randomBytes } from "crypto";
 import { join } from "path";
 import logger from "morgan";
 import passport from "passport";
@@ -43,6 +44,7 @@ const schemaWithResolvers = addResolversToSchema({
 });
 
 const app = express();
+app.disable("x-powered-by");
 
 /* istanbul ignore next */
 // @ts-expect-error
@@ -57,10 +59,14 @@ app.use(bodyParser.json());
 
 app.use(
   session({
-    secret: "session secret",
+    secret: process.env.SESSION_SECRET || randomBytes(32).toString("hex"),
     resave: false,
     saveUninitialized: false,
     unset: "destroy",
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+    },
   })
 );
 app.use(passport.initialize());
