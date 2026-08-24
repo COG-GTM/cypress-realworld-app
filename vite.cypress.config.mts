@@ -1,9 +1,9 @@
 import { defineConfig, mergeConfig, loadEnv } from "vite";
 import viteConfig from "./vite.config.mts";
 
-export default defineConfig(({ mode } = { mode: "development", command: "serve" }) =>
+export default defineConfig(async ({ mode } = { mode: "development", command: "serve" }) =>
   mergeConfig(
-    viteConfig({ mode, command: "serve" }),
+    await viteConfig({ mode, command: "serve" }),
     defineConfig({
       define: {
         "process.env": loadEnv("development", process.cwd(), "VITE"),
