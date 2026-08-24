@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { set } from "lodash";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import jwt from "express-jwt";
+import { expressjwt, Params } from "express-jwt";
 import jwksRsa from "jwks-rsa";
 
 // @ts-ignore
@@ -12,7 +12,7 @@ import awsConfig from "../src/aws-exports";
 
 dotenv.config();
 
-const auth0JwtConfig = {
+const auth0JwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -24,6 +24,7 @@ const auth0JwtConfig = {
   audience: process.env.VITE_AUTH0_AUDIENCE,
   issuer: `https://${process.env.VITE_AUTH0_DOMAIN}/`,
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
 // Okta Validate the JWT Signature
@@ -35,7 +36,7 @@ const oktaJwtVerifier = new OktaJwtVerifier({
     cid: process.env.VITE_OKTA_CLIENTID,
   },
 });
-const googleJwtConfig = {
+const googleJwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -47,6 +48,7 @@ const googleJwtConfig = {
   audience: process.env.VITE_GOOGLE_CLIENTID,
   issuer: "accounts.google.com",
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
 /* istanbul ignore next */
@@ -82,18 +84,19 @@ export const verifyOktaToken = (req: Request, res: Response, next: NextFunction)
 // https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html#amazon-cognito-user-pools-using-tokens-step-2
 const userPoolId = awsConfig.Auth.Cognito.userPoolId;
 const region = userPoolId.split("_")[0];
-const awsCognitoJwtConfig = {
+const awsCognitoJwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     jwksUri: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`,
   }),
 
   issuer: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
-export const checkAuth0Jwt = jwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
-export const checkCognitoJwt = jwt(awsCognitoJwtConfig).unless({ path: ["/testData/*"] });
-export const checkGoogleJwt = jwt(googleJwtConfig).unless({ path: ["/testData/*"] });
+export const checkAuth0Jwt = expressjwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
+export const checkCognitoJwt = expressjwt(awsCognitoJwtConfig).unless({ path: ["/testData/*"] });
+export const checkGoogleJwt = expressjwt(googleJwtConfig).unless({ path: ["/testData/*"] });
 
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
@@ -114,7 +117,9 @@ export const ensureAuthenticated = (req: Request, res: Response, next: NextFunct
 
 export const validateMiddleware = (validations: any[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    await Promise.all(validations.map((validation: any) => validation.run(req)));
+    for (const validation of validations) {
+      await validation.run(req);
+    }
 
     const errors = validationResult(req);
     if (errors.isEmpty()) {

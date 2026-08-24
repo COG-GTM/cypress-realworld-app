@@ -66,6 +66,19 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Express 5 recomputes req.query on each access, discarding writes from
+// middleware like express-paginate and express-validator sanitizers;
+// snapshot it as a plain writable property so mutations persist.
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", {
+    value: { ...req.query },
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+  next();
+});
+
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
 /* istanbul ignore next */

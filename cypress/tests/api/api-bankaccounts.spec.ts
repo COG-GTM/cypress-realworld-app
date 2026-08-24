@@ -62,7 +62,7 @@ describe("Bank Accounts API", function () {
       const { id: userId } = ctx.authenticatedUser!;
 
       cy.request("POST", `${apiBankAccounts}`, {
-        bankName: `${faker.company.companyName()} Bank`,
+        bankName: `${faker.company.name()} Bank`,
         accountNumber: faker.finance.account(10),
         routingNumber: faker.finance.account(9),
       }).then((response) => {
@@ -125,7 +125,7 @@ describe("Bank Accounts API", function () {
           }
         }`,
         variables: {
-          bankName: `${faker.company.companyName()} Bank`,
+          bankName: `${faker.company.name()} Bank`,
           accountNumber: faker.finance.account(10),
           routingNumber: faker.finance.account(9),
         },
