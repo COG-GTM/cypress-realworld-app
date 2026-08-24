@@ -111,7 +111,7 @@
     "express-session": "1.19.0",
     "express-validator": "^7.3.2",
     "fuse.js": "^7.5.0",
-    "graphql": "16.8.1",
+    "graphql": "17.0.2",
     "graphql-http": "^1.23.0",
     "graphql-playground-middleware-express": "^1.7.23",
     "http-proxy-middleware": "^3.0.7",
