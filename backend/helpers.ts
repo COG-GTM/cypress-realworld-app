@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { set } from "lodash";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import jwt from "express-jwt";
+import { expressjwt, Params } from "express-jwt";
 import jwksRsa from "jwks-rsa";
 
 // @ts-ignore
@@ -12,7 +12,7 @@ import awsConfig from "../src/aws-exports";
 
 dotenv.config();
 
-const auth0JwtConfig = {
+const auth0JwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -35,7 +35,7 @@ const oktaJwtVerifier = new OktaJwtVerifier({
     cid: process.env.VITE_OKTA_CLIENTID,
   },
 });
-const googleJwtConfig = {
+const googleJwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
@@ -82,7 +82,7 @@ export const verifyOktaToken = (req: Request, res: Response, next: NextFunction)
 // https://docs.aws.amazon.com/cognito/latest/developerguide/amazon-cognito-user-pools-using-tokens-verifying-a-jwt.html#amazon-cognito-user-pools-using-tokens-step-2
 const userPoolId = awsConfig.Auth.Cognito.userPoolId;
 const region = userPoolId.split("_")[0];
-const awsCognitoJwtConfig = {
+const awsCognitoJwtConfig: Params = {
   secret: jwksRsa.expressJwtSecret({
     jwksUri: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}/.well-known/jwks.json`,
   }),
@@ -91,9 +91,9 @@ const awsCognitoJwtConfig = {
   algorithms: ["RS256"],
 };
 
-export const checkAuth0Jwt = jwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
-export const checkCognitoJwt = jwt(awsCognitoJwtConfig).unless({ path: ["/testData/*"] });
-export const checkGoogleJwt = jwt(googleJwtConfig).unless({ path: ["/testData/*"] });
+export const checkAuth0Jwt = expressjwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
+export const checkCognitoJwt = expressjwt(awsCognitoJwtConfig).unless({ path: ["/testData/*"] });
+export const checkGoogleJwt = expressjwt(googleJwtConfig).unless({ path: ["/testData/*"] });
 
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
