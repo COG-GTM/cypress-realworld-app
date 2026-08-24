@@ -117,15 +117,6 @@ export const ensureAuthenticated = (req: Request, res: Response, next: NextFunct
 
 export const validateMiddleware = (validations: any[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    // Express 5 recomputes req.query on each access, so sanitizers cannot
-    // write values back; snapshot it as a plain writable property first.
-    Object.defineProperty(req, "query", {
-      value: { ...req.query },
-      writable: true,
-      enumerable: true,
-      configurable: true,
-    });
-
     for (const validation of validations) {
       await validation.run(req);
     }
