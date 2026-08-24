@@ -24,6 +24,7 @@ const auth0JwtConfig: Params = {
   audience: process.env.VITE_AUTH0_AUDIENCE,
   issuer: `https://${process.env.VITE_AUTH0_DOMAIN}/`,
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
 // Okta Validate the JWT Signature
@@ -47,6 +48,7 @@ const googleJwtConfig: Params = {
   audience: process.env.VITE_GOOGLE_CLIENTID,
   issuer: "accounts.google.com",
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
 /* istanbul ignore next */
@@ -89,6 +91,7 @@ const awsCognitoJwtConfig: Params = {
 
   issuer: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
   algorithms: ["RS256"],
+  requestProperty: "user",
 };
 
 export const checkAuth0Jwt = expressjwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
