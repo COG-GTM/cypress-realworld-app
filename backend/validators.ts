@@ -1,4 +1,4 @@
-import { body, check, oneOf, query, sanitizeQuery } from "express-validator";
+import { body, check, oneOf, query } from "express-validator";
 import { isValid } from "shortid";
 import {
   TransactionStatus,
@@ -50,7 +50,7 @@ export const isUserValidator = [
     .isIn(["public", "private", "contacts"]),
 ];
 
-export const sanitizeTransactionStatus = sanitizeQuery("status").customSanitizer((value) => {
+export const sanitizeTransactionStatus = query("status").customSanitizer((value: unknown) => {
   /* istanbul ignore if*/
   if (includes(value, TransactionStatusValues)) {
     return value;
@@ -59,7 +59,7 @@ export const sanitizeTransactionStatus = sanitizeQuery("status").customSanitizer
 });
 
 // default request status to undefined if not provided
-export const sanitizeRequestStatus = sanitizeQuery("requestStatus").customSanitizer((value) => {
+export const sanitizeRequestStatus = query("requestStatus").customSanitizer((value: unknown) => {
   /* istanbul ignore if*/
   if (includes(value, RequestStatusValues)) {
     return value;
