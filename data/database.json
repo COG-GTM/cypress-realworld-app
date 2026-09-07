@@ -174,14 +174,6 @@
       "modifiedAt": "2024-03-07T16:47:25.546Z"
     },
     {
-      "id": "efK_uSejoLk",
-      "uuid": "9a4c1ad5-27b4-4c93-935f-70b871bb57a0",
-      "userId": "WHjJ4qR2R2",
-      "contactUserId": "GjWovtg2hr",
-      "createdAt": "2024-01-26T12:14:27.732Z",
-      "modifiedAt": "2024-03-07T15:00:44.732Z"
-    },
-    {
       "id": "uHz1WRJsXCk",
       "uuid": "dfb5b7ad-3135-4a45-a0da-60f42adf3277",
       "userId": "WHjJ4qR2R2",
@@ -217,7 +209,7 @@
       "bankName": "D'Amore Inc Bank",
       "accountNumber": "5785581121",
       "routingNumber": "501852312",
-      "isDeleted": true,
+      "isDeleted": false,
       "createdAt": "2023-04-03T08:50:04.983Z",
       "modifiedAt": "2024-03-07T11:35:16.676Z"
     },
