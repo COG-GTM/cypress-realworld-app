@@ -239,7 +239,7 @@
       "bankName": "Rosenbaum, Dach and Goyette Bank",
       "accountNumber": "7151213986",
       "routingNumber": "956968094",
-      "isDeleted": true,
+      "isDeleted": false,
       "createdAt": "2023-09-01T19:33:00.932Z",
       "modifiedAt": "2024-03-07T01:44:38.458Z"
     },
