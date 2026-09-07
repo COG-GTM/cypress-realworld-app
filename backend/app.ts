@@ -66,6 +66,11 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Express 5 exposes req.query as a read-only getter; express-paginate needs to write page/limit to it
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", { value: { ...req.query }, writable: true });
+  next();
+});
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
 /* istanbul ignore next */
