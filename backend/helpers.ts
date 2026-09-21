@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { set } from "lodash";
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import jwt from "express-jwt";
+import { expressjwt as jwt } from "express-jwt";
 import jwksRsa from "jwks-rsa";
 
 // @ts-ignore
@@ -23,7 +23,8 @@ const auth0JwtConfig = {
   // Validate the audience and the issuer.
   audience: process.env.VITE_AUTH0_AUDIENCE,
   issuer: `https://${process.env.VITE_AUTH0_DOMAIN}/`,
-  algorithms: ["RS256"],
+  algorithms: ["RS256" as const],
+  requestProperty: "user",
 };
 
 // Okta Validate the JWT Signature
@@ -46,7 +47,8 @@ const googleJwtConfig = {
   // Validate the audience and the issuer.
   audience: process.env.VITE_GOOGLE_CLIENTID,
   issuer: "accounts.google.com",
-  algorithms: ["RS256"],
+  algorithms: ["RS256" as const],
+  requestProperty: "user",
 };
 
 /* istanbul ignore next */
@@ -88,7 +90,8 @@ const awsCognitoJwtConfig = {
   }),
 
   issuer: `https://cognito-idp.${region}.amazonaws.com/${userPoolId}`,
-  algorithms: ["RS256"],
+  algorithms: ["RS256" as const],
+  requestProperty: "user",
 };
 
 export const checkAuth0Jwt = jwt(auth0JwtConfig).unless({ path: ["/testData/*"] });
