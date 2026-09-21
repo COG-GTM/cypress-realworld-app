@@ -211,8 +211,8 @@ const NavDrawer: React.FC<Props> = ({
         paper: clsx(classes.drawerPaper, !drawerOpen && classes.drawerPaperClose),
       }}
       open={drawerOpen}
+      onClose={() => closeMobileDrawer()}
       ModalProps={{
-        onBackdropClick: () => closeMobileDrawer(),
         closeAfterTransition: showTemporaryDrawer,
       }}
     >
