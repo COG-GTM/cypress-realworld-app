@@ -66,10 +66,10 @@ const TransactionList: React.FC<TransactionListProps> = ({
             style={{ width: "100%" }}
             spacing={2}
           >
-            <Grid item>
+            <Grid>
               <TransferMoneyIllustration style={{ height: 200, width: 300, marginBottom: 30 }} />
             </Grid>
-            <Grid item>
+            <Grid>
               {showCreateButton && (
                 <Button
                   data-test="transaction-list-empty-create-transaction-button"

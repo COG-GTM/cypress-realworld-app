@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { styled } from "@mui/material/styles";
-import NumberFormat from "react-number-format";
+import { NumericFormat } from "react-number-format";
 import { Formik, Form, Field, FieldProps } from "formik";
 import { string, object, number } from "yup";
 import { Paper, Typography, Button, Grid, Container, Avatar, Box, TextField } from "@mui/material";
@@ -47,7 +47,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
   const { inputRef, onChange, ...other } = props;
 
   return (
-    <NumberFormat
+    <NumericFormat
       {...other}
       getInputRef={inputRef}
       onValueChange={(values) => {
@@ -59,7 +59,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
         });
       }}
       thousandSeparator
-      isNumericString
+      valueIsNumericString
       prefix="$"
     />
   );
@@ -97,10 +97,10 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
     <StyledPaper className={classes.paper} elevation={0}>
       <Box display="flex" height={200} alignItems="center" justifyContent="center">
         <Grid container direction="column" justifyContent="flex-start" alignItems="center">
-          <Grid item>
+          <Grid>
             <Avatar src={receiver.avatar} />
           </Grid>
-          <Grid item>
+          <Grid>
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
               {receiver.firstName} {receiver.lastName}
               {transactionType}
@@ -142,9 +142,11 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     data-test={"transaction-create-amount-input"}
                     error={(touched || value !== initialValue) && Boolean(error)}
                     helperText={touched || value !== initialValue ? error : ""}
-                    InputProps={{
-                      inputComponent: NumberFormatCustom as any,
-                      inputProps: { id: "amount" },
+                    slotProps={{
+                      input: {
+                        inputComponent: NumberFormatCustom as any,
+                        inputProps: { id: "amount" },
+                      },
                     }}
                     {...field}
                   />
@@ -174,7 +176,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                 justifyContent="center"
                 alignItems="center"
               >
-                <Grid item>
+                <Grid>
                   <Button
                     type="submit"
                     fullWidth
@@ -188,7 +190,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     Request
                   </Button>
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Button
                     type="submit"
                     fullWidth

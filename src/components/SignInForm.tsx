@@ -161,10 +161,8 @@ const SignInForm: React.FC<Props> = ({ authService }) => {
                 Sign In
               </Button>
               <Grid container>
-                <Grid item xs>
-                  {/*<Link to="/forgotpassword">Forgot password?</Link>*/}
-                </Grid>
-                <Grid item>
+                <Grid size="grow">{/*<Link to="/forgotpassword">Forgot password?</Link>*/}</Grid>
+                <Grid>
                   <Link data-test="signup" to="/signup">
                     {"Don't have an account? Sign Up"}
                   </Link>

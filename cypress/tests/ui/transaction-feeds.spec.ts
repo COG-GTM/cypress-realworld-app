@@ -185,7 +185,7 @@ describe("Transaction Feed", function () {
         cy.getBySelLike(feed.tab)
           .should("have.class", "Mui-selected")
           .contains(feed.tabLabel, { matchCase: false })
-          .should("have.css", { "text-transform": "uppercase" });
+          .should("have.css", "text-transform", "uppercase");
         cy.getBySel("list-skeleton").should("not.exist");
         cy.visualSnapshot(`Paginate ${feedName}`);
 
@@ -296,7 +296,7 @@ describe("Transaction Feed", function () {
         cy.getBySelLike("empty-create-transaction-button")
           .should("have.attr", "href", "/transaction/new")
           .contains("create a transaction", { matchCase: false })
-          .should("have.css", { "text-transform": "uppercase" });
+          .should("have.css", "text-transform", "uppercase");
         cy.visualSnapshot("No Transactions");
       });
     });
@@ -372,7 +372,7 @@ describe("Transaction Feed", function () {
         cy.getBySelLike("empty-create-transaction-button")
           .should("have.attr", "href", "/transaction/new")
           .contains("create a transaction", { matchCase: false })
-          .should("have.css", { "text-transform": "uppercase" });
+          .should("have.css", "text-transform", "uppercase");
         cy.visualSnapshot("No Transactions");
       });
     });

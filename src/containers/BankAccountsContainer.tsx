@@ -75,12 +75,12 @@ const BankAccountsContainer: React.FC<Props> = ({ authService, bankAccountsServi
   return (
     <StyledPaper className={classes.paper}>
       <Grid container direction="row" justifyContent="space-between" alignItems="center">
-        <Grid item>
+        <Grid>
           <Typography component="h2" variant="h6" color="primary" gutterBottom>
             Bank Accounts
           </Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <Button
             variant="contained"
             color="primary"

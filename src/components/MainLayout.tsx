@@ -111,9 +111,7 @@ const MainLayout: React.FC<Props> = ({ children, notificationsService, authServi
         <div className={classes.appBarSpacer} />
         <Container maxWidth="md" className={classes.container}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              {children}
-            </Grid>
+            <Grid size={12}>{children}</Grid>
           </Grid>
         </Container>
         <footer>

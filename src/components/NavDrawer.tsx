@@ -211,8 +211,8 @@ const NavDrawer: React.FC<Props> = ({
         paper: clsx(classes.drawerPaper, !drawerOpen && classes.drawerPaperClose),
       }}
       open={drawerOpen}
+      onClose={() => closeMobileDrawer()}
       ModalProps={{
-        onBackdropClick: () => closeMobileDrawer(),
         closeAfterTransition: showTemporaryDrawer,
       }}
     >
@@ -223,7 +223,7 @@ const NavDrawer: React.FC<Props> = ({
         alignItems="center"
         className={drawerOpen ? classes.userProfile : classes.userProfileHidden}
       >
-        <Grid item>
+        <Grid>
           {currentUser && (
             <Avatar
               className={classes.avatar}
@@ -232,7 +232,7 @@ const NavDrawer: React.FC<Props> = ({
             />
           )}
         </Grid>
-        <Grid item>
+        <Grid>
           {currentUser && (
             <>
               <Typography
@@ -253,7 +253,7 @@ const NavDrawer: React.FC<Props> = ({
             </>
           )}
         </Grid>
-        <Grid item style={{ width: "30%" }}></Grid>
+        <Grid style={{ width: "30%" }}></Grid>
       </Grid>
       <Grid
         container
@@ -262,7 +262,7 @@ const NavDrawer: React.FC<Props> = ({
         alignItems="center"
         className={drawerOpen ? classes.userProfile : classes.userProfileHidden}
       >
-        <Grid item>
+        <Grid>
           {currentUser && (
             <>
               <Typography
@@ -279,16 +279,16 @@ const NavDrawer: React.FC<Props> = ({
             </>
           )}
         </Grid>
-        <Grid item>
+        <Grid>
           <Divider />
         </Grid>
-        <Grid item>
+        <Grid>
           <List>{mainListItems(toggleDrawer, showTemporaryDrawer)}</List>
         </Grid>
-        <Grid item>
+        <Grid>
           <Divider />
         </Grid>
-        <Grid item>
+        <Grid>
           <List>{secondaryListItems(signOut)}</List>
         </Grid>
       </Grid>

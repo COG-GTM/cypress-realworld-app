@@ -24,7 +24,8 @@ import bankTransferRoutes from "./banktransfer-routes";
 import testDataRoutes from "./testdata-routes";
 import { checkAuth0Jwt, verifyOktaToken, checkCognitoJwt, checkGoogleJwt } from "./helpers";
 import resolvers from "./graphql/resolvers";
-import { frontendPort, getBackendPort } from "../src/utils/portUtils";
+import { frontendPort } from "../src/utils/portUtils";
+import { getBackendPort } from "./portUtils";
 
 require("dotenv").config();
 
@@ -66,6 +67,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Express 5 exposes req.query as a re-parsed getter; make it a plain writable
+// object so express-paginate and the query sanitizers can mutate it.
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", { value: { ...req.query }, writable: true });
+  next();
+});
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
 /* istanbul ignore next */

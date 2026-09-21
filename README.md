@@ -185,7 +185,7 @@ The Cypress Real-World App uses the [@cypress/code-coverage](https://github.com/
 To generate a code coverage report:
 
 1. Start the development server with coverage enabled by running `yarn dev:coverage`.
-2. Run `yarn cypress:run --env coverage=true` and wait for the test run to complete.
+2. Run `yarn cypress:run --expose coverage=true` and wait for the test run to complete.
 3. Once the test run is complete, you can view the report at `coverage/index.html`.
 
 ## 3rd Party Authentication Providers

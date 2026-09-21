@@ -113,7 +113,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
       </DialogContent>
       <DialogActions>
         <Grid container justifyContent="space-between">
-          <Grid item>
+          <Grid>
             <Button
               style={{ paddingRight: "80%" }}
               onClick={/* istanbul ignore next */ () => sendAuth("LOGOUT")}
@@ -123,7 +123,7 @@ const UserOnboardingContainer: React.FC<Props> = ({ authService, bankAccountsSer
               Logout
             </Button>
           </Grid>
-          <Grid item>
+          <Grid>
             {!userOnboardingState.matches("stepTwo") && (
               <Button onClick={() => nextStep()} color="primary" data-test="user-onboarding-next">
                 {userOnboardingState.matches("stepThree") ? "Done" : "Next"}

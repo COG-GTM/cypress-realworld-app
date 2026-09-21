@@ -190,7 +190,7 @@ const SignUpForm: React.FC<Props> = ({ authService }) => {
                 Sign Up
               </Button>
               <Grid container>
-                <Grid item>
+                <Grid>
                   <Link to="/signin">{"Have an account? Sign In"}</Link>
                 </Grid>
               </Grid>

@@ -69,7 +69,7 @@ const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilte
       spacing={1}
       sx={{ width: "300px", margin: "30px" }}
     >
-      <Grid item>
+      <Grid>
         <Grid
           container
           direction="row"
@@ -77,12 +77,12 @@ const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilte
           alignItems="center"
           sx={{ width: "100%" }}
         >
-          <Grid item sx={{ width: "225px" }}>
+          <Grid sx={{ width: "225px" }}>
             <Typography color="textSecondary" data-test="transaction-list-filter-amount-range-text">
               Amount Range: {formatAmountRangeValues(amountRangeValue)}
             </Typography>
           </Grid>
-          <Grid item>
+          <Grid>
             <Button
               data-test="transaction-list-filter-amount-clear-button"
               onClick={() => {
@@ -95,7 +95,7 @@ const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilte
           </Grid>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         <Slider
           data-test="transaction-list-filter-amount-range-slider"
           sx={{ width: "200px" }}
