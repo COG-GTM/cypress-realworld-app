@@ -143,7 +143,7 @@ const UserSettingsForm: React.FC<UserSettingsProps> = ({ userProfile, updateUser
               justifyContent="flex-start"
               alignItems="flex-start"
             >
-              <Grid item>
+              <Grid>
                 <Button
                   type="submit"
                   fullWidth

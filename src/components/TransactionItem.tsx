@@ -87,7 +87,7 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
     >
       <Paper className={classes.paper} elevation={0}>
         <Grid container spacing={2}>
-          <Grid item>
+          <Grid>
             <ListItemAvatar>
               <Badge
                 overlap="circular"
@@ -108,9 +108,9 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
               </Badge>
             </ListItemAvatar>
           </Grid>
-          <Grid item xs={12} sm container>
-            <Grid item xs container direction="column" spacing={2}>
-              <Grid item xs>
+          <Grid size={{ xs: 12, sm: "grow" }} container>
+            <Grid size="grow" container direction="column" spacing={2}>
+              <Grid size="grow">
                 <TransactionTitle transaction={transaction} />
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   {transaction.description}
@@ -123,18 +123,18 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
                   spacing={1}
                   className={classes.socialStats}
                 >
-                  <Grid item>
+                  <Grid>
                     <LikeIcon className={classes.countIcons} />
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Typography data-test="transaction-like-count" className={classes.countText}>
                       {transaction.likes.length}
                     </Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <CommentIcon className={classes.countIcons} />
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Typography data-test="transaction-comment-count" className={classes.countText}>
                       {transaction.comments.length}
                     </Typography>
@@ -142,7 +142,7 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item>
+            <Grid>
               <TransactionAmount transaction={transaction} />
             </Grid>
           </Grid>

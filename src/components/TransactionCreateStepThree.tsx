@@ -73,12 +73,12 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
           alignItems="center"
           spacing={4}
         >
-          <Grid item>
+          <Grid>
             <Grid container direction="column" justifyContent="flex-start" alignItems="center">
-              <Grid item>
+              <Grid>
                 <Avatar src={receiver.avatar} />
               </Grid>
-              <Grid item>
+              <Grid>
                 <Typography component="h2" variant="h6" color="primary" gutterBottom>
                   {receiver.firstName} {receiver.lastName}
                 </Typography>
@@ -95,7 +95,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
         style={{ paddingBottom: "5%" }}
       >
         <Grid container direction="row" justifyContent="center" alignItems="center">
-          <Grid item>
+          <Grid>
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
               {transactionDetails?.transactionType === "payment" ? "Paid " : "Requested "}
               {transactionDetails?.amount &&
@@ -113,7 +113,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
         style={{ paddingBottom: "5%" }}
       >
         <Grid container direction="row" justifyContent="space-around" alignItems="center">
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               size="small"
@@ -124,7 +124,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
               Return To Transactions
             </Button>
           </Grid>
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               size="small"

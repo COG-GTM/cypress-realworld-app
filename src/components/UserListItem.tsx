@@ -27,21 +27,17 @@ const UserListItem: React.FC<UserListItemProps> = ({ user, setReceiver, index })
               alignItems="flex-start"
               spacing={1}
             >
-              <Grid item component={"span"}>
+              <Grid component={"span"}>
                 <b>U: </b>
                 {user.username}
               </Grid>
-              <Grid item component={"span"}>
-                &bull;
-              </Grid>
-              <Grid item component={"span"}>
+              <Grid component={"span"}>&bull;</Grid>
+              <Grid component={"span"}>
                 <b>E: </b>
                 {user.email}
               </Grid>
-              <Grid item component={"span"}>
-                &bull;
-              </Grid>
-              <Grid item component={"span"}>
+              <Grid component={"span"}>&bull;</Grid>
+              <Grid component={"span"}>
                 <b>P: </b>
                 {user.phoneNumber}
               </Grid>

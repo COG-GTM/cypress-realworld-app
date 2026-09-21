@@ -97,10 +97,10 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
     <StyledPaper className={classes.paper} elevation={0}>
       <Box display="flex" height={200} alignItems="center" justifyContent="center">
         <Grid container direction="column" justifyContent="flex-start" alignItems="center">
-          <Grid item>
+          <Grid>
             <Avatar src={receiver.avatar} />
           </Grid>
-          <Grid item>
+          <Grid>
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
               {receiver.firstName} {receiver.lastName}
               {transactionType}
@@ -176,7 +176,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                 justifyContent="center"
                 alignItems="center"
               >
-                <Grid item>
+                <Grid>
                   <Button
                     type="submit"
                     fullWidth
@@ -190,7 +190,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     Request
                   </Button>
                 </Grid>
-                <Grid item>
+                <Grid>
                   <Button
                     type="submit"
                     fullWidth

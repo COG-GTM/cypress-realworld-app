@@ -124,7 +124,7 @@ const TransactionDetail: React.FC<TransactionProps> = ({
         alignItems="center"
         data-test={`transaction-item-${transaction.id}`}
       >
-        <Grid item className={classes.headline}>
+        <Grid className={classes.headline}>
           <Grid container direction="row">
             <AvatarGroup className={classes.avatarGroup} max={2}>
               <Avatar
@@ -139,14 +139,14 @@ const TransactionDetail: React.FC<TransactionProps> = ({
               />
             </AvatarGroup>
             {/* eat up space to right of AvatarGroup: */}
-            <Grid item sx={{ width: "100%" }} />
+            <Grid sx={{ width: "100%" }} />
           </Grid>
           <Grid container direction="column" justifyContent="flex-start" alignItems="flex-start">
-            <Grid item></Grid>
-            <Grid item>
+            <Grid></Grid>
+            <Grid>
               <TransactionTitle transaction={transaction} />
             </Grid>
-            <Grid item>
+            <Grid>
               <Typography
                 variant="body2"
                 color="textSecondary"
@@ -158,12 +158,12 @@ const TransactionDetail: React.FC<TransactionProps> = ({
             </Grid>
           </Grid>
         </Grid>
-        <Grid item>
+        <Grid>
           <TransactionAmount transaction={transaction} />
         </Grid>
       </Grid>
       <Grid container direction="row" justifyContent="flex-start" alignItems="center" spacing={2}>
-        <Grid item>
+        <Grid>
           <Grid
             container
             direction="row"
@@ -171,10 +171,10 @@ const TransactionDetail: React.FC<TransactionProps> = ({
             alignItems="center"
             spacing={2}
           >
-            <Grid item data-test={`transaction-like-count-${transaction.id}`}>
+            <Grid data-test={`transaction-like-count-${transaction.id}`}>
               {transaction.likes ? transaction.likes.length : 0}{" "}
             </Grid>
-            <Grid item>
+            <Grid>
               <IconButton
                 color="primary"
                 disabled={currentUserLikesTransaction(currentUser, transaction)}
@@ -185,10 +185,10 @@ const TransactionDetail: React.FC<TransactionProps> = ({
                 <LikeIcon />
               </IconButton>
             </Grid>
-            <Grid item>
+            <Grid>
               {receiverIsCurrentUser(currentUser, transaction) &&
                 isPendingRequestTransaction(transaction) && (
-                  <Grid item>
+                  <Grid>
                     <Button
                       className={classes.greenButton}
                       variant="contained"
@@ -221,7 +221,7 @@ const TransactionDetail: React.FC<TransactionProps> = ({
                 )}
             </Grid>
           </Grid>
-          <Grid item>
+          <Grid>
             <CommentForm
               transactionId={transaction.id}
               transactionComment={(payload) => transactionComment(payload)}

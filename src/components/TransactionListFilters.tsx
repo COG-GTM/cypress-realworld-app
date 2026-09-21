@@ -50,14 +50,14 @@ const TransactionListFilters: React.FC<TransactionListFiltersProps> = ({
         alignItems="flex-start"
         spacing={1}
       >
-        <Grid item>
+        <Grid>
           <TransactionListDateRangeFilter
             filterDateRange={filterDateRange}
             dateRangeFilters={dateRangeFilters}
             resetDateRange={resetDateRange}
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <TransactionListAmountRangeFilter
             filterAmountRange={filterAmountRange}
             amountRangeFilters={amountRangeFilters}

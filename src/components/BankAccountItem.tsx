@@ -15,13 +15,13 @@ const BankAccountListItem: React.FC<BankAccountListItemProps> = ({
   return (
     <ListItem data-test={`bankaccount-list-item-${bankAccount.id}`}>
       <Grid container direction="row" justifyContent="space-between" alignItems="flex-start">
-        <Grid item>
+        <Grid>
           <Typography variant="body1" color="primary" gutterBottom>
             {bankAccount.bankName} {bankAccount.isDeleted ? "(Deleted)" : undefined}
           </Typography>
         </Grid>
         {!bankAccount.isDeleted && (
-          <Grid item>
+          <Grid>
             <Button
               variant="contained"
               color="secondary"
