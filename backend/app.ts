@@ -67,6 +67,12 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Express 5 exposes req.query as a re-parsed getter; make it a plain writable
+// object so express-paginate and the query sanitizers can mutate it.
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", { value: { ...req.query }, writable: true });
+  next();
+});
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
 /* istanbul ignore next */
