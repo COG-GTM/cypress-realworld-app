@@ -24,7 +24,8 @@ import bankTransferRoutes from "./banktransfer-routes";
 import testDataRoutes from "./testdata-routes";
 import { checkAuth0Jwt, verifyOktaToken, checkCognitoJwt, checkGoogleJwt } from "./helpers";
 import resolvers from "./graphql/resolvers";
-import { frontendPort, getBackendPort } from "../src/utils/portUtils";
+import { frontendPort } from "../src/utils/portUtils";
+import { getBackendPort } from "./portUtils";
 
 require("dotenv").config();
 
