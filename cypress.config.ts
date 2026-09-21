@@ -23,14 +23,16 @@ export default defineConfig({
   retries: {
     runMode: 2,
   },
-  env: {
-    apiUrl: "http://localhost:3001",
-    mobileViewportWidthBreakpoint: 414,
+  expose: {
     coverage: false,
     codeCoverage: {
       url: "http://localhost:3001/__coverage__",
       exclude: "cypress/**/*.*",
     },
+  },
+  env: {
+    apiUrl: "http://localhost:3001",
+    mobileViewportWidthBreakpoint: 414,
     defaultPassword: process.env.SEED_DEFAULT_USER_PASSWORD,
     paginationPageSize: process.env.PAGINATION_PAGE_SIZE,
 
