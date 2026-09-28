@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 import Promise from "bluebird";
 import codeCoverageTask from "@cypress/code-coverage/task";
 import { defineConfig } from "cypress";
-import viteConfig from "./vite.cypress.config.ts";
+import viteConfig from "./vite.cypress.config.mts";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
