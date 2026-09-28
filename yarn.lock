@@ -5015,7 +5015,7 @@ axios@0.28.1:
     form-data "^4.0.0"
     proxy-from-env "^1.1.0"
 
-axios@^1.12.1, axios@^1.18.1:
+axios@^1.18.1:
   version "1.20.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.20.0.tgz#515513445aa60e71d04b6521ca6210829ccb4786"
   integrity sha512-r8aOh8j9cGKpgQAqpzrUHnSIc6a59Y3Xf/cv8sy1DrHCkZHzQGEuoq1tARk6qSyDdtQGSDgpb9kFlruzPvrgwg==
@@ -8403,7 +8403,7 @@ jest-worker@^27.4.5:
     merge-stream "^2.0.0"
     supports-color "^8.0.0"
 
-joi@^18.0.1, joi@^18.2.3:
+joi@^18.2.3:
   version "18.2.9"
   resolved "https://registry.yarnpkg.com/joi/-/joi-18.2.9.tgz#8f489aebefab85cfa9979ea4471e3eea022787b1"
   integrity sha512-2mD929bUVKUhOLQQEVhlf6EZ0Mlo0DeRb5MO7cViR9AXLtBauuccEtB1py9Ocxpo/P7ucnh442iY/iOwrh3IQw==
@@ -12676,7 +12676,7 @@ w3c-xmlserializer@^4.0.0:
   dependencies:
     xml-name-validator "^4.0.0"
 
-wait-on@9.1.0:
+wait-on@9.1.0, wait-on@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-9.1.0.tgz#3872a460589e33f2c7a1c53cbbb83c437477073e"
   integrity sha512-PymrLXHLBM1Ju/Xspb2ADUhbPSMvbnuNvy/mN2hWtpbJ3da0h3Ky1LqwKPG5QSVR57liyO0iUpfipYl/s5qNvA==
@@ -12684,17 +12684,6 @@ wait-on@9.1.0:
     axios "^1.18.1"
     joi "^18.2.3"
     lodash "^4.18.1"
-    minimist "^1.2.8"
-    rxjs "^7.8.2"
-
-wait-on@^8.0.5:
-  version "8.0.5"
-  resolved "https://registry.yarnpkg.com/wait-on/-/wait-on-8.0.5.tgz#63169c6979aea15cbfc813d91e4cf2513958632b"
-  integrity sha512-J3WlS0txVHkhLRb2FsmRg3dkMTCV1+M6Xra3Ho7HzZDHpE7DCOnoSoCJsZotrmW3uRMhvIJGSKUKrh/MeF4iag==
-  dependencies:
-    axios "^1.12.1"
-    joi "^18.0.1"
-    lodash "^4.17.21"
     minimist "^1.2.8"
     rxjs "^7.8.2"
 
