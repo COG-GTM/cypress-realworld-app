@@ -44,6 +44,7 @@ const schemaWithResolvers = addResolversToSchema({
 });
 
 const app = express();
+app.set("query parser", "extended");
 
 /* istanbul ignore next */
 // @ts-expect-error
@@ -66,6 +67,17 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+
+// keep req.query mutable so sanitizers and express-paginate can normalize values
+app.use((req, _res, next) => {
+  Object.defineProperty(req, "query", {
+    value: { ...req.query },
+    writable: true,
+    configurable: true,
+    enumerable: true,
+  });
+  next();
+});
 
 app.use(paginate.middleware(+process.env.PAGINATION_PAGE_SIZE!));
 
