@@ -99,7 +99,7 @@
     "concurrently": "10.0.5",
     "connect-history-api-fallback": "1.6.0",
     "cors": "2.8.6",
-    "cross-env": "7.0.3",
+    "cross-env": "10.1.0",
     "cypress": "15.21.1",
     "dotenv": "16.6.1",
     "eslint": "^9.39.5",
