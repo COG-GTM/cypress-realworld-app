@@ -1,4 +1,4 @@
-import { body, check, oneOf, query, sanitizeQuery } from "express-validator";
+import { body, check, oneOf, query } from "express-validator";
 import { isValid } from "shortid";
 import {
   TransactionStatus,
@@ -21,14 +21,17 @@ export const shortIdValidation = (key: string) => check(key).custom(isShortId);
 
 export const searchValidation = query("q").exists();
 
-export const userFieldsValidator = oneOf([
-  check("firstName").exists(),
-  check("lastName").exists(),
-  check("password").exists(),
-  check("balance").exists(),
-  check("avatar").exists(),
-  check("defaultPrivacyLevel").exists(),
-]);
+export const userFieldsValidator = oneOf(
+  [
+    check("firstName").exists(),
+    check("lastName").exists(),
+    check("password").exists(),
+    check("balance").exists(),
+    check("avatar").exists(),
+    check("defaultPrivacyLevel").exists(),
+  ],
+  { errorType: "flat" }
+);
 
 export const isBankAccountValidator = [
   body("bankName").isString().trim(),
@@ -50,7 +53,7 @@ export const isUserValidator = [
     .isIn(["public", "private", "contacts"]),
 ];
 
-export const sanitizeTransactionStatus = sanitizeQuery("status").customSanitizer((value) => {
+export const sanitizeTransactionStatus = query("status").customSanitizer((value) => {
   /* istanbul ignore if*/
   if (includes(value, TransactionStatusValues)) {
     return value;
@@ -59,7 +62,7 @@ export const sanitizeTransactionStatus = sanitizeQuery("status").customSanitizer
 });
 
 // default request status to undefined if not provided
-export const sanitizeRequestStatus = sanitizeQuery("requestStatus").customSanitizer((value) => {
+export const sanitizeRequestStatus = query("requestStatus").customSanitizer((value) => {
   /* istanbul ignore if*/
   if (includes(value, RequestStatusValues)) {
     return value;
