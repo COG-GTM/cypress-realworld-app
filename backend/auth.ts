@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import passport from "passport";
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { User } from "../src/models/user";
 import { getUserBy, getUserById } from "./database";
 
@@ -46,11 +46,15 @@ router.post("/login", passport.authenticate("local"), (req: Request, res: Respon
   res.send({ user: req.user });
 });
 
-router.post("/logout", (req: Request, res: Response): void => {
+router.post("/logout", (req: Request, res: Response, next: NextFunction): void => {
   res.clearCookie("connect.sid");
-  req.logout(() => res.redirect("/"));
-  req.session!.destroy(function (err) {
-    res.redirect("/");
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.session!.destroy(function () {
+      res.redirect("/");
+    });
   });
 });
 
