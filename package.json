@@ -63,7 +63,7 @@
     "@percy/cypress": "3.1.9",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^14.0.0",
+    "@testing-library/react": "^16.3.3",
     "@types/bcryptjs": "3.0.0",
     "@types/bluebird": "3.5.42",
     "@types/connect-flash": "0.0.40",
