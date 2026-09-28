@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import Promise from "bluebird";
 import codeCoverageTask from "@cypress/code-coverage/task";
 import { defineConfig } from "cypress";
-import viteConfig from "./vite.cypress.config.mts";
 
 dotenv.config({ path: ".env.local" });
 dotenv.config();
@@ -62,7 +61,7 @@ export default defineConfig({
     devServer: {
       framework: "react",
       bundler: "vite",
-      viteConfig,
+      viteConfig: async () => (await import("./vite.cypress.config.mts")).default(),
     },
     specPattern: "src/**/*.cy.{js,jsx,ts,tsx}",
     supportFile: "cypress/support/component.ts",
