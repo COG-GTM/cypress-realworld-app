@@ -19,10 +19,10 @@
   2. `yarn start:ci`
   3. `./node_modules/.bin/wait-on --timeout 120000 http://localhost:3000 http://localhost:3001`
   4. `yarn test:api`
-  5. `git checkout -- data/`
+  5. `git checkout -- data/database.json`
 - End-to-end: `yarn test:headless` — not run in this setup; requires the app to be running.
 
-Run `git checkout -- data/` after API/e2e tests; they mutate data/database.json.
+Run `git checkout -- data/database.json` after API/e2e tests; they mutate data/database.json. Do not restore other files in data/; review their diff instead, since seed changes may be part of the change.
 
 ## Verification for Changes
 
@@ -31,7 +31,7 @@ Before declaring a change done, run:
 - `yarn types`
 - `yarn lint`
 - `yarn test:unit:ci`
-- `yarn test:api` when `backend/` changes.
+- Run the full API test sequence above (build, `yarn start:ci`, wait-on, `yarn test:api`, cleanup) when `backend/` changes.
 
 ## Agents
 
