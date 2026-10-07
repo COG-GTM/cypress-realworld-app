@@ -1,24 +1,50 @@
 # Repository Guide
 
+## Environment
+
+- Use Node.js 22.13.0 via nvm; `.nvmrc` pins the version.
+- Use Yarn Classic 1.x.
+- Install OpenSpec CLI 1.13.2 with `npm i -g @fission-ai/openspec@1.13.2`; `openspec --version` returned `1.13.2`.
+
 ## Commands
 
-- Install dependencies: `yarn install` — verified successfully.
-- Start the development app: `yarn dev` — not run in this setup pass.
-- Start the app for API tests: `yarn start:ci` — started successfully; backend listened on port 3001.
-- Build: `yarn build` — not run in this setup pass.
-- Typecheck: `yarn types` — passed.
-- Lint and formatting: `yarn lint`.
-- Unit tests: `yarn test:unit:ci` — passed (44 passed, 10 skipped).
-- API tests: `yarn test:api` — Cypress ran headlessly, but all 9 specs failed in their setup hooks because `http://localhost:3000/` returned 404; 42 tests were skipped. The `start:ci` proxy serves `build/`, which was absent.
+- Install: `yarn install` — passed (36.67s).
+- Dev: `yarn dev` — not run in this setup; `.env` configures the frontend at port 3000 and API at port 3001.
+- Build: `yarn build:ci` — passed (10.16s; produced `build/`). `yarn build` was not run.
+- Types: `yarn types` — passed (2.29s).
+- Lint: `yarn lint` — passed (2.66s).
+- Unit tests: `yarn test:unit:ci` — passed (44 passed, 10 skipped; 9.95s).
+- API tests: passed (51 passed, 0 failed; 32.04s). Run the full sequence below; keep `yarn start:ci` running in the background:
+  1. `yarn build:ci`
+  2. `yarn start:ci`
+  3. `./node_modules/.bin/wait-on --timeout 120000 http://localhost:3000 http://localhost:3001`
+  4. `yarn test:api`
+  5. `git checkout -- data/`
+- End-to-end: `yarn test:headless` — not run in this setup; requires the app to be running.
+
+Run `git checkout -- data/` after API/e2e tests; they mutate data/database.json.
+
+## Verification for Changes
+
+Before declaring a change done, run:
+
+- `yarn types`
+- `yarn lint`
+- `yarn test:unit:ci`
+- `yarn test:api` when `backend/` changes.
+
+## Agents
+
+Implementation and QA run inline in the same session. QA runs the verification commands above.
 
 ## SDD Conventions
 
-- Name SDD branches `feature/<JIRA-KEY>-<slug>`; keep names at or below 80 characters and use a lowercase kebab-case slug.
-- Use these exact checkpoint commit subjects:
-  - Start: `docs: sdd-spec-started <change> <KEY>`
-  - Proposed: `docs: sdd-spec-proposed <change> <KEY>`
-  - Finished, after archiving: `docs: sdd-spec-finished <change> <KEY>`
-- Store OpenSpec artifacts in `openspec/`, with active changes in `openspec/changes/`; archive completed changes with `openspec archive`.
-- Validate OpenSpec changes with `openspec validate --strict`.
-- Use `.github/pull_request_template.md` for PR descriptions. PR titles start with the Jira key, and PRs carry the `AI-assisted` label.
-- For stacked work, branch a dependent task from its upstream task branch and target the dependent PR at that upstream branch.
+- Name branches `feature/<JIRA-KEY>-<slug>`; keep them at or below 80 characters and use a lowercase ASCII kebab-case slug. Example: `feature/ADAM-14-transactions-csv-export`.
+- Use these exact checkpoint subjects, with no scope or body; never use `--no-verify`:
+  - `docs: sdd-spec-started <change> <JIRA-KEY>`
+  - `docs: sdd-spec-proposed <change> <JIRA-KEY>`
+  - `docs: sdd-spec-finished <change> <JIRA-KEY>`
+- Implementation commits use Conventional Commits and end with the Jira key, for example: `feat(api): add transactions export endpoint ADAM-14`.
+- OpenSpec lives in `openspec/`: active changes in `openspec/changes/`, archived with `openspec archive <change> --yes`, and specs in `openspec/specs/`. Validate a change with `openspec validate <change> --strict`.
+- Use `.github/pull_request_template.md`. PR titles use `<JIRA-KEY>: <summary>`. Open PRs as drafts with the `AI-assisted` label.
+- For stacked work, a Sub-task blocked by another task through a Jira `Blocks` link branches from the upstream task's branch, and its PR targets that branch. Retarget the PR to `main` after the upstream PR merges. Never push directly to `main`.

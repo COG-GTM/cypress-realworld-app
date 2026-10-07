@@ -1,15 +1,27 @@
 ## Summary
 
-<!-- Summarize the change and its impact. -->
+<!-- Describe the change and its impact. -->
+
+## Jira
+
+<!-- Primary issue: [<KEY>](<issue URL>)
+Parent Story: [<KEY>](<issue URL>) -->
+
+## Stacked on
+
+<!-- Upstream PR/branch, or "Not stacked (base: main)".
+Retarget to main after the upstream PR merges. -->
+
+## OpenSpec change
+
+<!-- Change name: <change-name>
+Archived path: <openspec/changes/archive/...> or Not archived -->
 
 ## Validation evidence
 
-<!-- List checks run and their results. Note any checks that could not be run. -->
+<!-- Commands run and results, including warnings. -->
 
 ## AI-assisted
 
-**AI-assisted**
-
-## Jira issue
-
-<!-- Add the Jira key or issue link. -->
+`AI-assisted`
+This PR was produced with AI assistance and requires human review before merge.

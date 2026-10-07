@@ -1,31 +1,10 @@
 schema: spec-driven
-# Project context (optional)
-# This is shown to AI when creating artifacts.
-# Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
-
-# Per-artifact rules (optional)
-# Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
-
-# Per-operation guidance (optional)
-# Add advisory guidance for how apply and archive work should be conducted.
-# This is separate from artifact rules above.
-# Example:
-#   operations:
-#     apply:
-#       guidance:
-#         - Keep test summaries concise
-#     archive:
-#       guidance:
-#         - Summarize the archive outcome before finishing
+context: |
+  Stack: React 18 and TypeScript on Vite, Express APIs, lowdb JSON storage, Cypress, and Vitest.
+  Layout: frontend in src/, API in backend/, database and seeds in data/, tests in cypress/.
+  Unit tests use Vitest; Cypress covers API, end-to-end, and component workflows.
+  Verification: yarn types, yarn lint, yarn test:unit:ci, and yarn test:api for backend changes.
+  Every change references its Jira key (e.g. Source: ADAM-14) in proposal.md.
+rules:
+  proposal: ["Reference the source Jira issue key", "State out-of-scope explicitly"]
+  tasks: ["Include a final verification task running the AGENTS.md verification commands"]
