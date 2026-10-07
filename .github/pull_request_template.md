@@ -9,8 +9,8 @@ Parent Story: [<KEY>](<issue URL>) -->
 
 ## Stacked on
 
-<!-- Upstream PR/branch, or "Not stacked (base: main)".
-Retarget to main after the upstream PR merges. -->
+<!-- Upstream PR/branch, or "Not stacked (base: develop)".
+Retarget to develop after the upstream PR merges. -->
 
 ## OpenSpec change
 

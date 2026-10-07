@@ -39,6 +39,7 @@ Implementation and QA run inline in the same session. QA runs the verification c
 
 ## SDD Conventions
 
+- The integration branch is `develop` (there is no `main`). SDD branches start from an up-to-date `develop`, and non-stacked PRs target `develop`.
 - Name branches `feature/<JIRA-KEY>-<slug>`; keep them at or below 80 characters and use a lowercase ASCII kebab-case slug. Example: `feature/ADAM-14-transactions-csv-export`.
 - Use these exact checkpoint subjects, with no scope or body; never use `--no-verify`:
   - `docs: sdd-spec-started <change> <JIRA-KEY>`
@@ -47,4 +48,4 @@ Implementation and QA run inline in the same session. QA runs the verification c
 - Implementation commits use Conventional Commits and end with the Jira key, for example: `feat(api): add transactions export endpoint ADAM-14`.
 - OpenSpec lives in `openspec/`: active changes in `openspec/changes/`, archived with `openspec archive <change> --yes`, and specs in `openspec/specs/`. Validate a change with `openspec validate <change> --strict`.
 - Use `.github/pull_request_template.md`. PR titles use `<JIRA-KEY>: <summary>`. Open PRs as drafts with the `AI-assisted` label.
-- For stacked work, a Sub-task blocked by another task through a Jira `Blocks` link branches from the upstream task's branch, and its PR targets that branch. Retarget the PR to `main` after the upstream PR merges. Never push directly to `main`.
+- For stacked work, a Sub-task blocked by another task through a Jira `Blocks` link branches from the upstream task's branch, and its PR targets that branch. Retarget the PR to `develop` after the upstream PR merges. Never push directly to `develop`.
