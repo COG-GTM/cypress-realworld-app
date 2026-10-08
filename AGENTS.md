@@ -39,13 +39,14 @@ Implementation and QA run inline in the same session. QA runs the verification c
 
 ## SDD Conventions
 
+- Work items live in Azure Boards (https://dev.azure.com/AdamAchebe/Devin). Reference a work item as `AB#<id>`. With the Azure Boards GitHub app installed, this links commits and PRs to the work item.
 - The integration branch is `develop` (there is no `main`). SDD branches start from an up-to-date `develop`, and non-stacked PRs target `develop`.
-- Name branches `feature/<JIRA-KEY>-<slug>`; keep them at or below 80 characters and use a lowercase ASCII kebab-case slug. Example: `feature/ADAM-14-transactions-csv-export`.
+- Name branches `<prefix>/<id>-<slug>`, where `<id>` is the Azure Boards Task id. Use `feature/` by default; `fix/`, `hotfix/`, `refactor/`, `ci/` and `support/` are also allowed. Keep branch names at or below 80 characters and use a lowercase ASCII kebab-case slug. Example: `feature/14-transactions-csv-export`.
 - Use these exact checkpoint subjects, with no scope or body; never use `--no-verify`:
-  - `docs: sdd-spec-started <change> <JIRA-KEY>`
-  - `docs: sdd-spec-proposed <change> <JIRA-KEY>`
-  - `docs: sdd-spec-finished <change> <JIRA-KEY>`
-- Implementation commits use Conventional Commits and end with the Jira key, for example: `feat(api): add transactions export endpoint ADAM-14`.
+  - `docs: sdd-spec-started <change> AB#<id>`
+  - `docs: sdd-spec-proposed <change> AB#<id>`
+  - `docs: sdd-spec-finished <change> AB#<id>`
+- Implementation commits use Conventional Commits and end with the work item reference, for example: `feat(api): add transactions export endpoint AB#14`.
 - OpenSpec lives in `openspec/`: active changes in `openspec/changes/`, archived with `openspec archive <change> --yes`, and specs in `openspec/specs/`. Validate a change with `openspec validate <change> --strict`.
-- Use `.github/pull_request_template.md`. PR titles use `<JIRA-KEY>: <summary>`. Open PRs as drafts with the `AI-assisted` label.
-- For stacked work, a Sub-task blocked by another task through a Jira `Blocks` link branches from the upstream task's branch, and its PR targets that branch. Retarget the PR to `develop` after the upstream PR merges. Never push directly to `develop`.
+- Use `.github/pull_request_template.md`. PR titles use `AB#<id>: <summary>`. Open PRs as drafts with the `AI-assisted` label.
+- A Task with an Azure Boards `Predecessor` link to another Task branches from that Task's branch, and its PR targets that branch. Retarget the PR to `develop` after the upstream PR merges. Never push directly to `develop`.

@@ -2,10 +2,10 @@
 
 <!-- Describe the change and its impact. -->
 
-## Jira
+## Work item
 
-<!-- Primary issue: [<KEY>](<issue URL>)
-Parent Story: [<KEY>](<issue URL>) -->
+<!-- Task: AB#<id>
+Parent Issue: AB#<id> -->
 
 ## Stacked on
 
