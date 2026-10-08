@@ -1,0 +1,11 @@
+schema: spec-driven
+context: |
+  Stack: React 18 and TypeScript on Vite, Express APIs, lowdb JSON storage, Cypress, and Vitest.
+  Layout: frontend in src/, API in backend/, database and seeds in data/, tests in cypress/.
+  Unit tests use Vitest; Cypress covers API, end-to-end, and component workflows.
+  Verification: yarn types, yarn lint, yarn test:unit:ci, and yarn test:api for backend changes.
+  Every change references its Azure Boards work item (e.g. Source: AB#14) in proposal.md.
+rules:
+  proposal:
+    ["Reference the source Azure Boards work item (AB#<id>)", "State out-of-scope explicitly"]
+  tasks: ["Include a final verification task running the AGENTS.md verification commands"]
