@@ -154,6 +154,45 @@ describe("Bank Accounts", function () {
   });
 
   // TODO: [enhancement] the onboarding modal assertion can be removed after adding "onboarded" flag to user profile
+  it("keeps the bank account when deletion fails", function () {
+    cy.intercept("POST", apiGraphQL, (req) => {
+      if (req.body?.operationName === "DeleteBankAccount") {
+        req.alias = "gqlDeleteBankAccountError";
+        req.reply({ statusCode: 500, body: { errors: [{ message: "Internal Server Error" }] } });
+      }
+    });
+
+    cy.visit("/bankaccounts");
+    cy.getBySelLike("list-item").first().as("firstBankAccount").should("not.contain", "Deleted");
+    cy.get("@firstBankAccount").find("[data-test=bankaccount-delete]").click();
+
+    cy.wait("@gqlDeleteBankAccountError");
+    cy.get("@firstBankAccount").should("not.contain", "Deleted");
+    cy.get("@firstBankAccount").find("[data-test=bankaccount-delete]").should("exist");
+    cy.database("filter", "bankaccounts", { userId: ctx.user!.id, isDeleted: true }).should(
+      "be.empty"
+    );
+  });
+
+  it("does not delete any bank account when deleting an unknown id", function () {
+    cy.intercept("POST", apiGraphQL, (req) => {
+      if (req.body?.operationName === "DeleteBankAccount") {
+        req.alias = "gqlDeleteUnknownBankAccount";
+        req.body.variables.id = "does-not-exist";
+      }
+    });
+
+    cy.visit("/bankaccounts");
+    cy.getBySelLike("list-item").first().as("firstBankAccount");
+    cy.get("@firstBankAccount").find("[data-test=bankaccount-delete]").click();
+
+    cy.wait("@gqlDeleteUnknownBankAccount");
+    cy.get("@firstBankAccount").should("not.contain", "Deleted");
+    cy.database("filter", "bankaccounts", { userId: ctx.user!.id, isDeleted: true }).should(
+      "be.empty"
+    );
+  });
+
   it("renders an empty bank account list state with onboarding modal", function () {
     cy.wait("@getNotifications");
     cy.intercept("POST", apiGraphQL, (req) => {

@@ -52,4 +52,40 @@ describe("Comments API", function () {
       });
     });
   });
+
+  context("errors", function () {
+    it("errors when the comment content is missing", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: {},
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors[0]).to.include({ param: "content" });
+      });
+    });
+
+    it("errors when the transactionId is invalid", function () {
+      cy.request({
+        method: "GET",
+        url: `${apiComments}/!invalid!`,
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 422);
+    });
+
+    it("errors when the user is not authenticated", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "POST",
+        url: `${apiComments}/${ctx.transactionId}`,
+        body: { content: "Anonymous comment" },
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 401);
+    });
+  });
 });

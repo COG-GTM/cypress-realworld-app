@@ -114,4 +114,65 @@ describe("Transaction View", function () {
       cy.visualSnapshot("Transaction Completed (not able to accept or reject)");
     });
   });
+
+  it("keeps a like after reload and does not allow liking twice", function () {
+    cy.intercept("POST", "/likes/*").as("postLike");
+    cy.getBySelLike("transaction-item").first().click({ force: true });
+    cy.wait("@getTransaction");
+
+    cy.getBySelLike("like-button").click();
+    cy.wait("@postLike");
+    cy.getBySelLike("like-count").should("contain", 2);
+
+    cy.reload();
+    cy.wait("@getTransaction");
+    cy.getBySelLike("like-count").should("contain", 2);
+    cy.getBySelLike("like-button").should("be.disabled");
+    cy.get("@postLike.all").should("have.length", 1);
+  });
+
+  it("trims whitespace around a comment", function () {
+    cy.intercept("POST", "/comments/*").as("postComment");
+    cy.getBySelLike("transaction-item").first().click({ force: true });
+    cy.wait("@getTransaction");
+
+    cy.getBySelLike("comment-input").type("   Looks good!   {enter}");
+    cy.wait("@postComment");
+
+    cy.getBySelLike("comments-list").children().first().should("contain", "Looks good!");
+    cy.getBySelLike("comment-input").should("have.value", "");
+  });
+
+  it("does not persist a comment when the comment request fails", function () {
+    cy.intercept("POST", "/comments/*", { statusCode: 500, body: {} }).as("postCommentError");
+    cy.getBySelLike("transaction-item").first().click({ force: true });
+    cy.wait("@getTransaction");
+    cy.location("pathname").then((pathname) => {
+      const transactionId = pathname.split("/").pop();
+
+      cy.database("filter", "comments", { transactionId }).then((comments: any[]) => {
+        cy.getBySelLike("comment-input").type("This will fail{enter}");
+        cy.wait("@postCommentError");
+
+        cy.contains("This will fail").should("not.exist");
+        cy.database("filter", "comments", { transactionId }).should("have.length", comments.length);
+      });
+    });
+  });
+
+  it("does not record a like when the like request fails", function () {
+    cy.intercept("POST", "/likes/*", { statusCode: 500, body: {} }).as("postLikeError");
+    cy.getBySelLike("transaction-item").first().click({ force: true });
+    cy.wait("@getTransaction");
+    cy.location("pathname").then((pathname) => {
+      const transactionId = pathname.split("/").pop();
+
+      cy.database("filter", "likes", { transactionId }).then((likes: any[]) => {
+        cy.getBySelLike("like-button").click();
+        cy.wait("@postLikeError");
+
+        cy.database("filter", "likes", { transactionId }).should("have.length", likes.length);
+      });
+    });
+  });
 });
