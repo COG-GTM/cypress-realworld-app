@@ -1,11 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { check } from "express-validator";
 
-// src/aws-exports.js is generated at dev/CI start; provide a stand-in so helpers can be imported.
-vi.mock("../../src/aws-exports", () => ({
-  default: { Auth: { Cognito: { userPoolId: "us-east-1_TEST" } } },
-}));
-
 import { ensureAuthenticated, validateMiddleware } from "../../backend/helpers";
 
 const buildResponse = () => {

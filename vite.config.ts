@@ -40,6 +40,13 @@ export default defineConfig(({ mode }) => {
       environment: "jsdom",
       setupFiles: "./src/setup-tests.js",
       exclude: ["node_modules", "cypress", "dist"],
+      alias: [
+        // src/aws-exports.js is generated at dev start; unit tests use a committed stub instead.
+        {
+          find: /^(\.\.\/)+src\/aws-exports$/,
+          replacement: "/src/__tests__/__mocks__/aws-exports.ts",
+        },
+      ],
       fileParallelism: false, // #1666: Run tests sequentially to avoid race conditions with shared database.json file.
       coverage: {
         provider: "v8",
