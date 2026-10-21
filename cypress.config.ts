@@ -97,6 +97,11 @@ export default defineConfig({
           const { data } = await axios.post(`${testDataApiEndpoint}/seed`);
           return data;
         },
+        async "db:seed:empty"() {
+          // seed database with no data (matches `yarn start:empty`)
+          const { data } = await axios.post(`${testDataApiEndpoint}/seed`, { seed: "empty" });
+          return data;
+        },
 
         // fetch test data from a database (MySQL, PostgreSQL, etc...)
         "filter:database"(queryPayload) {

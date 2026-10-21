@@ -50,4 +50,28 @@ describe("Likes API", function () {
       });
     });
   });
+
+  context("errors", function () {
+    it("errors when the transactionId is invalid", function () {
+      cy.request({
+        method: "POST",
+        url: `${apiLikes}/!invalid!`,
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors[0]).to.include({ param: "transactionId" });
+      });
+    });
+
+    it("errors when the user is not authenticated", function () {
+      cy.clearCookies();
+      cy.request({
+        method: "POST",
+        url: `${apiLikes}/${ctx.transactionId}`,
+        failOnStatusCode: false,
+      })
+        .its("status")
+        .should("eq", 401);
+    });
+  });
 });

@@ -3,15 +3,15 @@
 import express from "express";
 import { getAllForEntity, seedDatabase } from "./database";
 import { validateMiddleware } from "./helpers";
-import { isValidEntityValidator } from "./validators";
+import { isSeedValidator, isValidEntityValidator } from "./validators";
 import { DbSchema } from "../src/models/db-schema";
 const router = express.Router();
 
 // Routes
 
 //POST /testData/seed
-router.post("/seed", (req, res) => {
-  seedDatabase();
+router.post("/seed", validateMiddleware(isSeedValidator), (req, res) => {
+  seedDatabase(req.body?.seed);
   res.sendStatus(200);
 });
 

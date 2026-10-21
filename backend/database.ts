@@ -91,9 +91,17 @@ const adapter = new FileSync<DbSchema>(databaseFile);
 
 const db = low(adapter);
 
-export const seedDatabase = () => {
+const seedFiles = {
+  default: "database-seed.json",
+  empty: "empty-seed.json",
+};
+
+export type SeedName = keyof typeof seedFiles;
+export const seedNames = Object.keys(seedFiles) as SeedName[];
+
+export const seedDatabase = (seedName: SeedName = "default") => {
   const testSeed = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data", "database-seed.json"), "utf-8")
+    fs.readFileSync(path.join(process.cwd(), "data", seedFiles[seedName]), "utf-8")
   );
 
   // seed database with test data

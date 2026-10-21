@@ -116,3 +116,10 @@ export const isValidEntityValidator = [
     ])
     .trim(),
 ];
+
+export const isSeedValidator = [
+  body("seed")
+    .optional()
+    .isIn(["default", "empty"])
+    .withMessage("seed must be one of: default, empty"),
+];

@@ -26,6 +26,11 @@ jobs:
       - run: yarn types
       - run: yarn lint
       - run: yarn test:unit:ci
+      - name: Save unit test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-coverage
+          path: coverage/unit
       - run: yarn build:ci
 
       - name: Save build folder

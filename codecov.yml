@@ -10,14 +10,30 @@ coverage:
       default:
         base: auto
         target: auto
-        threshold: 0.1%
+        threshold: 0.05%
         if_not_found: success
     backend:
+      target: auto
+      threshold: 0.05%
       paths:
         - backend
     frontend:
+      target: auto
+      threshold: 0.05%
       paths:
         - src
+
+flags:
+  unit:
+    carryforward: true
+    paths:
+      - backend
+      - src
+  cypress:
+    carryforward: true
+    paths:
+      - backend
+      - src
 
 comment:
   layout: "reach,diff,flags,tree"
