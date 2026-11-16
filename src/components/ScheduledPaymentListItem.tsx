@@ -57,7 +57,9 @@ const ScheduledPaymentListItem: React.FC<ScheduledPaymentListItemProps> = ({
             {description}
           </Typography>
           <Typography variant="body2" color="textSecondary">
-            <span data-test="scheduled-payment-frequency">{frequencyLabels[frequency]}</span>
+            <span data-test="scheduled-payment-frequency">
+              {frequencyLabels[frequency] ?? "Other"}
+            </span>
             {" · "}
             <span data-test="scheduled-payment-next-run">
               {nextRunAt
@@ -76,8 +78,8 @@ const ScheduledPaymentListItem: React.FC<ScheduledPaymentListItemProps> = ({
             <Grid item>
               <Chip
                 size="small"
-                label={statusLabels[status]}
-                color={statusColors[status]}
+                label={statusLabels[status] ?? "Other"}
+                color={statusColors[status] ?? "default"}
                 data-test="scheduled-payment-status"
               />
             </Grid>
@@ -85,7 +87,7 @@ const ScheduledPaymentListItem: React.FC<ScheduledPaymentListItemProps> = ({
               <Grid item>
                 <Button
                   variant="outlined"
-                  color="secondary"
+                  color="error"
                   data-test="scheduled-payment-cancel"
                   onClick={() => onCancel(scheduledPayment)}
                 >

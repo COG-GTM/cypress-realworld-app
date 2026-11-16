@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from "@mui/material/styles";
 import { useActor, useMachine } from "@xstate/react";
 import {
@@ -8,7 +8,7 @@ import {
   ServiceMap,
   TypegenDisabled,
 } from "xstate";
-import { Paper, Typography } from "@mui/material";
+import { Alert, Button, Paper, Typography } from "@mui/material";
 
 import { ScheduledPaymentResponseItem } from "../models";
 import { scheduledPaymentsMachine } from "../machines/scheduledPaymentsMachine";
@@ -44,7 +44,9 @@ const ScheduledPaymentsContainer: React.FC<Props> = ({ snackbarService }) => {
   const [, sendSnackbar] = useActor(snackbarService);
   const [scheduledPaymentsState, sendScheduledPayments] = useMachine(scheduledPaymentsMachine);
   const cancelInFlight = useRef(false);
+  const cancelPatched = useRef(false);
   const loadedOnce = useRef(false);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     sendScheduledPayments("FETCH");
@@ -54,6 +56,14 @@ const ScheduledPaymentsContainer: React.FC<Props> = ({ snackbarService }) => {
     loadedOnce.current = true;
   }
 
+  // dataMachine only moves from updating to loading once the PATCH succeeded
+  const refetching = scheduledPaymentsState.matches("loading");
+  useEffect(() => {
+    if (refetching && cancelInFlight.current) {
+      cancelPatched.current = true;
+    }
+  }, [refetching]);
+
   const settled = scheduledPaymentsState.matches("success")
     ? "success"
     : scheduledPaymentsState.matches("failure")
@@ -61,18 +71,25 @@ const ScheduledPaymentsContainer: React.FC<Props> = ({ snackbarService }) => {
       : undefined;
 
   useEffect(() => {
-    if (!cancelInFlight.current || !settled) return;
+    if (!settled) return;
+    const wasCancel = cancelInFlight.current;
+    const patched = cancelPatched.current;
     cancelInFlight.current = false;
-    if (settled === "success") {
-      sendSnackbar({ type: "SHOW", severity: "success", message: "Scheduled payment canceled" });
-    } else {
+    cancelPatched.current = false;
+
+    if (wasCancel && !patched) {
       sendSnackbar({
         type: "SHOW",
         severity: "error",
         message: "Couldn't cancel the scheduled payment",
       });
       sendScheduledPayments("FETCH");
+      return;
     }
+    if (wasCancel) {
+      sendSnackbar({ type: "SHOW", severity: "success", message: "Scheduled payment canceled" });
+    }
+    setLoadFailed(settled === "failure");
   }, [settled, sendSnackbar, sendScheduledPayments]);
 
   const cancelScheduledPayment = ({ id }: ScheduledPaymentResponseItem) => {
@@ -85,8 +102,26 @@ const ScheduledPaymentsContainer: React.FC<Props> = ({ snackbarService }) => {
       <Typography component="h2" variant="h6" color="primary" gutterBottom>
         Scheduled Payments
       </Typography>
+      {loadFailed && (
+        <Alert
+          severity="error"
+          data-test="scheduled-payments-load-error"
+          action={
+            <Button
+              color="inherit"
+              size="small"
+              data-test="scheduled-payments-retry"
+              onClick={() => sendScheduledPayments("FETCH")}
+            >
+              Retry
+            </Button>
+          }
+        >
+          Couldn't load your scheduled payments.
+        </Alert>
+      )}
       {/* Keep the list mounted while a cancel refetches, so rows don't flicker */}
-      {(loadedOnce.current || scheduledPaymentsState.matches("failure")) && (
+      {loadedOnce.current && (
         <ScheduledPaymentList
           scheduledPayments={scheduledPaymentsState.context.results!}
           cancelScheduledPayment={cancelScheduledPayment}

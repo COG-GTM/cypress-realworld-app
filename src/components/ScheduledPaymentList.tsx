@@ -78,7 +78,7 @@ const ScheduledPaymentList: React.FC<ScheduledPaymentListProps> = ({
             Keep it
           </Button>
           <Button
-            color="secondary"
+            color="error"
             variant="contained"
             data-test="scheduled-payment-cancel-confirm"
             onClick={() => {

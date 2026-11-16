@@ -164,4 +164,58 @@ describe("Scheduled Payments", function () {
     cy.getBySel("alert-bar-error").should("contain", "Couldn't cancel the scheduled payment");
     cy.getBySel("scheduled-payment-status").should("contain", "Active");
   });
+
+  it("reports a cancel as done when only the refresh after it fails", function () {
+    cy.wait("@notifications");
+    cy.request("POST", apiScheduledPayments, {
+      receiverId: ctx.userB.id,
+      amount: 500,
+      description: "Coffee fund",
+      frequency: "weekly",
+      startDate: isoDate(1),
+    }).then(({ body }) => {
+      const { id } = body.scheduledPayment;
+
+      openScheduledPayments();
+      cy.wait("@getScheduledPayments");
+      cy.intercept(
+        { method: "GET", url: "/scheduledPayments", times: 1 },
+        { statusCode: 500, body: {} }
+      ).as("failedRefresh");
+      cy.getBySel("scheduled-payment-cancel").click();
+      cy.getBySel("scheduled-payment-cancel-confirm").click();
+      cy.wait("@cancelScheduledPayment");
+      cy.wait("@failedRefresh");
+
+      cy.getBySel("alert-bar-success").should("contain", "Scheduled payment canceled");
+      cy.getBySel("scheduled-payments-load-error").should("be.visible");
+      cy.database("find", "scheduledpayments", { id }).its("status").should("equal", "canceled");
+    });
+  });
+
+  it("shows a retryable error instead of the empty state when loading fails", function () {
+    cy.wait("@notifications");
+    cy.request("POST", apiScheduledPayments, {
+      receiverId: ctx.userB.id,
+      amount: 500,
+      description: "Coffee fund",
+      frequency: "weekly",
+      startDate: isoDate(1),
+    });
+    cy.intercept(
+      { method: "GET", url: "/scheduledPayments", times: 1 },
+      { statusCode: 500, body: {} }
+    ).as("failedLoad");
+
+    openScheduledPayments();
+    cy.wait("@failedLoad");
+    cy.getBySel("scheduled-payments-load-error").should("be.visible");
+    cy.getBySel("empty-list-header").should("not.exist");
+
+    cy.intercept("GET", "/scheduledPayments").as("retryLoad");
+    cy.getBySel("scheduled-payments-retry").click();
+    cy.wait("@retryLoad");
+    cy.getBySel("scheduled-payments-load-error").should("not.exist");
+    cy.getBySelLike("scheduled-payment-list-item").should("have.length", 1);
+  });
 });
