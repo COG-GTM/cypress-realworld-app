@@ -26,6 +26,7 @@ export interface Transaction {
   status: TransactionStatus;
   requestStatus?: TransactionRequestStatus | string;
   requestResolvedAt?: Date | string;
+  scheduledPaymentId?: string;
   createdAt: Date;
   modifiedAt: Date;
 }

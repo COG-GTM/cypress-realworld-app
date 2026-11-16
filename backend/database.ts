@@ -18,7 +18,7 @@ import {
   inRange,
   remove,
 } from "lodash/fp";
-import { isWithinInterval } from "date-fns";
+import { format as formatDate, isWithinInterval } from "date-fns";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import shortid from "shortid";
@@ -46,6 +46,9 @@ import {
   NotificationResponseItem,
   TransactionQueryPayload,
   DefaultPrivacyLevel,
+  ScheduledPayment,
+  ScheduledPaymentPayload,
+  ScheduledPaymentStatus,
 } from "../src/models";
 import Fuse from "fuse.js";
 import {
@@ -75,6 +78,7 @@ export type TDatabase = {
   comments: Comment[];
   notifications: NotificationType[];
   banktransfers: BankTransfer[];
+  scheduledpayments: ScheduledPayment[];
 };
 
 const USER_TABLE = "users";
@@ -85,6 +89,7 @@ const LIKE_TABLE = "likes";
 const COMMENT_TABLE = "comments";
 const NOTIFICATION_TABLE = "notifications";
 const BANK_TRANSFER_TABLE = "banktransfers";
+const SCHEDULED_PAYMENT_TABLE = "scheduledpayments";
 
 const databaseFile = path.join(__dirname, "../data/database.json");
 const adapter = new FileSync<DbSchema>(databaseFile);
@@ -595,6 +600,82 @@ export const updateTransactionById = (transactionId: string, edits: Partial<Tran
   }
 
   db.get(TRANSACTION_TABLE).find(transaction).assign(edits).write();
+};
+
+// Scheduled Payments
+
+export const getScheduledPaymentBy = (key: string, value: any): ScheduledPayment =>
+  getBy(SCHEDULED_PAYMENT_TABLE, key, value);
+
+export const getScheduledPaymentById = (id: string): ScheduledPayment =>
+  getScheduledPaymentBy("id", id);
+
+const sortByNextRunAt = (scheduledPayments: ScheduledPayment[]): ScheduledPayment[] =>
+  orderBy(
+    [(scheduledPayment) => scheduledPayment.nextRunAt === null, "nextRunAt"],
+    ["asc", "asc"],
+    scheduledPayments
+  );
+
+export const getScheduledPaymentsByUserId = (userId: string): ScheduledPayment[] =>
+  sortByNextRunAt(getAllBy(SCHEDULED_PAYMENT_TABLE, "senderId", userId));
+
+export const createScheduledPayment = (
+  userId: User["id"],
+  details: ScheduledPaymentPayload
+): ScheduledPayment => {
+  const sender = getUserById(userId);
+  const scheduledPayment: ScheduledPayment = {
+    id: shortid(),
+    uuid: v4(),
+    senderId: userId,
+    receiverId: details.receiverId,
+    amount: details.amount,
+    description: details.description,
+    privacyLevel: details.privacyLevel || sender.defaultPrivacyLevel,
+    source: details.source,
+    frequency: details.frequency,
+    startDate: details.startDate,
+    endDate: details.endDate,
+    nextRunAt: details.startDate,
+    status: ScheduledPaymentStatus.active,
+    createdAt: new Date(),
+    modifiedAt: new Date(),
+  };
+
+  db.get(SCHEDULED_PAYMENT_TABLE).push(scheduledPayment).write();
+
+  // manual lookup after scheduled payment created
+  return getScheduledPaymentById(scheduledPayment.id);
+};
+
+export const updateScheduledPaymentById = (
+  scheduledPaymentId: string,
+  edits: Partial<ScheduledPayment>
+): ScheduledPayment => {
+  db.get(SCHEDULED_PAYMENT_TABLE)
+    .find({ id: scheduledPaymentId })
+    .assign({ ...edits, modifiedAt: new Date() })
+    .write();
+
+  return getScheduledPaymentById(scheduledPaymentId);
+};
+
+// Dates are compared in server local time (see COG-1478)
+export const getDueScheduledPayments = (now: Date): ScheduledPayment[] => {
+  const today = formatDate(now, "yyyy-MM-dd");
+
+  return sortByNextRunAt(
+    db
+      .get(SCHEDULED_PAYMENT_TABLE)
+      .filter(
+        (scheduledPayment: ScheduledPayment) =>
+          scheduledPayment.status === ScheduledPaymentStatus.active &&
+          scheduledPayment.nextRunAt !== null &&
+          scheduledPayment.nextRunAt <= today
+      )
+      .value()
+  );
 };
 
 // Likes
