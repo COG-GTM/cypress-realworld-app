@@ -364,17 +364,19 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                 </Grid>
                 <Grid item>
                   <Button
-                    type={scheduling ? "submit" : "button"}
+                    type="submit"
                     fullWidth
                     variant={scheduling ? "contained" : "outlined"}
                     color="primary"
                     className={classes.submit}
                     data-test="transaction-create-submit-schedule"
                     disabled={scheduling && (!isValid || isSubmitting)}
-                    onClick={() => {
+                    onClick={(event) => {
                       if (scheduling) {
                         setTransactionType("schedule");
                       } else {
+                        // First click only reveals the schedule fields
+                        event.preventDefault();
                         setScheduling(true);
                       }
                     }}

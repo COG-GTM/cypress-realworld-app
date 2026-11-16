@@ -108,6 +108,8 @@ describe("New Transaction", function () {
     cy.getBySel("transaction-create-schedule-fields").should("not.exist");
     cy.getBySel("transaction-create-submit-schedule").click();
     cy.getBySel("transaction-create-schedule-fields").should("be.visible");
+    cy.getBySel("transaction-create-form").should("be.visible");
+    cy.getBySel("alert-bar-success").should("not.exist");
     cy.getBySel("transaction-create-start-date-input").should("have.value", isoDate(1));
     cy.getBySel("transaction-create-end-date-input").should("not.exist");
 
