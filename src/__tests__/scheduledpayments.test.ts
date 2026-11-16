@@ -447,6 +447,27 @@ describe("Scheduled Payments", () => {
       expect(getScheduledPaymentById(failing.id).nextRunAt).toBe("2026-12-08");
     });
 
+    it("keeps the run advanced when the payment was saved before the failure, so it isn't charged twice", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly })
+      );
+      const failAfterSaving: typeof createTransaction = (...args) => {
+        createTransaction(...args);
+        throw new Error("notification write failed");
+      };
+
+      expect(processDueScheduledPayments(at("2026-12-01"), failAfterSaving)).toEqual([]);
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(1);
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        lastRunAt: "2026-12-01",
+        nextRunAt: "2026-12-08",
+      });
+
+      expect(processDueScheduledPayments(at("2026-12-01"))).toEqual([]);
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(1);
+    });
+
     it("leaves a one-time schedule active when its payment fails", () => {
       const scheduledPayment = createScheduledPayment(
         sender.id,
