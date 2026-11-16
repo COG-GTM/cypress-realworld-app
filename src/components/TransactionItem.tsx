@@ -9,9 +9,14 @@ import {
   ListItemAvatar,
   Paper,
   Badge,
+  Chip,
   Theme,
 } from "@mui/material";
-import { ThumbUpAltOutlined as LikeIcon, CommentRounded as CommentIcon } from "@mui/icons-material";
+import {
+  ThumbUpAltOutlined as LikeIcon,
+  CommentRounded as CommentIcon,
+  Schedule as ScheduleIcon,
+} from "@mui/icons-material";
 import { TransactionResponseItem } from "../models";
 import TransactionTitle from "./TransactionTitle";
 import TransactionAmount from "./TransactionAmount";
@@ -115,6 +120,16 @@ const TransactionItem: React.FC<TransactionProps> = ({ transaction }) => {
                 <Typography variant="body2" color="textSecondary" gutterBottom>
                   {transaction.description}
                 </Typography>
+                {transaction.scheduledPaymentId && (
+                  <Chip
+                    icon={<ScheduleIcon />}
+                    label="Scheduled"
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    data-test="transaction-scheduled-badge"
+                  />
+                )}
                 <Grid
                   container
                   direction="row"

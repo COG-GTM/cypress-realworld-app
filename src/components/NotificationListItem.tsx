@@ -8,6 +8,7 @@ import {
   Payment as PaymentIcon,
   CommentRounded as CommentIcon,
   MonetizationOn as MonetizationOnIcon,
+  Schedule as ScheduleIcon,
 } from "@mui/icons-material";
 import {
   Button,
@@ -24,6 +25,7 @@ import {
   isPaymentNotification,
   isPaymentRequestedNotification,
   isPaymentReceivedNotification,
+  isPaymentScheduledSentNotification,
 } from "../utils/transactionUtils";
 import { NotificationResponseItem } from "../models";
 
@@ -86,6 +88,9 @@ const NotificationListItem: React.FC<NotificationListItemProps> = ({
     } else if (isPaymentReceivedNotification(notification)) {
       listItemIcon = <MonetizationOnIcon className={classes.green} />;
       listItemText = `${notification.userFullName} received payment.`;
+    } else if (isPaymentScheduledSentNotification(notification)) {
+      listItemIcon = <ScheduleIcon className={classes.blue} />;
+      listItemText = `Your scheduled payment to ${notification.userFullName} was sent.`;
     }
   }
 

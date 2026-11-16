@@ -1,3 +1,4 @@
+import { addDays, format } from "date-fns";
 import { isMobile } from "../../support/utils";
 import { User, Transaction } from "../../../src/models";
 
@@ -245,6 +246,48 @@ describe("Notifications", function () {
         .should("contain", ctx.userA.firstName)
         .and("contain", "requested payment");
       cy.visualSnapshot("User C Notified of Request from User A");
+    });
+
+    it("User A's scheduled payment to User B runs; User A is notified it was sent and the transaction is marked Scheduled", function () {
+      const startDate = format(addDays(new Date(), 1), "yyyy-MM-dd");
+
+      cy.loginByXstate(ctx.userA.username);
+      cy.wait("@getNotifications");
+
+      cy.request("POST", `${Cypress.env("apiUrl")}/scheduledPayments`, {
+        receiverId: ctx.userB.id,
+        amount: 1500,
+        description: "Weekly lunch",
+        frequency: "weekly",
+        startDate,
+      });
+      cy.request("POST", `${Cypress.env("apiUrl")}/testData/scheduledPayments/run`, {
+        now: `${startDate}T12:00:00`,
+      })
+        .its("body.results.0")
+        .as("scheduledTransaction");
+
+      cy.getBySelLike("notifications-link").click();
+      cy.getBySelLike("notification-list-item")
+        .first()
+        .should(
+          "contain",
+          `Your scheduled payment to ${ctx.userB.firstName} ${ctx.userB.lastName} was sent.`
+        );
+      cy.visualSnapshot("User A Notified of Scheduled Payment Sent");
+
+      cy.get<Transaction>("@scheduledTransaction").then((transaction) => {
+        cy.visit(`/transaction/${transaction.id}`);
+        cy.getBySel("transaction-scheduled-badge").should("contain", "Scheduled");
+      });
+      cy.visualSnapshot("Scheduled Payment Transaction Badge");
+
+      cy.switchUserByXstate(ctx.userB.username);
+      cy.getBySelLike("notifications-link").click();
+      cy.getBySelLike("notification-list-item")
+        .first()
+        .should("contain", ctx.userB.firstName)
+        .and("contain", "received payment");
     });
   });
 
