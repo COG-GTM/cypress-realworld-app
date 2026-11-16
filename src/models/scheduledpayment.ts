@@ -36,3 +36,8 @@ export type ScheduledPaymentPayload = Pick<
   "receiverId" | "amount" | "description" | "frequency" | "startDate"
 > &
   Partial<Pick<ScheduledPayment, "privacyLevel" | "source" | "endDate">>;
+
+export interface ScheduledPaymentResponseItem extends ScheduledPayment {
+  receiverName: string;
+  receiverAvatar: string;
+}
