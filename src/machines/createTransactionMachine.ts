@@ -2,7 +2,7 @@ import { omit } from "lodash/fp";
 import { Machine, assign } from "xstate";
 import { dataMachine } from "./dataMachine";
 import { httpClient } from "../utils/asyncUtils";
-import { User, TransactionCreatePayload } from "../models";
+import { User, TransactionCreatePayload, ScheduledPaymentPayload } from "../models";
 import { authService } from "./authMachine";
 import { backendPort } from "../utils/portUtils";
 
@@ -17,6 +17,14 @@ export interface CreateTransactionMachineSchema {
 const transactionDataMachine = dataMachine("transactionData").withConfig({
   services: {
     createData: async (ctx, event: any) => {
+      if (event.transactionType === "schedule") {
+        // No balance refresh: nothing is debited until the schedule runs
+        const resp = await httpClient.post(
+          `http://localhost:${backendPort}/scheduledPayments`,
+          omit(["type", "transactionType"], event)
+        );
+        return resp.data;
+      }
       const payload = omit("type", event);
       const resp = await httpClient.post(`http://localhost:${backendPort}/transactions`, payload);
       authService.send("REFRESH");
@@ -30,10 +38,18 @@ export type CreateTransactionMachineEvents =
   | { type: "CREATE" }
   | { type: "RESET" };
 
+export type ScheduledTransactionCreatePayload = ScheduledPaymentPayload & {
+  transactionType: "schedule";
+};
+
+export const isScheduledTransactionCreatePayload = (
+  details?: TransactionCreatePayload | ScheduledTransactionCreatePayload
+): details is ScheduledTransactionCreatePayload => details?.transactionType === "schedule";
+
 export interface CreateTransactionMachineContext {
   sender: User;
   receiver: User;
-  transactionDetails: TransactionCreatePayload;
+  transactionDetails: TransactionCreatePayload | ScheduledTransactionCreatePayload;
 }
 
 export const createTransactionMachine = Machine<

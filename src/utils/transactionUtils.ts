@@ -11,6 +11,7 @@ import {
   LikeNotification,
   CommentNotification,
   ValuePiece,
+  ScheduledPaymentFrequency,
 } from "../models";
 import { faker } from "@faker-js/faker";
 import Dinero from "dinero.js";
@@ -30,7 +31,7 @@ import {
   map,
   drop,
 } from "lodash/fp";
-import { parseISO } from "date-fns";
+import { addDays, format as formatDate, parseISO } from "date-fns";
 import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 
 const timezone = "UTC";
@@ -60,6 +61,30 @@ export const getFakeAmount = (min: number = 1000, max: number = 50000) =>
 export const formatAmount = (amount: number) => Dinero({ amount }).toFormat();
 
 /* istanbul ignore next */
+export const dollarsToCents = (amount: number | string) => Math.round(Number(amount) * 100);
+
+export const tomorrowIsoDate = (now: Date = new Date()) =>
+  formatDate(addDays(now, 1), "yyyy-MM-dd");
+
+const scheduleCadence = (frequency: ScheduledPaymentFrequency, startDate: string) => {
+  const start = formatDate(parseISO(startDate), "MMM d");
+  if (frequency === ScheduledPaymentFrequency.weekly) {
+    return `weekly starting ${start}`;
+  }
+  if (frequency === ScheduledPaymentFrequency.monthly) {
+    return `monthly starting ${start}`;
+  }
+  return `on ${start}`;
+};
+
+// e.g. "$25.00 to Kristian Bradtke, monthly starting Dec 1"
+export const formatScheduleSummary = (
+  amount: number,
+  receiverName: string,
+  frequency: ScheduledPaymentFrequency,
+  startDate: string
+) => `${formatAmount(amount)} to ${receiverName}, ${scheduleCadence(frequency, startDate)}`;
+
 export const formatAmountSlider = (amount: number) => Dinero({ amount }).toFormat("$0,0");
 
 export const payAppDifference = curry((sender: User, transaction: Transaction) =>

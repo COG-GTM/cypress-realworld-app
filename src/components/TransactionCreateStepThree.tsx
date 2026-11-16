@@ -13,9 +13,10 @@ import {
   CreateTransactionMachineContext,
   CreateTransactionMachineEvents,
   CreateTransactionMachineSchema,
+  isScheduledTransactionCreatePayload,
 } from "../machines/createTransactionMachine";
 import { useActor } from "@xstate/react";
-import { formatAmount } from "../utils/transactionUtils";
+import { formatAmount, formatScheduleSummary } from "../utils/transactionUtils";
 
 const PREFIX = "TransactionCreateStepThree";
 
@@ -55,6 +56,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
 
   const receiver = createTransactionState?.context?.receiver;
   const transactionDetails = createTransactionState?.context?.transactionDetails;
+  const isScheduled = isScheduledTransactionCreatePayload(transactionDetails);
 
   return (
     <StyledPaper className={classes.paper} elevation={0}>
@@ -96,12 +98,30 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
       >
         <Grid container direction="row" justifyContent="center" alignItems="center">
           <Grid item>
-            <Typography component="h2" variant="h6" color="primary" gutterBottom>
-              {transactionDetails?.transactionType === "payment" ? "Paid " : "Requested "}
-              {transactionDetails?.amount &&
-                formatAmount(parseInt(transactionDetails.amount, 10) * 100)}{" "}
-              for {transactionDetails?.description}
-            </Typography>
+            {isScheduled ? (
+              <Typography
+                component="h2"
+                variant="h6"
+                color="primary"
+                gutterBottom
+                data-test="new-transaction-schedule-confirmation"
+              >
+                Scheduled{" "}
+                {formatScheduleSummary(
+                  transactionDetails.amount,
+                  `${receiver.firstName} ${receiver.lastName}`,
+                  transactionDetails.frequency,
+                  transactionDetails.startDate
+                )}
+              </Typography>
+            ) : (
+              <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                {transactionDetails?.transactionType === "payment" ? "Paid " : "Requested "}
+                {transactionDetails?.amount &&
+                  formatAmount(parseInt(transactionDetails.amount, 10) * 100)}{" "}
+                for {transactionDetails?.description}
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Box>
@@ -124,6 +144,19 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
               Return To Transactions
             </Button>
           </Grid>
+          {isScheduled && (
+            <Grid item>
+              <Button
+                variant="contained"
+                size="small"
+                component={RouterLink}
+                to="/scheduled-payments"
+                data-test="new-transaction-view-scheduled-payments"
+              >
+                View Scheduled Payments
+              </Button>
+            </Grid>
+          )}
           <Grid item>
             <Button
               variant="contained"
