@@ -14,12 +14,14 @@ import {
   formatNotificationForApiResponse,
   getTransactionByIdForApi,
   getTransactionsForUserForApi,
+  rebaseSeedScheduledPayments,
 } from "../../backend/database";
 import { isSchedulerEnabled } from "../../backend/scheduledpayment-scheduler";
 import {
   User,
   DefaultPrivacyLevel,
   ScheduledPaymentFrequency,
+  ScheduledPayment,
   ScheduledPaymentPayload,
   ScheduledPaymentStatus,
   PaymentNotification,
@@ -46,8 +48,43 @@ describe("Scheduled Payments", () => {
     [sender, receiver] = getAllUsers();
   });
 
-  it("seeds an empty scheduledpayments table", () => {
-    expect(getAllForEntity("scheduledpayments")).toEqual([]);
+  it("seeds demo schedules for the last two users only", () => {
+    const seeded = getAllForEntity("scheduledpayments");
+    const demoSenderIds = getAllUsers()
+      .slice(-2)
+      .map((user: User) => user.id);
+
+    expect(seeded).toHaveLength(6);
+    seeded.forEach((scheduledPayment: any) => {
+      expect(demoSenderIds).toContain(scheduledPayment.senderId);
+      expect(scheduledPayment.receiverId).not.toBe(scheduledPayment.senderId);
+    });
+    expect(getScheduledPaymentsByUserId(sender.id)).toEqual([]);
+    expect(seeded.filter((s: any) => s.status === ScheduledPaymentStatus.active)).toHaveLength(4);
+    expect(seeded.filter((s: any) => s.status === ScheduledPaymentStatus.canceled)).toHaveLength(2);
+  });
+
+  it("keeps seeded demo schedules upcoming when the seed is reloaded months later", () => {
+    const original = getAllForEntity("scheduledpayments") as ScheduledPayment[];
+    const later = new Date(original[0].createdAt);
+    later.setMonth(later.getMonth() + 14);
+    const laterIsoDate = later.toISOString().slice(0, 10);
+
+    seedDatabase(later);
+    const rebased = getAllForEntity("scheduledpayments");
+    rebased
+      .filter((s: any) => s.status === ScheduledPaymentStatus.active)
+      .forEach((scheduledPayment: any) => {
+        expect(scheduledPayment.nextRunAt > laterIsoDate).toBe(true);
+        expect(scheduledPayment.nextRunAt).toBe(scheduledPayment.startDate);
+      });
+    rebased
+      .filter((s: any) => s.status === ScheduledPaymentStatus.canceled)
+      .forEach((scheduledPayment: any) => expect(scheduledPayment.nextRunAt).toBeNull());
+    expect(getDueScheduledPayments(later)).toEqual([]);
+    expect(rebaseSeedScheduledPayments(original, new Date(original[0].createdAt))).toEqual(
+      original
+    );
   });
 
   describe("createScheduledPayment", () => {
@@ -73,7 +110,7 @@ describe("Scheduled Payments", () => {
       expect(scheduledPayment.lastRunAt).toBeUndefined();
       expect(scheduledPayment.createdAt).toBeDefined();
       expect(scheduledPayment.modifiedAt).toBeDefined();
-      expect(getAllForEntity("scheduledpayments")).toHaveLength(1);
+      expect(getScheduledPaymentsByUserId(sender.id)).toHaveLength(1);
     });
 
     it("defaults privacyLevel to the sender's default privacy level", () => {

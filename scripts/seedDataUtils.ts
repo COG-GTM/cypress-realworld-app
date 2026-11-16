@@ -43,7 +43,11 @@ import {
   BankTransferType,
   BankTransfer,
   PaymentNotificationStatus,
+  ScheduledPayment,
+  ScheduledPaymentFrequency,
+  ScheduledPaymentStatus,
 } from "../src/models";
+import { addDays, addMonths, format as formatDate, startOfMonth, subDays } from "date-fns";
 import { getFakeAmount } from "../src/utils/transactionUtils";
 
 export const userbaseSize = +process.env.SEED_USERBASE_SIZE!;
@@ -568,6 +572,86 @@ export const createSeedBankTransfers = (
     })(seedUsers)
   );
 
+type SeedSchedule = Pick<ScheduledPayment, "amount" | "description" | "frequency" | "status"> & {
+  startDate: Date;
+  endDate?: Date;
+};
+
+// Demo schedules go to the last two seed users so the first three, which the Cypress specs
+// use, start with none. Dates are relative to when the seed is generated and land 1-3 months
+// out, so neither the dev scheduler nor a test run with a near-future `now` executes them.
+export const scheduledPaymentsPerSeededUser = 3;
+export const scheduledPaymentSenderCount = 2;
+export const totalScheduledPayments = scheduledPaymentsPerSeededUser * scheduledPaymentSenderCount;
+
+const seedSchedules = (now: Date): SeedSchedule[] => {
+  const nextMonth = addMonths(startOfMonth(now), 2);
+
+  return [
+    {
+      amount: 65000,
+      description: "Rent share",
+      frequency: ScheduledPaymentFrequency.monthly,
+      status: ScheduledPaymentStatus.active,
+      startDate: nextMonth,
+      endDate: subDays(addMonths(nextMonth, 12), 1),
+    },
+    {
+      amount: 1500,
+      description: "Weekly lunch",
+      frequency: ScheduledPaymentFrequency.weekly,
+      status: ScheduledPaymentStatus.active,
+      startDate: addDays(nextMonth, 6),
+    },
+    {
+      amount: 4500,
+      description: "Concert tickets",
+      frequency: ScheduledPaymentFrequency.once,
+      status: ScheduledPaymentStatus.canceled,
+      startDate: addMonths(nextMonth, 1),
+    },
+  ];
+};
+
+const toIsoDate = (date: Date) => formatDate(date, "yyyy-MM-dd");
+
+export const createSeedScheduledPayments = (
+  seedUsers: User[],
+  seedBankAccounts: BankAccount[],
+  now: Date = new Date()
+): ScheduledPayment[] => {
+  const senders = seedUsers.slice(-scheduledPaymentSenderCount);
+
+  return flattenDepth(
+    1,
+    map((sender: User): ScheduledPayment[] => {
+      const receivers = reject({ id: sender.id }, seedUsers) as User[];
+      const [bankAccount] = getBankAccountsByUserId(seedBankAccounts, sender.id);
+
+      return seedSchedules(now).map((schedule, index) => {
+        const isActive = schedule.status === ScheduledPaymentStatus.active;
+        return {
+          id: shortid(),
+          uuid: faker.datatype.uuid(),
+          senderId: sender.id,
+          receiverId: receivers[index % receivers.length].id,
+          amount: schedule.amount,
+          description: schedule.description,
+          privacyLevel: sender.defaultPrivacyLevel,
+          source: bankAccount?.id,
+          frequency: schedule.frequency,
+          startDate: toIsoDate(schedule.startDate),
+          ...(schedule.endDate && { endDate: toIsoDate(schedule.endDate) }),
+          nextRunAt: isActive ? toIsoDate(schedule.startDate) : null,
+          status: schedule.status,
+          createdAt: now,
+          modifiedAt: now,
+        };
+      });
+    })(senders)
+  ) as ScheduledPayment[];
+};
+
 export const buildDatabase = () => {
   const seedUsers: User[] = createSeedUsers();
   const seedContacts: Contact[] = createSeedContacts(seedUsers);
@@ -596,6 +680,6 @@ export const buildDatabase = () => {
     comments: seedComments,
     notifications: seedNotifications,
     banktransfers: seedBankTransfers,
-    scheduledpayments: [],
+    scheduledpayments: createSeedScheduledPayments(seedUsers, seedBankAccounts),
   };
 };
