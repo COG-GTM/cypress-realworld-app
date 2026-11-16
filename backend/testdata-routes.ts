@@ -15,7 +15,7 @@ router.post("/seed", (req, res) => {
   res.sendStatus(200);
 });
 
-//GET /testData/:entity
+//POST /testData/scheduledPayments/run
 router.post(
   "/scheduledPayments/run",
   validateMiddleware(isScheduledPaymentsRunValidator),
@@ -23,11 +23,13 @@ router.post(
     const now = req.body.now ? new Date(req.body.now) : new Date();
     const results = processDueScheduledPayments(now);
 
+    res.set("Cache-Control", "no-store");
     res.status(200);
     res.json({ results });
   }
 );
 
+//GET /testData/:entity
 router.get("/:entity", validateMiddleware([...isValidEntityValidator]), (req, res) => {
   const { entity } = req.params;
   const results = getAllForEntity(entity as keyof DbSchema);

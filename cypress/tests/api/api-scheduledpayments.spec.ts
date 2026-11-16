@@ -290,6 +290,7 @@ describe("Scheduled Payments API", function () {
           cy.request("POST", apiRunScheduledPayments, { now: nowOn(startDate) }).then(
             (response) => {
               expect(response.status).to.eq(200);
+              expect(response.headers["cache-control"]).to.eq("no-store");
               expect(response.body.results).to.have.length(1);
               expect(response.body.results[0]).to.include({
                 scheduledPaymentId: scheduledPayment.id,

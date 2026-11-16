@@ -723,7 +723,14 @@ const nextRunDateAfter = (scheduledPayment: ScheduledPayment, today: string): st
   return scheduledPayment.endDate && nextRunAt > scheduledPayment.endDate ? null : nextRunAt;
 };
 
-const runScheduledPayment = (scheduledPayment: ScheduledPayment, today: string): Transaction => {
+type PayScheduledPayment = typeof createTransaction;
+
+const runScheduledPayment = (
+  scheduledPayment: ScheduledPayment,
+  today: string,
+  pay: PayScheduledPayment
+): Transaction => {
+  const { lastRunAt, nextRunAt: previousNextRunAt, status } = scheduledPayment;
   const nextRunAt = nextRunDateAfter(scheduledPayment, today);
 
   updateScheduledPaymentById(scheduledPayment.id, {
@@ -732,31 +739,52 @@ const runScheduledPayment = (scheduledPayment: ScheduledPayment, today: string):
     status: nextRunAt === null ? ScheduledPaymentStatus.completed : ScheduledPaymentStatus.active,
   });
 
-  // createTransaction takes dollars and stores cents
-  return createTransaction(
-    scheduledPayment.senderId,
-    "payment",
-    {
-      senderId: scheduledPayment.senderId,
-      receiverId: scheduledPayment.receiverId,
-      amount: scheduledPayment.amount / 100,
-      description: scheduledPayment.description,
-      privacyLevel: scheduledPayment.privacyLevel,
-      source: scheduledPayment.source!,
-      status: TransactionStatus.pending,
-    },
-    scheduledPayment.id
-  );
+  try {
+    // createTransaction takes dollars and stores cents
+    return pay(
+      scheduledPayment.senderId,
+      "payment",
+      {
+        senderId: scheduledPayment.senderId,
+        receiverId: scheduledPayment.receiverId,
+        amount: scheduledPayment.amount / 100,
+        description: scheduledPayment.description,
+        privacyLevel: scheduledPayment.privacyLevel,
+        source: scheduledPayment.source!,
+        status: TransactionStatus.pending,
+      },
+      scheduledPayment.id
+    );
+  } catch (error) {
+    // Put the run back so the next tick retries it instead of skipping it
+    updateScheduledPaymentById(scheduledPayment.id, {
+      lastRunAt,
+      nextRunAt: previousNextRunAt,
+      status,
+    });
+    throw error;
+  }
 };
 
 // Runs synchronously, so overlapping ticks can't pick up the same schedule twice;
-// once run, a schedule's nextRunAt is after today (or null) and it is no longer due
-export const processDueScheduledPayments = (now: Date): Transaction[] => {
+// once run, a schedule's nextRunAt is after today (or null) and it is no longer due.
+// A schedule whose payment fails is left due and doesn't stop the others.
+export const processDueScheduledPayments = (
+  now: Date,
+  pay: PayScheduledPayment = createTransaction
+): Transaction[] => {
   const today = toIsoDate(now);
 
   return getDueScheduledPayments(now)
     .filter((scheduledPayment) => scheduledPayment.lastRunAt !== today)
-    .map((scheduledPayment) => runScheduledPayment(scheduledPayment, today));
+    .flatMap((scheduledPayment) => {
+      try {
+        return [runScheduledPayment(scheduledPayment, today, pay)];
+      } catch (error) {
+        console.error(`Scheduled payment ${scheduledPayment.id} failed`, error);
+        return [];
+      }
+    });
 };
 
 // Likes

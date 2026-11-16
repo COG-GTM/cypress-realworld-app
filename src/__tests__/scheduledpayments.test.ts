@@ -416,6 +416,52 @@ describe("Scheduled Payments", () => {
 
       expect(processDueScheduledPayments(at("2026-12-01"))).toHaveLength(2);
     });
+
+    it("leaves a schedule due when its payment fails, and retries it on the next run", () => {
+      const failing = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly })
+      );
+      const other = createScheduledPayment(receiver.id, buildPayload({ receiverId: sender.id }));
+      const failFirst: typeof createTransaction = (...args) => {
+        if (args[3] === failing.id) {
+          throw new Error("payment failed");
+        }
+        return createTransaction(...args);
+      };
+
+      const results = processDueScheduledPayments(at("2026-12-01"), failFirst);
+
+      expect(results.map((transaction) => transaction.scheduledPaymentId)).toEqual([other.id]);
+      expect(transactionsFor(failing.id)).toEqual([]);
+      expect(getScheduledPaymentById(failing.id)).toMatchObject({
+        status: ScheduledPaymentStatus.active,
+        nextRunAt: "2026-12-01",
+      });
+      expect(getScheduledPaymentById(failing.id).lastRunAt).toBeUndefined();
+
+      const [retried] = processDueScheduledPayments(at("2026-12-01"));
+
+      expect(retried.scheduledPaymentId).toBe(failing.id);
+      expect(transactionsFor(failing.id)).toHaveLength(1);
+      expect(getScheduledPaymentById(failing.id).nextRunAt).toBe("2026-12-08");
+    });
+
+    it("leaves a one-time schedule active when its payment fails", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.once })
+      );
+      const alwaysFail: typeof createTransaction = () => {
+        throw new Error("payment failed");
+      };
+
+      expect(processDueScheduledPayments(at("2026-12-01"), alwaysFail)).toEqual([]);
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.active,
+        nextRunAt: "2026-12-01",
+      });
+    });
   });
 
   describe("isSchedulerEnabled", () => {
