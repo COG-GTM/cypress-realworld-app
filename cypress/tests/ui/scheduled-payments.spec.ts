@@ -1,6 +1,6 @@
 import Dinero from "dinero.js";
 import { addDays, format as formatDate } from "date-fns";
-import { User, Transaction } from "../../../src/models";
+import { User, Transaction, NotificationType } from "../../../src/models";
 import { isMobile } from "../../support/utils";
 
 type ScheduledPaymentsCtx = {
@@ -199,10 +199,16 @@ describe("Scheduled Payments", function () {
       );
     }
     openNotifications();
-    cy.getBySelLike("notification-list-item").should(
-      "contain",
-      `${ctx.userA.firstName} ${ctx.userA.lastName} received payment.`
-    );
+    cy.get<string>("@paymentId").then((paymentId) => {
+      cy.database("find", "notifications", { transactionId: paymentId, userId: ctx.userB.id }).then(
+        (notification: NotificationType) => {
+          cy.getBySel(`notification-list-item-${notification.id}`).should(
+            "contain",
+            `${ctx.userB.firstName} ${ctx.userB.lastName} received payment.`
+          );
+        }
+      );
+    });
   });
 
   it("lists schedules active first and cancels one after confirming", function () {

@@ -18,7 +18,14 @@ import {
   inRange,
   remove,
 } from "lodash/fp";
-import { addMonths, addWeeks, format as formatDate, isWithinInterval, parseISO } from "date-fns";
+import {
+  addMonths,
+  addWeeks,
+  differenceInCalendarMonths,
+  format as formatDate,
+  isWithinInterval,
+  parseISO,
+} from "date-fns";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import shortid from "shortid";
@@ -99,13 +106,40 @@ const adapter = new FileSync<DbSchema>(databaseFile);
 
 const db = low(adapter);
 
-export const seedDatabase = () => {
+// Demo schedules in the seed file are dated from when it was generated; move them forward
+// by the months since then so they stay upcoming whenever the database is reseeded
+export const rebaseSeedScheduledPayments = (
+  scheduledPayments: ScheduledPayment[],
+  now: Date = new Date()
+): ScheduledPayment[] =>
+  scheduledPayments.map((scheduledPayment) => {
+    const months = differenceInCalendarMonths(now, new Date(scheduledPayment.createdAt));
+    if (months <= 0) {
+      return scheduledPayment;
+    }
+    const shiftDate = (date: string) => formatDate(addMonths(parseISO(date), months), "yyyy-MM-dd");
+    const shiftTimestamp = (date: Date) => addMonths(new Date(date), months);
+
+    return {
+      ...scheduledPayment,
+      startDate: shiftDate(scheduledPayment.startDate),
+      ...(scheduledPayment.endDate && { endDate: shiftDate(scheduledPayment.endDate) }),
+      nextRunAt: scheduledPayment.nextRunAt && shiftDate(scheduledPayment.nextRunAt),
+      createdAt: shiftTimestamp(scheduledPayment.createdAt),
+      modifiedAt: shiftTimestamp(scheduledPayment.modifiedAt),
+    };
+  });
+
+export const seedDatabase = (now: Date = new Date()) => {
   const testSeed = JSON.parse(
     fs.readFileSync(path.join(process.cwd(), "data", "database-seed.json"), "utf-8")
   );
 
   // seed database with test data
-  db.setState(testSeed).write();
+  db.setState({
+    ...testSeed,
+    scheduledpayments: rebaseSeedScheduledPayments(testSeed.scheduledpayments ?? [], now),
+  }).write();
   return;
 };
 
