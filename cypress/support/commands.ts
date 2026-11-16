@@ -235,6 +235,25 @@ Cypress.Commands.add("createTransaction", (payload) => {
     });
 });
 
+Cypress.Commands.add("runScheduledPayments", (now) => {
+  const log = Cypress.log({
+    name: "runScheduledPayments",
+    displayName: "RUN SCHEDULED PAYMENTS",
+    message: [`⏰ ${now ?? "now"}`],
+    // @ts-ignore
+    autoEnd: false,
+  });
+
+  return cy
+    .request("POST", `${Cypress.env("apiUrl")}/testData/scheduledPayments/run`, now ? { now } : {})
+    .its("body.results", { log: false })
+    .then((results) => {
+      log.set({ consoleProps: () => ({ now, results }) });
+      log.end();
+      return results;
+    });
+});
+
 Cypress.Commands.add("nextTransactionFeedPage", (service, page) => {
   const log = Cypress.log({
     name: "nextTransactionFeedPage",

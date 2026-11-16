@@ -146,6 +146,12 @@ declare namespace Cypress {
     createTransaction(payload): Chainable<any>;
 
     /**
+     * Run due scheduled payments as of `now` (ISO timestamp, defaults to the server's current time)
+     * through POST /testData/scheduledPayments/run; yields the transactions it created
+     */
+    runScheduledPayments(now?: string): Chainable<Transaction[]>;
+
+    /**
      * Logs in to AWS Cognito via Amplify Auth API bypassing UI using Cypress Task
      */
     loginByCognitoApi(username: string, password: string): Chainable<any>;

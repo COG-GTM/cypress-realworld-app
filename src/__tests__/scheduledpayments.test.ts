@@ -46,8 +46,20 @@ describe("Scheduled Payments", () => {
     [sender, receiver] = getAllUsers();
   });
 
-  it("seeds an empty scheduledpayments table", () => {
-    expect(getAllForEntity("scheduledpayments")).toEqual([]);
+  it("seeds demo schedules for the last two users only", () => {
+    const seeded = getAllForEntity("scheduledpayments");
+    const demoSenderIds = getAllUsers()
+      .slice(-2)
+      .map((user: User) => user.id);
+
+    expect(seeded).toHaveLength(6);
+    seeded.forEach((scheduledPayment: any) => {
+      expect(demoSenderIds).toContain(scheduledPayment.senderId);
+      expect(scheduledPayment.receiverId).not.toBe(scheduledPayment.senderId);
+    });
+    expect(getScheduledPaymentsByUserId(sender.id)).toEqual([]);
+    expect(seeded.filter((s: any) => s.status === ScheduledPaymentStatus.active)).toHaveLength(4);
+    expect(seeded.filter((s: any) => s.status === ScheduledPaymentStatus.canceled)).toHaveLength(2);
   });
 
   describe("createScheduledPayment", () => {
@@ -73,7 +85,7 @@ describe("Scheduled Payments", () => {
       expect(scheduledPayment.lastRunAt).toBeUndefined();
       expect(scheduledPayment.createdAt).toBeDefined();
       expect(scheduledPayment.modifiedAt).toBeDefined();
-      expect(getAllForEntity("scheduledpayments")).toHaveLength(1);
+      expect(getScheduledPaymentsByUserId(sender.id)).toHaveLength(1);
     });
 
     it("defaults privacyLevel to the sender's default privacy level", () => {

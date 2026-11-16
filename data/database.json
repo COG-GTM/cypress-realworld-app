@@ -9937,14 +9937,6 @@
       "transactionId": "Duc8WQEFqBCm",
       "createdAt": "2023-04-15T16:27:28.535Z",
       "modifiedAt": "2024-03-07T13:31:05.096Z"
-    },
-    {
-      "id": "vcr-DEIjyP",
-      "uuid": "5f7a901d-4dda-4915-8190-9de3be881904",
-      "userId": "uBmeaz5pX",
-      "transactionId": "T_gY9e9g_Ua",
-      "createdAt": "2026-11-16T20:45:59.785Z",
-      "modifiedAt": "2026-11-16T20:45:59.785Z"
     }
   ],
   "comments": [
@@ -10993,5 +10985,104 @@
       "modifiedAt": "2024-03-07T13:32:42.472Z"
     }
   ],
-  "scheduledpayments": []
+  "scheduledpayments": [
+    {
+      "id": "JyysEf0Sz",
+      "uuid": "0a9dde30-a5f2-4927-b92a-96fccc5c4648",
+      "senderId": "M1ty1gR8B3",
+      "receiverId": "uBmeaz5pX",
+      "amount": 65000,
+      "description": "Rent share",
+      "privacyLevel": "private",
+      "source": "5JXFHs8PJzk",
+      "frequency": "monthly",
+      "startDate": "2027-01-01",
+      "endDate": "2027-12-31",
+      "nextRunAt": "2027-01-01",
+      "status": "active",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    },
+    {
+      "id": "Rm5lIzSVJ8",
+      "uuid": "3545dc26-fcae-42f5-aaae-d6dbb4416c8f",
+      "senderId": "M1ty1gR8B3",
+      "receiverId": "GjWovtg2hr",
+      "amount": 1500,
+      "description": "Weekly lunch",
+      "privacyLevel": "private",
+      "source": "5JXFHs8PJzk",
+      "frequency": "weekly",
+      "startDate": "2027-01-07",
+      "nextRunAt": "2027-01-07",
+      "status": "active",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    },
+    {
+      "id": "TesUeGK4tY",
+      "uuid": "57424e0d-1517-4b97-ad07-c20a55ec9d83",
+      "senderId": "M1ty1gR8B3",
+      "receiverId": "_XblMqbuoP",
+      "amount": 4500,
+      "description": "Concert tickets",
+      "privacyLevel": "private",
+      "source": "5JXFHs8PJzk",
+      "frequency": "once",
+      "startDate": "2027-02-01",
+      "nextRunAt": null,
+      "status": "canceled",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    },
+    {
+      "id": "DSI9zuyhHL",
+      "uuid": "ab934b9b-4d51-46d1-8906-fab85dbeb25b",
+      "senderId": "WHjJ4qR2R2",
+      "receiverId": "uBmeaz5pX",
+      "amount": 65000,
+      "description": "Rent share",
+      "privacyLevel": "public",
+      "source": "fBzOsXo6JCj",
+      "frequency": "monthly",
+      "startDate": "2027-01-01",
+      "endDate": "2027-12-31",
+      "nextRunAt": "2027-01-01",
+      "status": "active",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    },
+    {
+      "id": "IYfxQuYFMC",
+      "uuid": "c0083237-1f73-4057-a2e2-a63478d590ba",
+      "senderId": "WHjJ4qR2R2",
+      "receiverId": "GjWovtg2hr",
+      "amount": 1500,
+      "description": "Weekly lunch",
+      "privacyLevel": "public",
+      "source": "fBzOsXo6JCj",
+      "frequency": "weekly",
+      "startDate": "2027-01-07",
+      "nextRunAt": "2027-01-07",
+      "status": "active",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    },
+    {
+      "id": "znQMwIbckg",
+      "uuid": "4f4aa156-a215-41b1-bcc7-8a482ec3e774",
+      "senderId": "WHjJ4qR2R2",
+      "receiverId": "_XblMqbuoP",
+      "amount": 4500,
+      "description": "Concert tickets",
+      "privacyLevel": "public",
+      "source": "fBzOsXo6JCj",
+      "frequency": "once",
+      "startDate": "2027-02-01",
+      "nextRunAt": null,
+      "status": "canceled",
+      "createdAt": "2026-11-16T22:53:38.657Z",
+      "modifiedAt": "2026-11-16T22:53:38.657Z"
+    }
+  ]
 }

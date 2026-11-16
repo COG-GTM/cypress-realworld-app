@@ -9,6 +9,7 @@ import {
   totalComments,
   totalNotifications,
   totalBankTransfers,
+  totalScheduledPayments,
 } from "../../scripts/seedDataUtils";
 import { TDatabase } from "../../backend/database";
 
@@ -56,5 +57,10 @@ describe.skip("Seed Database", () => {
   it("should contain a list of bank transfers", () => {
     expect(database).toHaveProperty("banktransfers");
     expect(database.banktransfers.length).toBeLessThanOrEqual(totalBankTransfers);
+  });
+
+  it("should contain a list of scheduled payments", () => {
+    expect(database).toHaveProperty("scheduledpayments");
+    expect(database.scheduledpayments.length).toBe(totalScheduledPayments);
   });
 });
