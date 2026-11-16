@@ -2,7 +2,7 @@ import { omit } from "lodash/fp";
 import { Machine, assign } from "xstate";
 import { dataMachine } from "./dataMachine";
 import { httpClient } from "../utils/asyncUtils";
-import { User, TransactionCreatePayload } from "../models";
+import { User, TransactionCreatePayload, ScheduledPaymentPayload } from "../models";
 import { authService } from "./authMachine";
 import { backendPort } from "../utils/portUtils";
 
@@ -28,12 +28,30 @@ const transactionDataMachine = dataMachine("transactionData").withConfig({
 export type CreateTransactionMachineEvents =
   | { type: "SET_USERS" }
   | { type: "CREATE" }
+  | { type: "SCHEDULED" }
   | { type: "RESET" };
+
+export type ScheduledTransactionCreatePayload = ScheduledPaymentPayload & {
+  transactionType: "schedule";
+};
+
+export const isScheduledTransactionCreatePayload = (
+  details?: TransactionCreatePayload | ScheduledTransactionCreatePayload
+): details is ScheduledTransactionCreatePayload => details?.transactionType === "schedule";
+
+// No balance refresh: nothing is debited until the schedule runs
+export const createScheduledPayment = async (payload: ScheduledTransactionCreatePayload) => {
+  const resp = await httpClient.post(
+    `http://localhost:${backendPort}/scheduledPayments`,
+    omit("transactionType", payload)
+  );
+  return resp.data;
+};
 
 export interface CreateTransactionMachineContext {
   sender: User;
   receiver: User;
-  transactionDetails: TransactionCreatePayload;
+  transactionDetails: TransactionCreatePayload | ScheduledTransactionCreatePayload;
 }
 
 export const createTransactionMachine = Machine<
@@ -60,6 +78,8 @@ export const createTransactionMachine = Machine<
         },
         on: {
           CREATE: "stepThree",
+          // Sent after POST /scheduledPayments succeeds
+          SCHEDULED: "stepThree",
         },
       },
       stepThree: {

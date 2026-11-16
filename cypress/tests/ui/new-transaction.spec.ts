@@ -1,5 +1,6 @@
 import Dinero from "dinero.js";
-import { User } from "../../../src/models";
+import { addDays, format as formatDate } from "date-fns";
+import { User, Transaction } from "../../../src/models";
 import { isMobile } from "../../support/utils";
 
 type NewTransactionTestCtx = {
@@ -19,6 +20,7 @@ describe("New Transaction", function () {
     cy.intercept("GET", "/users/search*").as("usersSearch");
 
     cy.intercept("POST", "/transactions").as("createTransaction");
+    cy.intercept("POST", "/scheduledPayments").as("createScheduledPayment");
 
     cy.intercept("GET", "/notifications").as("notifications");
     cy.intercept("GET", "/transactions/public").as("publicTransactions");
@@ -87,6 +89,166 @@ describe("New Transaction", function () {
       .should("equal", ctx.contact!.balance + parseInt(payment.amount) * 100);
     cy.getBySel("alert-bar-success").should("not.exist");
     cy.visualSnapshot("Personal List Validate Transaction in List");
+  });
+
+  it("schedules a monthly payment without debiting the balance", function () {
+    const isoDate = (days: number) => formatDate(addDays(new Date(), days), "yyyy-MM-dd");
+    const startDate = isoDate(14);
+    const endDate = isoDate(120);
+
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySel("user-list-search-input").type(ctx.contact!.firstName, { force: true });
+    cy.wait("@usersSearch");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySelLike("amount-input").type("25");
+    cy.getBySelLike("description-input").type("Rent share");
+
+    cy.getBySel("transaction-create-schedule-fields").should("not.exist");
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-schedule-fields").should("be.visible");
+    cy.getBySel("transaction-create-form").should("be.visible");
+    cy.getBySel("alert-bar-success").should("not.exist");
+    cy.getBySel("transaction-create-start-date-input").should("have.value", isoDate(1));
+    cy.getBySel("transaction-create-end-date-input").should("not.exist");
+
+    cy.getBySel("transaction-create-start-date-input").clear();
+
+    cy.getBySel("transaction-create-start-date-input").type(startDate);
+    cy.getBySel("transaction-create-frequency-select").click();
+    cy.getBySel("transaction-create-frequency-monthly").click();
+    cy.getBySel("transaction-create-end-date-input").clear();
+    cy.getBySel("transaction-create-end-date-input").type(endDate);
+
+    cy.getBySel("transaction-create-submit-schedule").should("be.enabled").click();
+    cy.wait("@createScheduledPayment").then(({ request, response }) => {
+      expect(request.body).to.deep.equal({
+        receiverId: ctx.contact!.id,
+        amount: 2500,
+        description: "Rent share",
+        frequency: "monthly",
+        startDate,
+        endDate,
+      });
+      expect(response!.statusCode).to.equal(200);
+    });
+    cy.getBySel("alert-bar-success").should("be.visible").and("have.text", "Payment Scheduled!");
+
+    cy.getBySel("new-transaction-schedule-confirmation").should(
+      "have.text",
+      `Scheduled $25.00 to ${ctx.contact!.firstName} ${ctx.contact!.lastName}, monthly starting ${formatDate(
+        addDays(new Date(), 14),
+        "MMM d"
+      )}`
+    );
+    cy.getBySel("new-transaction-view-scheduled-payments").should(
+      "have.attr",
+      "href",
+      "/scheduled-payments"
+    );
+
+    cy.database("find", "users", { id: ctx.user!.id })
+      .its("balance")
+      .should("equal", ctx.user!.balance);
+    cy.database("filter", "transactions", {
+      senderId: ctx.user!.id,
+      description: "Rent share",
+    }).then((transactions: Transaction[]) => expect(transactions).to.have.length(0));
+    cy.database("find", "scheduledpayments", {
+      senderId: ctx.user!.id,
+      description: "Rent share",
+    }).should("deep.include", { amount: 2500, frequency: "monthly", startDate, endDate });
+  });
+
+  it("validates the schedule fields before enabling Schedule", function () {
+    const isoDate = (days: number) => formatDate(addDays(new Date(), days), "yyyy-MM-dd");
+
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+
+    cy.getBySelLike("amount-input").type("10.505");
+    cy.getBySelLike("description-input").type("Coffee");
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+    cy.getBySelLike("amount-input").clear();
+    cy.getBySelLike("amount-input").type("10.50");
+    cy.getBySel("transaction-create-submit-schedule").should("be.enabled");
+
+    cy.getBySel("transaction-create-start-date-input").clear();
+
+    cy.getBySel("transaction-create-start-date-input").type(isoDate(0));
+    cy.getBySel("transaction-create-schedule-fields").should(
+      "contain",
+      "Start date must be tomorrow or later"
+    );
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+
+    cy.getBySel("transaction-create-start-date-input").clear();
+
+    cy.getBySel("transaction-create-start-date-input").type(isoDate(10));
+    cy.getBySel("transaction-create-frequency-select").click();
+    cy.getBySel("transaction-create-frequency-weekly").click();
+    cy.getBySel("transaction-create-end-date-input").clear();
+    cy.getBySel("transaction-create-end-date-input").type(isoDate(5));
+    cy.getBySel("transaction-create-schedule-fields").should(
+      "contain",
+      "End date must be on or after the start date"
+    );
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+
+    cy.getBySel("transaction-create-frequency-select").click();
+    cy.getBySel("transaction-create-frequency-once").click();
+    cy.getBySel("transaction-create-end-date-input").should("not.exist");
+    cy.getBySel("transaction-create-submit-schedule").should("be.enabled");
+    cy.getBySel("transaction-create-submit-payment").should("be.enabled");
+  });
+
+  it("pays immediately even when the open schedule fields are invalid", function () {
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySelLike("amount-input").type("12");
+    cy.getBySelLike("description-input").type("Lunch now");
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-start-date-input").clear();
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+
+    cy.getBySelLike("submit-payment").click();
+    cy.wait("@createTransaction").its("request.body").should("deep.include", {
+      transactionType: "payment",
+      description: "Lunch now",
+    });
+    cy.getBySel("alert-bar-success").should("contain", "Transaction Submitted!");
+    cy.getBySel("new-transaction-schedule-confirmation").should("not.exist");
+  });
+
+  it("shows the API error instead of a confirmation when scheduling fails", function () {
+    cy.intercept("POST", "/scheduledPayments", {
+      statusCode: 422,
+      body: { errors: [{ path: "startDate", msg: "must be tomorrow or later" }] },
+    }).as("rejectedSchedule");
+
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySelLike("amount-input").type("5");
+    cy.getBySelLike("description-input").type("Rejected schedule");
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-submit-schedule").click();
+
+    cy.wait("@rejectedSchedule");
+    cy.getBySel("alert-bar-error").should(
+      "contain",
+      "Payment not scheduled: startDate must be tomorrow or later"
+    );
+    cy.getBySel("new-transaction-schedule-confirmation").should("not.exist");
+    cy.getBySel("transaction-create-submit-schedule").should("be.enabled");
   });
 
   it("navigates to the new transaction form, selects a user and submits a transaction request", function () {
