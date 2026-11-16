@@ -112,10 +112,12 @@ export const isScheduledPaymentPayloadValidator = [
     .withMessage("cannot schedule a payment to yourself")
     .custom((value) => !!getUserById(value))
     .withMessage("receiver not found"),
-  body("amount").isFloat({ gt: 0 }).toFloat(),
+  body("amount").isInt({ gt: 0 }).withMessage("must be a positive whole number of cents").toInt(),
   body("description").isString().trim().notEmpty(),
-  body("frequency").isIn(ScheduledPaymentFrequencyValues),
+  body("frequency").isString().bail().isIn(ScheduledPaymentFrequencyValues),
   body("startDate")
+    .isString()
+    .bail()
     .custom(isIsoDate)
     .withMessage("must be an ISO date (YYYY-MM-DD)")
     .bail()
@@ -123,6 +125,8 @@ export const isScheduledPaymentPayloadValidator = [
     .withMessage("must be tomorrow or later"),
   body("endDate")
     .optional()
+    .isString()
+    .bail()
     .custom(isIsoDate)
     .withMessage("must be an ISO date (YYYY-MM-DD)")
     .bail()
@@ -131,12 +135,12 @@ export const isScheduledPaymentPayloadValidator = [
     .bail()
     .custom((value, { req }) => value >= req.body.startDate)
     .withMessage("must be on or after startDate"),
-  body("privacyLevel").optional().isIn(DefaultPrivacyLevelValues),
+  body("privacyLevel").optional().isString().bail().isIn(DefaultPrivacyLevelValues),
   body("source").optional().isString().trim(),
 ];
 
 export const isScheduledPaymentPatchValidator = [
-  body("status").isIn([ScheduledPaymentStatus.canceled]),
+  body("status").isString().bail().isIn([ScheduledPaymentStatus.canceled]),
 ];
 
 export const isCommentValidator = body("content").isString().trim();

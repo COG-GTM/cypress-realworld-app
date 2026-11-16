@@ -18,6 +18,11 @@ import {
 import { ScheduledPaymentStatus } from "../src/models";
 const router = express.Router();
 
+router.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+
 // Routes
 
 //GET /scheduledPayments (scoped-user)
@@ -55,13 +60,10 @@ router.patch(
     const { scheduledPaymentId } = req.params;
     const scheduledPayment = getScheduledPaymentById(scheduledPaymentId);
 
-    if (!scheduledPayment) {
-      return res.status(404).json({ error: "Scheduled payment not found" });
-    }
-
+    // Someone else's schedule is a 404 too, so other users' schedule ids aren't revealed
     /* istanbul ignore next */
-    if (scheduledPayment.senderId !== req.user?.id) {
-      return res.status(403).json({ error: "Forbidden" });
+    if (!scheduledPayment || scheduledPayment.senderId !== req.user?.id) {
+      return res.status(404).json({ error: "Scheduled payment not found" });
     }
 
     if (scheduledPayment.status !== ScheduledPaymentStatus.active) {

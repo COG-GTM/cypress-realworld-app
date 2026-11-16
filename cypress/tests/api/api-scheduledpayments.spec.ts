@@ -71,6 +71,7 @@ describe("Scheduled Payments API", function () {
       cy.request("GET", apiScheduledPayments).then((response) => {
         expect(response.status).to.eq(200);
         expect(response.body.results).to.deep.eq([]);
+        expect(response.headers["cache-control"]).to.eq("no-store");
       });
     });
 
@@ -144,6 +145,20 @@ describe("Scheduled Payments API", function () {
       expectValidationError(buildPayload({ amount: -100 }), "amount");
     });
 
+    it("rejects fractional cents", function () {
+      expectValidationError(buildPayload({ amount: 2500.5 }), "amount");
+      expectValidationError(buildPayload({ amount: 0.5 }), "amount");
+    });
+
+    it("rejects array values for enum and date fields", function () {
+      expectValidationError(
+        buildPayload({ frequency: ["once"], endDate: isoDateFromToday(30) }),
+        "frequency"
+      );
+      expectValidationError(buildPayload({ privacyLevel: ["private"] }), "privacyLevel");
+      expectValidationError(buildPayload({ startDate: [isoDateFromToday(7)] }), "startDate");
+    });
+
     it("rejects a missing description", function () {
       expectValidationError(buildPayload({ description: undefined }), "description");
     });
@@ -214,7 +229,7 @@ describe("Scheduled Payments API", function () {
       });
     });
 
-    it("returns 403 when the schedule belongs to another user", function () {
+    it("returns 404 when the schedule belongs to another user", function () {
       cy.loginByApi(ctx.otherUser!.username);
       createScheduledPayment().then((scheduledPayment: ScheduledPayment) => {
         cy.loginByApi(ctx.authenticatedUser!.username);
@@ -225,7 +240,11 @@ describe("Scheduled Payments API", function () {
           body: { status: "canceled" },
         })
           .its("status")
-          .should("eq", 403);
+          .should("eq", 404);
+
+        cy.database("find", "scheduledpayments", { id: scheduledPayment.id })
+          .its("status")
+          .should("eq", "active");
       });
     });
 
