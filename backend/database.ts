@@ -18,7 +18,7 @@ import {
   inRange,
   remove,
 } from "lodash/fp";
-import { format as formatDate, isWithinInterval } from "date-fns";
+import { addMonths, addWeeks, format as formatDate, isWithinInterval, parseISO } from "date-fns";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import shortid from "shortid";
@@ -47,6 +47,7 @@ import {
   TransactionQueryPayload,
   DefaultPrivacyLevel,
   ScheduledPayment,
+  ScheduledPaymentFrequency,
   ScheduledPaymentPayload,
   ScheduledPaymentStatus,
   ScheduledPaymentResponseItem,
@@ -530,7 +531,9 @@ export const savePayAppBalance = curry((sender: User, balance: number) =>
 export const createTransaction = (
   userId: User["id"],
   transactionType: "payment" | "request",
-  transactionDetails: TransactionPayload
+  transactionDetails: TransactionPayload,
+  // Kept out of transactionDetails so API clients can't attach payments to a schedule
+  scheduledPaymentId?: ScheduledPayment["id"]
 ): Transaction => {
   const sender = getUserById(userId);
   const receiver = getUserById(transactionDetails.receiverId);
@@ -538,13 +541,14 @@ export const createTransaction = (
     id: shortid(),
     uuid: v4(),
     source: transactionDetails.source,
-    amount: transactionDetails.amount * 100,
+    amount: Math.round(transactionDetails.amount * 100),
     description: transactionDetails.description,
     receiverId: transactionDetails.receiverId,
     senderId: userId,
     privacyLevel: transactionDetails.privacyLevel || sender.defaultPrivacyLevel,
     status: TransactionStatus.pending,
     requestStatus: transactionType === "request" ? TransactionRequestStatus.pending : undefined,
+    ...(scheduledPaymentId && { scheduledPaymentId }),
     createdAt: new Date(),
     modifiedAt: new Date(),
   };
@@ -690,6 +694,69 @@ export const getDueScheduledPayments = (now: Date): ScheduledPayment[] => {
       )
       .value()
   );
+};
+
+const toIsoDate = (date: Date) => formatDate(date, "yyyy-MM-dd");
+
+// Monthly runs stay anchored to the start day, clamped to month end (Jan 31 -> Feb 28 -> Mar 31)
+const nthRunDate = (scheduledPayment: ScheduledPayment, n: number): string => {
+  const startDate = parseISO(scheduledPayment.startDate);
+  return toIsoDate(
+    scheduledPayment.frequency === ScheduledPaymentFrequency.weekly
+      ? addWeeks(startDate, n)
+      : addMonths(startDate, n)
+  );
+};
+
+// Missed runs are not backfilled: skip ahead to the first run date after today (see COG-1478)
+const nextRunDateAfter = (scheduledPayment: ScheduledPayment, today: string): string | null => {
+  if (scheduledPayment.frequency === ScheduledPaymentFrequency.once) {
+    return null;
+  }
+
+  let n = 1;
+  while (nthRunDate(scheduledPayment, n) <= today) {
+    n++;
+  }
+  const nextRunAt = nthRunDate(scheduledPayment, n);
+
+  return scheduledPayment.endDate && nextRunAt > scheduledPayment.endDate ? null : nextRunAt;
+};
+
+const runScheduledPayment = (scheduledPayment: ScheduledPayment, today: string): Transaction => {
+  const nextRunAt = nextRunDateAfter(scheduledPayment, today);
+
+  updateScheduledPaymentById(scheduledPayment.id, {
+    lastRunAt: today,
+    nextRunAt,
+    status: nextRunAt === null ? ScheduledPaymentStatus.completed : ScheduledPaymentStatus.active,
+  });
+
+  // createTransaction takes dollars and stores cents
+  return createTransaction(
+    scheduledPayment.senderId,
+    "payment",
+    {
+      senderId: scheduledPayment.senderId,
+      receiverId: scheduledPayment.receiverId,
+      amount: scheduledPayment.amount / 100,
+      description: scheduledPayment.description,
+      privacyLevel: scheduledPayment.privacyLevel,
+      source: scheduledPayment.source!,
+      status: TransactionStatus.pending,
+    },
+    scheduledPayment.id
+  );
+};
+
+// Runs synchronously, so overlapping ticks can't pick up the same schedule twice;
+// once run, a schedule's nextRunAt is after today (or null) and it is no longer due
+export const processDueScheduledPayments = (now: Date): Transaction[] => {
+  const today = toIsoDate(now);
+
+  return getDueScheduledPayments(now)
+    .filter((scheduledPayment) => scheduledPayment.lastRunAt !== today)
+    .map((scheduledPayment) => runScheduledPayment(scheduledPayment, today));
 };
 
 // Likes

@@ -8,13 +8,19 @@ import {
   getScheduledPaymentsByUserId,
   updateScheduledPaymentById,
   getDueScheduledPayments,
+  processDueScheduledPayments,
+  getUserById,
+  createTransaction,
 } from "../../backend/database";
+import { isSchedulerEnabled } from "../../backend/scheduledpayment-scheduler";
 import {
   User,
   DefaultPrivacyLevel,
   ScheduledPaymentFrequency,
   ScheduledPaymentPayload,
   ScheduledPaymentStatus,
+  Transaction,
+  TransactionStatus,
 } from "../../src/models";
 
 describe("Scheduled Payments", () => {
@@ -192,6 +198,237 @@ describe("Scheduled Payments", () => {
 
     it("returns nothing when no schedules exist", () => {
       expect(getDueScheduledPayments(now)).toEqual([]);
+    });
+  });
+
+  describe("processDueScheduledPayments", () => {
+    // Server local time, matching how due dates are compared
+    const at = (isoDate: string) => new Date(`${isoDate}T09:30:00`);
+
+    const transactionsFor = (scheduledPaymentId: string): Transaction[] =>
+      (getAllForEntity("transactions") as Transaction[]).filter(
+        (transaction) => transaction.scheduledPaymentId === scheduledPaymentId
+      );
+
+    it("creates one completed payment per due schedule, stamped with scheduledPaymentId", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.once, startDate: "2026-12-01" })
+      );
+
+      const [transaction] = processDueScheduledPayments(at("2026-12-01"));
+
+      expect(transaction).toMatchObject({
+        senderId: sender.id,
+        receiverId: receiver.id,
+        amount: 2500,
+        description: "Rent 🏠",
+        privacyLevel: scheduledPayment.privacyLevel,
+        scheduledPaymentId: scheduledPayment.id,
+      });
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(1);
+      expect(transactionsFor(scheduledPayment.id)[0].status).toBe("complete");
+    });
+
+    it("completes a one-time schedule after it runs", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.once, startDate: "2026-12-01" })
+      );
+
+      processDueScheduledPayments(at("2026-12-01"));
+
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.completed,
+        nextRunAt: null,
+        lastRunAt: "2026-12-01",
+      });
+    });
+
+    it("does nothing before the start date", () => {
+      const scheduledPayment = createScheduledPayment(sender.id, buildPayload());
+
+      expect(processDueScheduledPayments(at("2026-11-30"))).toEqual([]);
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2026-12-01");
+    });
+
+    it("moves a weekly schedule on by 7 days", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly })
+      );
+
+      processDueScheduledPayments(at("2026-12-01"));
+
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.active,
+        nextRunAt: "2026-12-08",
+        lastRunAt: "2026-12-01",
+      });
+    });
+
+    it("moves a monthly schedule to the same day next month", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ startDate: "2026-12-15" })
+      );
+
+      processDueScheduledPayments(at("2026-12-15"));
+
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2027-01-15");
+    });
+
+    it("clamps monthly runs on the 31st to month end and returns to the 31st after", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ startDate: "2027-01-31" })
+      );
+
+      processDueScheduledPayments(at("2027-01-31"));
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2027-02-28");
+
+      processDueScheduledPayments(at("2027-02-28"));
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2027-03-31");
+
+      processDueScheduledPayments(at("2027-03-31"));
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2027-04-30");
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(3);
+    });
+
+    it("clamps Jan 31 to Feb 29 in a leap year", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ startDate: "2028-01-31" })
+      );
+
+      processDueScheduledPayments(at("2028-01-31"));
+
+      expect(getScheduledPaymentById(scheduledPayment.id).nextRunAt).toBe("2028-02-29");
+    });
+
+    it("keeps a run that falls on the end date and completes the schedule after it", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly, endDate: "2026-12-08" })
+      );
+
+      processDueScheduledPayments(at("2026-12-01"));
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.active,
+        nextRunAt: "2026-12-08",
+      });
+
+      processDueScheduledPayments(at("2026-12-08"));
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.completed,
+        nextRunAt: null,
+        lastRunAt: "2026-12-08",
+      });
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(2);
+    });
+
+    it("completes the schedule when the next run would be past the end date", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ endDate: "2026-12-20" })
+      );
+
+      processDueScheduledPayments(at("2026-12-01"));
+
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        status: ScheduledPaymentStatus.completed,
+        nextRunAt: null,
+      });
+    });
+
+    it("does not run canceled schedules", () => {
+      const scheduledPayment = createScheduledPayment(sender.id, buildPayload());
+      updateScheduledPaymentById(scheduledPayment.id, {
+        status: ScheduledPaymentStatus.canceled,
+        nextRunAt: null,
+      });
+
+      expect(processDueScheduledPayments(at("2026-12-01"))).toEqual([]);
+      expect(transactionsFor(scheduledPayment.id)).toEqual([]);
+    });
+
+    it("is idempotent for the same now", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly })
+      );
+
+      expect(processDueScheduledPayments(at("2026-12-01"))).toHaveLength(1);
+      expect(processDueScheduledPayments(at("2026-12-01"))).toEqual([]);
+      expect(processDueScheduledPayments(new Date("2026-12-01T23:59:00"))).toEqual([]);
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(1);
+    });
+
+    it("runs missed runs once and skips ahead to the next future date", () => {
+      const scheduledPayment = createScheduledPayment(
+        sender.id,
+        buildPayload({ frequency: ScheduledPaymentFrequency.weekly })
+      );
+
+      // Due Dec 1, 8 and 15; the server comes back on Dec 17
+      processDueScheduledPayments(at("2026-12-17"));
+
+      expect(transactionsFor(scheduledPayment.id)).toHaveLength(1);
+      expect(getScheduledPaymentById(scheduledPayment.id)).toMatchObject({
+        nextRunAt: "2026-12-22",
+        lastRunAt: "2026-12-17",
+      });
+    });
+
+    it("moves balances the same way as an immediate payment", () => {
+      const senderBalance = getUserById(sender.id).balance;
+      const receiverBalance = getUserById(receiver.id).balance;
+      expect(senderBalance).toBeGreaterThanOrEqual(2501);
+      createScheduledPayment(sender.id, buildPayload({ amount: 2501 }));
+
+      const [transaction] = processDueScheduledPayments(at("2026-12-01"));
+
+      expect(transaction.amount).toBe(2501);
+      expect(getUserById(sender.id).balance).toBe(senderBalance - 2501);
+      expect(getUserById(receiver.id).balance).toBe(receiverBalance + 2501);
+    });
+
+    it("ignores a scheduledPaymentId sent in a regular payment payload", () => {
+      const scheduledPayment = createScheduledPayment(sender.id, buildPayload());
+
+      const transaction = createTransaction(sender.id, "payment", {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        amount: 10,
+        description: "Not scheduled",
+        privacyLevel: DefaultPrivacyLevel.public,
+        source: "",
+        status: TransactionStatus.pending,
+        scheduledPaymentId: scheduledPayment.id,
+      });
+
+      expect(transaction.scheduledPaymentId).toBeUndefined();
+    });
+
+    it("runs every due schedule in one pass", () => {
+      createScheduledPayment(sender.id, buildPayload());
+      createScheduledPayment(receiver.id, buildPayload({ receiverId: sender.id }));
+
+      expect(processDueScheduledPayments(at("2026-12-01"))).toHaveLength(2);
+    });
+  });
+
+  describe("isSchedulerEnabled", () => {
+    it("is on outside the test environment", () => {
+      expect(isSchedulerEnabled({ NODE_ENV: "development" })).toBe(true);
+      expect(isSchedulerEnabled({})).toBe(true);
+    });
+
+    it("is off under NODE_ENV=test unless opted in", () => {
+      expect(isSchedulerEnabled({ NODE_ENV: "test" })).toBe(false);
+      expect(isSchedulerEnabled({ NODE_ENV: "test", SCHEDULED_PAYMENTS_SCHEDULER: "true" })).toBe(
+        true
+      );
     });
   });
 });

@@ -1,9 +1,9 @@
 ///<reference path="types.ts" />
 
 import express from "express";
-import { getAllForEntity, seedDatabase } from "./database";
+import { getAllForEntity, processDueScheduledPayments, seedDatabase } from "./database";
 import { validateMiddleware } from "./helpers";
-import { isValidEntityValidator } from "./validators";
+import { isValidEntityValidator, isScheduledPaymentsRunValidator } from "./validators";
 import { DbSchema } from "../src/models/db-schema";
 const router = express.Router();
 
@@ -16,6 +16,18 @@ router.post("/seed", (req, res) => {
 });
 
 //GET /testData/:entity
+router.post(
+  "/scheduledPayments/run",
+  validateMiddleware(isScheduledPaymentsRunValidator),
+  (req, res) => {
+    const now = req.body.now ? new Date(req.body.now) : new Date();
+    const results = processDueScheduledPayments(now);
+
+    res.status(200);
+    res.json({ results });
+  }
+);
+
 router.get("/:entity", validateMiddleware([...isValidEntityValidator]), (req, res) => {
   const { entity } = req.params;
   const results = getAllForEntity(entity as keyof DbSchema);

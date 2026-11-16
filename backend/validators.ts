@@ -167,3 +167,7 @@ export const isValidEntityValidator = [
     ])
     .trim(),
 ];
+
+export const isScheduledPaymentsRunValidator = [
+  body("now").optional().isString().bail().isISO8601({ strict: true }),
+];
