@@ -17,14 +17,6 @@ export interface CreateTransactionMachineSchema {
 const transactionDataMachine = dataMachine("transactionData").withConfig({
   services: {
     createData: async (ctx, event: any) => {
-      if (event.transactionType === "schedule") {
-        // No balance refresh: nothing is debited until the schedule runs
-        const resp = await httpClient.post(
-          `http://localhost:${backendPort}/scheduledPayments`,
-          omit(["type", "transactionType"], event)
-        );
-        return resp.data;
-      }
       const payload = omit("type", event);
       const resp = await httpClient.post(`http://localhost:${backendPort}/transactions`, payload);
       authService.send("REFRESH");
@@ -36,6 +28,7 @@ const transactionDataMachine = dataMachine("transactionData").withConfig({
 export type CreateTransactionMachineEvents =
   | { type: "SET_USERS" }
   | { type: "CREATE" }
+  | { type: "SCHEDULED" }
   | { type: "RESET" };
 
 export type ScheduledTransactionCreatePayload = ScheduledPaymentPayload & {
@@ -45,6 +38,15 @@ export type ScheduledTransactionCreatePayload = ScheduledPaymentPayload & {
 export const isScheduledTransactionCreatePayload = (
   details?: TransactionCreatePayload | ScheduledTransactionCreatePayload
 ): details is ScheduledTransactionCreatePayload => details?.transactionType === "schedule";
+
+// No balance refresh: nothing is debited until the schedule runs
+export const createScheduledPayment = async (payload: ScheduledTransactionCreatePayload) => {
+  const resp = await httpClient.post(
+    `http://localhost:${backendPort}/scheduledPayments`,
+    omit("transactionType", payload)
+  );
+  return resp.data;
+};
 
 export interface CreateTransactionMachineContext {
   sender: User;
@@ -76,6 +78,8 @@ export const createTransactionMachine = Machine<
         },
         on: {
           CREATE: "stepThree",
+          // Sent after POST /scheduledPayments succeeds
+          SCHEDULED: "stepThree",
         },
       },
       stepThree: {

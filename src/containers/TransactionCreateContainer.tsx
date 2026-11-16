@@ -4,7 +4,11 @@ import { User, TransactionPayload } from "../models";
 import TransactionCreateStepOne from "../components/TransactionCreateStepOne";
 import TransactionCreateStepTwo from "../components/TransactionCreateStepTwo";
 import TransactionCreateStepThree from "../components/TransactionCreateStepThree";
-import { createTransactionMachine } from "../machines/createTransactionMachine";
+import {
+  createTransactionMachine,
+  createScheduledPayment,
+  ScheduledTransactionCreatePayload,
+} from "../machines/createTransactionMachine";
 import { usersMachine } from "../machines/usersMachine";
 import { debounce } from "lodash/fp";
 import {
@@ -54,6 +58,10 @@ const TransactionCreateContainer: React.FC<Props> = ({ authService, snackbarServ
   const createTransaction = (payload: TransactionPayload) => {
     sendCreateTransaction("CREATE", payload);
   };
+  const scheduleTransaction = async (payload: ScheduledTransactionCreatePayload) => {
+    await createScheduledPayment(payload);
+    sendCreateTransaction({ ...payload, type: "SCHEDULED" });
+  };
   const userListSearch = debounce(200, (payload: any) => sendUsers({ type: "FETCH", ...payload }));
 
   const showSnackbar = (payload: SnackbarContext) => sendSnackbar({ type: "SHOW", ...payload });
@@ -92,6 +100,7 @@ const TransactionCreateContainer: React.FC<Props> = ({ authService, snackbarServ
           receiver={createTransactionState.context.receiver}
           sender={sender}
           createTransaction={createTransaction}
+          scheduleTransaction={scheduleTransaction}
           showSnackbar={showSnackbar}
         />
       )}

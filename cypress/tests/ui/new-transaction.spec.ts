@@ -207,6 +207,50 @@ describe("New Transaction", function () {
     cy.getBySel("transaction-create-submit-payment").should("be.enabled");
   });
 
+  it("pays immediately even when the open schedule fields are invalid", function () {
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySelLike("amount-input").type("12");
+    cy.getBySelLike("description-input").type("Lunch now");
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-start-date-input").clear();
+    cy.getBySel("transaction-create-submit-schedule").should("be.disabled");
+
+    cy.getBySelLike("submit-payment").click();
+    cy.wait("@createTransaction").its("request.body").should("deep.include", {
+      transactionType: "payment",
+      description: "Lunch now",
+    });
+    cy.getBySel("alert-bar-success").should("contain", "Transaction Submitted!");
+    cy.getBySel("new-transaction-schedule-confirmation").should("not.exist");
+  });
+
+  it("shows the API error instead of a confirmation when scheduling fails", function () {
+    cy.intercept("POST", "/scheduledPayments", {
+      statusCode: 422,
+      body: { errors: [{ path: "startDate", msg: "must be tomorrow or later" }] },
+    }).as("rejectedSchedule");
+
+    cy.getBySelLike("new-transaction").click();
+    cy.wait("@allUsers");
+    cy.getBySelLike("user-list-item").contains(ctx.contact!.firstName).click({ force: true });
+
+    cy.getBySelLike("amount-input").type("5");
+    cy.getBySelLike("description-input").type("Rejected schedule");
+    cy.getBySel("transaction-create-submit-schedule").click();
+    cy.getBySel("transaction-create-submit-schedule").click();
+
+    cy.wait("@rejectedSchedule");
+    cy.getBySel("alert-bar-error").should(
+      "contain",
+      "Payment not scheduled: startDate must be tomorrow or later"
+    );
+    cy.getBySel("new-transaction-schedule-confirmation").should("not.exist");
+    cy.getBySel("transaction-create-submit-schedule").should("be.enabled");
+  });
+
   it("navigates to the new transaction form, selects a user and submits a transaction request", function () {
     const request = {
       amount: "95",

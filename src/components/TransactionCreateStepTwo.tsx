@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from "@mui/material/styles";
 import NumberFormat from "react-number-format";
 import { Formik, Form, Field, FieldProps, useFormikContext } from "formik";
@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { User, ScheduledPaymentFrequency } from "../models";
 import { dollarsToCents, tomorrowIsoDate } from "../utils/transactionUtils";
+import { ScheduledTransactionCreatePayload } from "../machines/createTransactionMachine";
 
 const PREFIX = "TransactionCreateStepTwo";
 
@@ -119,6 +120,7 @@ export interface TransactionCreateStepTwoProps {
   receiver: User;
   sender: User;
   createTransaction: Function;
+  scheduleTransaction: (payload: ScheduledTransactionCreatePayload) => Promise<void>;
   showSnackbar: Function;
 }
 
@@ -142,10 +144,13 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
   receiver,
   sender,
   createTransaction,
+  scheduleTransaction,
   showSnackbar,
 }) => {
   const [transactionType, setTransactionType] = useState<string>();
   const [scheduling, setScheduling] = useState(false);
+  // Set synchronously on click so Formik validates the action being submitted
+  const immediateAction = useRef(false);
   const initialValues: FormValues = {
     amount: "",
     description: "",
@@ -174,9 +179,11 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
       <Container maxWidth="xs">
         <Formik
           initialValues={initialValues}
-          validationSchema={scheduling ? scheduleValidationSchema : validationSchema}
+          validationSchema={() =>
+            scheduling && !immediateAction.current ? scheduleValidationSchema() : validationSchema
+          }
           validateOnMount={true}
-          onSubmit={(values, { setSubmitting }) => {
+          onSubmit={async (values, { setSubmitting }) => {
             setSubmitting(true);
 
             // reset transactionType
@@ -185,15 +192,27 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
             const { startDate, frequency, endDate, ...transactionValues } = values;
 
             if (transactionType === "schedule") {
-              createTransaction({
-                transactionType,
-                receiverId: values.receiverId,
-                amount: dollarsToCents(values.amount),
-                description: values.description.trim(),
-                frequency,
-                startDate,
-                ...(frequency !== ScheduledPaymentFrequency.once && endDate ? { endDate } : {}),
-              });
+              try {
+                await scheduleTransaction({
+                  transactionType,
+                  receiverId: values.receiverId,
+                  amount: dollarsToCents(values.amount),
+                  description: values.description.trim(),
+                  frequency,
+                  startDate,
+                  ...(frequency !== ScheduledPaymentFrequency.once && endDate ? { endDate } : {}),
+                });
+              } catch (error: any) {
+                const reason = error?.response?.data?.errors?.[0];
+                showSnackbar({
+                  severity: "error",
+                  message: reason
+                    ? `Payment not scheduled: ${reason.path ?? reason.param} ${reason.msg}`
+                    : "Payment not scheduled. Please try again.",
+                });
+                setSubmitting(false);
+                return;
+              }
               showSnackbar({
                 severity: "success",
                 message: "Payment Scheduled!",
@@ -209,7 +228,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
           }}
         >
           {({ isValid, isSubmitting, errors, values, setFieldValue }) => (
-            <Form className={classes.form} data-test="transaction-create-form">
+            <Form className={classes.form} data-test="transaction-create-form" noValidate>
               <RevalidateOnChange trigger={scheduling} />
               <Field name="amount">
                 {({ field, meta: { error, value, initialValue, touched } }: FieldProps) => (
@@ -343,7 +362,12 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     className={classes.submit}
                     data-test="transaction-create-submit-request"
                     disabled={!!errors.amount || !!errors.description || isSubmitting}
-                    onClick={() => setTransactionType("request")}
+                    onClick={() => {
+                      // Immediate actions ignore the schedule fields
+                      immediateAction.current = true;
+                      setScheduling(false);
+                      setTransactionType("request");
+                    }}
                   >
                     Request
                   </Button>
@@ -357,7 +381,11 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     className={classes.submit}
                     data-test="transaction-create-submit-payment"
                     disabled={!!errors.amount || !!errors.description || isSubmitting}
-                    onClick={() => setTransactionType("payment")}
+                    onClick={() => {
+                      immediateAction.current = true;
+                      setScheduling(false);
+                      setTransactionType("payment");
+                    }}
                   >
                     Pay
                   </Button>
@@ -372,6 +400,7 @@ const TransactionCreateStepTwo: React.FC<TransactionCreateStepTwoProps> = ({
                     data-test="transaction-create-submit-schedule"
                     disabled={scheduling && (!isValid || isSubmitting)}
                     onClick={(event) => {
+                      immediateAction.current = false;
                       if (scheduling) {
                         setTransactionType("schedule");
                       } else {
