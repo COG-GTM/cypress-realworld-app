@@ -68,6 +68,7 @@ import {
   formatFullName,
   isLikeNotification,
   isCommentNotification,
+  isPaymentScheduledSentNotification,
 } from "../src/utils/transactionUtils";
 import { DbSchema } from "../src/models/db-schema";
 
@@ -739,9 +740,10 @@ const runScheduledPayment = (
     status: nextRunAt === null ? ScheduledPaymentStatus.completed : ScheduledPaymentStatus.active,
   });
 
+  let transaction: Transaction;
   try {
     // createTransaction takes dollars and stores cents
-    return pay(
+    transaction = pay(
       scheduledPayment.senderId,
       "payment",
       {
@@ -764,6 +766,14 @@ const runScheduledPayment = (
     });
     throw error;
   }
+
+  createPaymentNotification(
+    scheduledPayment.senderId,
+    transaction.id,
+    PaymentNotificationStatus.scheduledSent
+  );
+
+  return transaction;
 };
 
 // Runs synchronously, so overlapping ticks can't pick up the same schedule twice;
@@ -986,6 +996,10 @@ export const formatNotificationForApiResponse = (
 
   if (isRequestTransaction(transaction)) {
     userFullName = getFullNameForUser(transaction.senderId);
+  }
+
+  if (isPaymentScheduledSentNotification(notification)) {
+    userFullName = getFullNameForUser(transaction.receiverId);
   }
 
   if (isLikeNotification(notification)) {

@@ -11,6 +11,9 @@ import {
   processDueScheduledPayments,
   getUserById,
   createTransaction,
+  formatNotificationForApiResponse,
+  getTransactionByIdForApi,
+  getTransactionsForUserForApi,
 } from "../../backend/database";
 import { isSchedulerEnabled } from "../../backend/scheduledpayment-scheduler";
 import {
@@ -19,6 +22,8 @@ import {
   ScheduledPaymentFrequency,
   ScheduledPaymentPayload,
   ScheduledPaymentStatus,
+  PaymentNotification,
+  PaymentNotificationStatus,
   Transaction,
   TransactionStatus,
 } from "../../src/models";
@@ -461,6 +466,88 @@ describe("Scheduled Payments", () => {
         status: ScheduledPaymentStatus.active,
         nextRunAt: "2026-12-01",
       });
+    });
+  });
+
+  describe("scheduled payment notifications and transaction formatting", () => {
+    const at = (isoDate: string) => new Date(`${isoDate}T09:30:00`);
+
+    const paymentNotificationsFor = (transactionId: string): PaymentNotification[] =>
+      (getAllForEntity("notifications") as PaymentNotification[]).filter(
+        (notification) => notification.transactionId === transactionId
+      );
+
+    it("notifies the sender that the run was sent and the receiver that payment was received", () => {
+      createScheduledPayment(sender.id, buildPayload());
+
+      const [transaction] = processDueScheduledPayments(at("2026-12-01"));
+      const notifications = paymentNotificationsFor(transaction.id);
+
+      expect(notifications).toHaveLength(2);
+      expect(notifications).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            userId: sender.id,
+            status: PaymentNotificationStatus.scheduledSent,
+            isRead: false,
+          }),
+          expect.objectContaining({
+            userId: receiver.id,
+            status: PaymentNotificationStatus.received,
+          }),
+        ])
+      );
+    });
+
+    it("does not notify the sender when the run's payment fails", () => {
+      createScheduledPayment(sender.id, buildPayload());
+      const before = getAllForEntity("notifications").length;
+
+      processDueScheduledPayments(at("2026-12-01"), () => {
+        throw new Error("payment failed");
+      });
+
+      expect(getAllForEntity("notifications")).toHaveLength(before);
+    });
+
+    it("does not send a scheduled notification for an immediate payment", () => {
+      const transaction = createTransaction(sender.id, "payment", {
+        senderId: sender.id,
+        receiverId: receiver.id,
+        amount: 10,
+        description: "Not scheduled",
+        privacyLevel: DefaultPrivacyLevel.public,
+        source: "",
+        status: TransactionStatus.pending,
+      });
+
+      expect(
+        paymentNotificationsFor(transaction.id).map((notification) => notification.status)
+      ).toEqual([PaymentNotificationStatus.received]);
+    });
+
+    it("names the receiver on the sender's scheduled notification", () => {
+      createScheduledPayment(sender.id, buildPayload());
+      const [transaction] = processDueScheduledPayments(at("2026-12-01"));
+      const senderNotification = paymentNotificationsFor(transaction.id).find(
+        (notification) => notification.userId === sender.id
+      )!;
+
+      expect(formatNotificationForApiResponse(senderNotification).userFullName).toBe(
+        `${receiver.firstName} ${receiver.lastName}`
+      );
+    });
+
+    it("passes scheduledPaymentId through the transaction API formatters", () => {
+      const scheduledPayment = createScheduledPayment(sender.id, buildPayload());
+      const [transaction] = processDueScheduledPayments(at("2026-12-01"));
+
+      expect(getTransactionByIdForApi(transaction.id).scheduledPaymentId).toBe(scheduledPayment.id);
+      expect(
+        getTransactionsForUserForApi(sender.id).find(
+          (item: Transaction) => item.id === transaction.id
+        )
+      ).toMatchObject({ scheduledPaymentId: scheduledPayment.id });
     });
   });
 

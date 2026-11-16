@@ -111,6 +111,9 @@ export const isPaymentRequestedNotification = (notification: NotificationType) =
 export const isPaymentReceivedNotification = (notification: NotificationType) =>
   flow(get("status"), isEqual(PaymentNotificationStatus.received))(notification);
 
+export const isPaymentScheduledSentNotification = (notification: NotificationType) =>
+  flow(get("status"), isEqual(PaymentNotificationStatus.scheduledSent))(notification);
+
 /* istanbul ignore next */
 export const currentUserLikesTransaction = (
   currentUser: User,

@@ -315,6 +315,26 @@ describe("Scheduled Payments API", function () {
               transactionId: transaction.id,
               status: "received",
             }).should("exist");
+            cy.database("find", "notifications", {
+              userId: ctx.authenticatedUser!.id,
+              transactionId: transaction.id,
+              status: "scheduledSent",
+            }).should("exist");
+
+            cy.request("GET", `${Cypress.env("apiUrl")}/notifications`).then((response) => {
+              const senderNotification = response.body.results.find(
+                (notification: { transactionId: string }) =>
+                  notification.transactionId === transaction.id
+              );
+              expect(senderNotification).to.include({
+                status: "scheduledSent",
+                userFullName: `${ctx.receiver!.firstName} ${ctx.receiver!.lastName}`,
+              });
+            });
+
+            cy.request("GET", `${Cypress.env("apiUrl")}/transactions/${transaction.id}`)
+              .its("body.transaction.scheduledPaymentId")
+              .should("eq", scheduledPayment.id);
           });
 
           cy.request("GET", apiScheduledPayments)

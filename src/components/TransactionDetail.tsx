@@ -1,8 +1,12 @@
 import React from "react";
 import { styled } from "@mui/material/styles";
-import { Button, Typography, Grid, Avatar, Paper, IconButton } from "@mui/material";
+import { Button, Typography, Grid, Avatar, Paper, IconButton, Chip } from "@mui/material";
 import { AvatarGroup } from "@mui/material";
-import { ThumbUpAltOutlined as LikeIcon, CommentRounded as CommentIcon } from "@mui/icons-material";
+import {
+  ThumbUpAltOutlined as LikeIcon,
+  CommentRounded as CommentIcon,
+  Schedule as ScheduleIcon,
+} from "@mui/icons-material";
 import { TransactionResponseItem, TransactionRequestStatus, User } from "../models";
 import CommentForm from "./CommentForm";
 import {
@@ -146,6 +150,18 @@ const TransactionDetail: React.FC<TransactionProps> = ({
             <Grid item>
               <TransactionTitle transaction={transaction} />
             </Grid>
+            {transaction.scheduledPaymentId && (
+              <Grid item>
+                <Chip
+                  icon={<ScheduleIcon />}
+                  label="Scheduled"
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  data-test="transaction-scheduled-badge"
+                />
+              </Grid>
+            )}
             <Grid item>
               <Typography
                 variant="body2"
