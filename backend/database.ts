@@ -49,6 +49,7 @@ import {
   ScheduledPayment,
   ScheduledPaymentPayload,
   ScheduledPaymentStatus,
+  ScheduledPaymentResponseItem,
 } from "../src/models";
 import Fuse from "fuse.js";
 import {
@@ -619,6 +620,19 @@ const sortByNextRunAt = (scheduledPayments: ScheduledPayment[]): ScheduledPaymen
 
 export const getScheduledPaymentsByUserId = (userId: string): ScheduledPayment[] =>
   sortByNextRunAt(getAllBy(SCHEDULED_PAYMENT_TABLE, "senderId", userId));
+
+export const formatScheduledPaymentForApiResponse = (
+  scheduledPayment: ScheduledPayment
+): ScheduledPaymentResponseItem => ({
+  ...scheduledPayment,
+  receiverName: getFullNameForUser(scheduledPayment.receiverId),
+  receiverAvatar: getUserById(scheduledPayment.receiverId).avatar,
+});
+
+export const getScheduledPaymentsByUserIdForApi = (
+  userId: string
+): ScheduledPaymentResponseItem[] =>
+  getScheduledPaymentsByUserId(userId).map(formatScheduledPaymentForApiResponse);
 
 export const createScheduledPayment = (
   userId: User["id"],
