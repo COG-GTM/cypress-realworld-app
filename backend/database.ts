@@ -734,6 +734,8 @@ const runScheduledPayment = (
   const { lastRunAt, nextRunAt: previousNextRunAt, status } = scheduledPayment;
   const nextRunAt = nextRunDateAfter(scheduledPayment, today);
 
+  const paymentsBefore = getTransactionsByObj({ scheduledPaymentId: scheduledPayment.id }).length;
+
   updateScheduledPaymentById(scheduledPayment.id, {
     lastRunAt: today,
     nextRunAt,
@@ -758,12 +760,18 @@ const runScheduledPayment = (
       scheduledPayment.id
     );
   } catch (error) {
-    // Put the run back so the next tick retries it instead of skipping it
-    updateScheduledPaymentById(scheduledPayment.id, {
-      lastRunAt,
-      nextRunAt: previousNextRunAt,
-      status,
-    });
+    // createTransaction isn't atomic: if the payment was already saved before it threw,
+    // keep the advance so the run can't be charged twice
+    const paymentSaved =
+      getTransactionsByObj({ scheduledPaymentId: scheduledPayment.id }).length > paymentsBefore;
+    if (!paymentSaved) {
+      // Put the run back so the next tick retries it instead of skipping it
+      updateScheduledPaymentById(scheduledPayment.id, {
+        lastRunAt,
+        nextRunAt: previousNextRunAt,
+        status,
+      });
+    }
     throw error;
   }
 
