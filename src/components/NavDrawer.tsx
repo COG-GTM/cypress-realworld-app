@@ -24,6 +24,7 @@ import {
   ExitToApp as LogoutIcon,
   Notifications as NotificationsIcon,
   AccountBalance as AccountBalanceIcon,
+  EventRepeat as EventRepeatIcon,
 } from "@mui/icons-material";
 
 import { formatAmount } from "../utils/transactionUtils";
@@ -168,6 +169,19 @@ export const mainListItems = (
         <NotificationsIcon />
       </ListItemIcon>
       <ListItemText primary="Notifications" />
+    </ListItem>
+    <ListItem
+      button
+      // @ts-ignore
+      onClick={() => showTemporaryDrawer && toggleDrawer()}
+      component={RouterLink}
+      to="/scheduled-payments"
+      data-test="sidenav-scheduled-payments"
+    >
+      <ListItemIcon>
+        <EventRepeatIcon />
+      </ListItemIcon>
+      <ListItemText primary="Scheduled Payments" />
     </ListItem>
   </div>
 );
