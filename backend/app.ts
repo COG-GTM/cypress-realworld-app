@@ -23,6 +23,7 @@ import notificationRoutes from "./notification-routes";
 import bankTransferRoutes from "./banktransfer-routes";
 import scheduledPaymentRoutes from "./scheduledpayment-routes";
 import testDataRoutes from "./testdata-routes";
+import { isSchedulerEnabled, startScheduledPaymentsScheduler } from "./scheduledpayment-scheduler";
 import { checkAuth0Jwt, verifyOktaToken, checkCognitoJwt, checkGoogleJwt } from "./helpers";
 import resolvers from "./graphql/resolvers";
 import { frontendPort, getBackendPort } from "../src/utils/portUtils";
@@ -124,3 +125,8 @@ app.use(express.static(join(__dirname, "../public")));
 getBackendPort().then((port) => {
   app.listen(port);
 });
+
+/* istanbul ignore next */
+if (isSchedulerEnabled()) {
+  startScheduledPaymentsScheduler();
+}

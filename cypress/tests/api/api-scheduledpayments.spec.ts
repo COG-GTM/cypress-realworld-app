@@ -1,5 +1,5 @@
 import { addDays, format } from "date-fns";
-import { User, ScheduledPayment } from "../../../src/models";
+import { User, ScheduledPayment, Transaction } from "../../../src/models";
 
 type TestScheduledPaymentsCtx = {
   authenticatedUser?: User;
@@ -8,6 +8,7 @@ type TestScheduledPaymentsCtx = {
 };
 
 const apiScheduledPayments = `${Cypress.env("apiUrl")}/scheduledPayments`;
+const apiRunScheduledPayments = `${Cypress.env("apiUrl")}/testData/scheduledPayments/run`;
 
 const isoDateFromToday = (days: number) => format(addDays(new Date(), days), "yyyy-MM-dd");
 
@@ -270,6 +271,118 @@ describe("Scheduled Payments API", function () {
           expect(response.status).to.eq(422);
           expect(response.body.errors[0].param).to.eq("status");
         });
+      });
+    });
+  });
+
+  context("POST /testData/scheduledPayments/run", function () {
+    // Server local midday on the given date
+    const nowOn = (isoDate: string) => `${isoDate}T12:00:00`;
+
+    it("runs due schedules through the payment path and advances them", function () {
+      const startDate = isoDateFromToday(1);
+
+      cy.database("find", "users", { id: ctx.authenticatedUser!.id }).as("senderBefore");
+      cy.database("find", "users", { id: ctx.receiver!.id }).as("receiverBefore");
+
+      createScheduledPayment({ startDate, frequency: "weekly" }).then(
+        (scheduledPayment: ScheduledPayment) => {
+          cy.request("POST", apiRunScheduledPayments, { now: nowOn(startDate) }).then(
+            (response) => {
+              expect(response.status).to.eq(200);
+              expect(response.headers["cache-control"]).to.eq("no-store");
+              expect(response.body.results).to.have.length(1);
+              expect(response.body.results[0]).to.include({
+                scheduledPaymentId: scheduledPayment.id,
+                senderId: ctx.authenticatedUser!.id,
+                receiverId: ctx.receiver!.id,
+                amount: 2500,
+              });
+              cy.wrap(response.body.results).as("runResults");
+            }
+          );
+
+          cy.database("filter", "transactions", { scheduledPaymentId: scheduledPayment.id }).then(
+            (transactions: Transaction[]) => {
+              expect(transactions).to.have.length(1);
+              expect(transactions[0].status).to.eq("complete");
+            }
+          );
+
+          cy.get<Transaction[]>("@runResults").then(([transaction]) => {
+            cy.database("find", "notifications", {
+              userId: ctx.receiver!.id,
+              transactionId: transaction.id,
+              status: "received",
+            }).should("exist");
+          });
+
+          cy.request("GET", apiScheduledPayments)
+            .its("body.results.0")
+            .should("include", {
+              status: "active",
+              lastRunAt: startDate,
+              nextRunAt: isoDateFromToday(8),
+            });
+        }
+      );
+
+      cy.get<User>("@senderBefore").then((senderBefore) => {
+        cy.database("find", "users", { id: ctx.authenticatedUser!.id })
+          .its("balance")
+          .should("eq", Math.max(senderBefore.balance - 2500, 0));
+      });
+      cy.get<User>("@receiverBefore").then((receiverBefore) => {
+        cy.database("find", "users", { id: ctx.receiver!.id })
+          .its("balance")
+          .should("eq", receiverBefore.balance + 2500);
+      });
+    });
+
+    it("does not create a second payment when run again for the same day", function () {
+      const startDate = isoDateFromToday(1);
+      createScheduledPayment({ startDate, frequency: "once" });
+
+      cy.request("POST", apiRunScheduledPayments, { now: nowOn(startDate) })
+        .its("body.results")
+        .should("have.length", 1);
+      cy.request("POST", apiRunScheduledPayments, { now: nowOn(startDate) })
+        .its("body.results")
+        .should("have.length", 0);
+
+      cy.request("GET", apiScheduledPayments)
+        .its("body.results.0")
+        .should("include", { status: "completed", nextRunAt: null });
+    });
+
+    it("skips canceled schedules", function () {
+      const startDate = isoDateFromToday(1);
+      createScheduledPayment({ startDate }).then((scheduledPayment: ScheduledPayment) => {
+        cy.request("PATCH", `${apiScheduledPayments}/${scheduledPayment.id}`, {
+          status: "canceled",
+        });
+      });
+
+      cy.request("POST", apiRunScheduledPayments, { now: nowOn(startDate) })
+        .its("body.results")
+        .should("have.length", 0);
+    });
+
+    it("defaults now to the current time", function () {
+      createScheduledPayment({ startDate: isoDateFromToday(1) });
+
+      cy.request("POST", apiRunScheduledPayments).its("body.results").should("have.length", 0);
+    });
+
+    it("rejects a now that is not an ISO timestamp", function () {
+      cy.request({
+        method: "POST",
+        url: apiRunScheduledPayments,
+        failOnStatusCode: false,
+        body: { now: "next tuesday" },
+      }).then((response) => {
+        expect(response.status).to.eq(422);
+        expect(response.body.errors[0].param).to.eq("now");
       });
     });
   });
