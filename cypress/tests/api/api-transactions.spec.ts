@@ -82,6 +82,29 @@ describe("Transactions API", function () {
         expect(response.body.results[0]).to.satisfy(isSenderOrReceiver);
       });
     });
+
+    it("ignores senderId and receiverId so only the caller's transactions are returned", function () {
+      cy.database("filter", "transactions").then((transactions: Transaction[]) => {
+        const otherTransaction = transactions.find(
+          (transaction) => !isSenderOrReceiver(transaction)
+        )!;
+
+        cy.request({
+          url: `${apiTransactions}`,
+          qs: {
+            senderId: otherTransaction.senderId,
+            receiverId: otherTransaction.receiverId,
+            limit: 1000,
+          },
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.results).to.have.length.greaterThan(0);
+          response.body.results.forEach((transaction: Transaction) => {
+            expect(transaction).to.satisfy(isSenderOrReceiver);
+          });
+        });
+      });
+    });
   });
 
   context("GET /transactions/contacts", function () {
