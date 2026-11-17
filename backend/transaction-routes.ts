@@ -1,7 +1,7 @@
 ///<reference path="types.ts" />
 
 import express from "express";
-import { remove, isEmpty, slice, concat } from "lodash/fp";
+import { remove, isEmpty, slice, concat, omit } from "lodash/fp";
 import {
   getTransactionsForUserContacts,
   createTransaction,
@@ -36,8 +36,10 @@ router.get(
     ...isTransactionQSValidator,
   ]),
   (req, res) => {
+    // senderId/receiverId would override the caller's ownership filter
+    const query = omit(["senderId", "receiverId"], req.query);
     /* istanbul ignore next */
-    const transactions = getTransactionsForUserForApi(req.user?.id!, req.query);
+    const transactions = getTransactionsForUserForApi(req.user?.id!, query);
 
     const { totalPages, data: paginatedItems } = getPaginatedItems(
       req.query.page as unknown as number,
