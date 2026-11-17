@@ -135,6 +135,31 @@ describe("Transactions", () => {
     expect(result.requestStatus).toEqual("pending");
   });
 
+  it.each([
+    ["payment", 12.34, 1234],
+    ["request", 12.34, 1234],
+    ["payment", 0.29, 29],
+    ["payment", 1234.56, 123456],
+  ] as const)("should keep the cents on a %s of %s", (transactionType, amount, expectedCents) => {
+    const sender: User = getAllUsers()[0];
+    const receiver: User = getAllUsers()[1];
+    const senderBankAccount = getBankAccountsByUserId(sender.id)[0];
+
+    const details: TransactionPayload = {
+      source: senderBankAccount.id!,
+      senderId: sender.id,
+      receiverId: receiver.id,
+      description: `${transactionType}: ${sender.id} to ${receiver.id}`,
+      amount,
+      privacyLevel: DefaultPrivacyLevel.public,
+      status: TransactionStatus.pending,
+    };
+
+    const result = createTransaction(sender.id, transactionType, details);
+    expect(result.amount).toBe(expectedCents);
+    expect(getTransactionById(result.id).amount).toBe(expectedCents);
+  });
+
   it("should create a payment and find it in the personal transactions", () => {
     const sender: User = getAllUsers()[0];
     const receiver: User = getAllUsers()[1];

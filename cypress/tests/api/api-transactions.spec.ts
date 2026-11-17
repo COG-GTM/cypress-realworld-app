@@ -141,6 +141,22 @@ describe("Transactions API", function () {
         expect(response.body.transaction.requestStatus).to.eq("pending");
       });
     });
+
+    ["payment", "request"].forEach((transactionType) => {
+      it(`keeps the cents on a ${transactionType} amount`, function () {
+        cy.request("POST", `${apiTransactions}`, {
+          transactionType,
+          source: ctx.bankAccountId,
+          receiverId: ctx.receiver!.id,
+          description: `${transactionType}: ${ctx.authenticatedUser!.id} and ${ctx.receiver!.id}`,
+          amount: "12.34",
+          privacyLevel: "public",
+        }).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.body.transaction.amount).to.eq(1234);
+        });
+      });
+    });
   });
 
   context("PATCH /transactions/:transactionId", function () {
