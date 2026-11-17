@@ -20,19 +20,19 @@ The file includes every transaction that matches your filters, not just the ones
 
 | Column        | What it holds                                        | Example                            |
 | ------------- | ---------------------------------------------------- | ---------------------------------- |
-| `date`        | When the transaction was created, as a UTC timestamp | `2023-06-07T14:23:25.264Z`         |
-| `description` | The note on the payment or request                   | `Payment: GjWovtg2hr to uBmeaz5pX` |
-| `sender`      | Full name of the person who sent the money           | `Kristian Bradtke`                 |
+| `date`        | When the transaction was created, as a UTC timestamp | `2023-08-29T18:56:16.181Z`         |
+| `description` | The note on the payment or request                   | `Payment: WHjJ4qR2R2 to uBmeaz5pX` |
+| `sender`      | Full name of the person who sent the money           | `Lia Rosenbaum`                    |
 | `receiver`    | Full name of the person who received it              | `Ted Parisian`                     |
-| `amount`      | Amount in dollars, two decimals, no currency sign    | `395.32`                           |
+| `amount`      | Amount in dollars, two decimals, no currency sign    | `440.19`                           |
 | `status`      | `pending`, `incomplete` or `complete`                | `complete`                         |
 
 A file looks like this:
 
 ```csv
 date,description,sender,receiver,amount,status
-2023-06-07T14:23:25.264Z,Payment: GjWovtg2hr to uBmeaz5pX,Kristian Bradtke,Ted Parisian,395.32,complete
-2023-06-16T09:54:09.314Z,Payment: uBmeaz5pX to M1ty1gR8B3,Ted Parisian,Ruthie Prosacco,424.08,pending
+2023-08-29T18:56:16.181Z,Payment: WHjJ4qR2R2 to uBmeaz5pX,Lia Rosenbaum,Ted Parisian,440.19,complete
+2023-10-22T18:36:47.425Z,Request: WHjJ4qR2R2 to uBmeaz5pX,Ted Parisian,Lia Rosenbaum,159.28,pending
 ```
 
 Amounts are always positive. To tell money in from money out, check whether your name is in the `sender` or the `receiver` column.
