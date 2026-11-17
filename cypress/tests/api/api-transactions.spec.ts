@@ -98,6 +98,19 @@ describe("Transactions API", function () {
         expect(response.body.results).length.to.be.greaterThan(1);
       });
     });
+
+    it("continues page 2 where page 1 ends", function () {
+      cy.request("GET", `${apiTransactions}/public?page=1&limit=10`).then((page1) => {
+        cy.request("GET", `${apiTransactions}/public?page=2&limit=10`).then((page2) => {
+          cy.request("GET", `${apiTransactions}/public?page=1&limit=20`).then((firstTwenty) => {
+            expect([...page1.body.results, ...page2.body.results]).to.deep.equal(
+              firstTwenty.body.results
+            );
+            expect(page2.body.pageData.totalPages).to.equal(page1.body.pageData.totalPages);
+          });
+        });
+      });
+    });
   });
 
   context("GET /transactions/public", function () {
