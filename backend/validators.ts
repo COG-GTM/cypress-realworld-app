@@ -84,7 +84,7 @@ export const isTransactionPayloadValidator = [
   body("source").optional().isString().trim(),
   body("receiverId").isString().trim(),
   body("description").isString().trim(),
-  body("amount").isNumeric().trim().toInt(),
+  body("amount").isNumeric().trim().toFloat(),
 ];
 
 export const isTransactionPatchValidator = [body("requestStatus").isIn(RequestStatusValues)];

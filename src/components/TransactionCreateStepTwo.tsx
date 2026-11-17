@@ -59,6 +59,7 @@ function NumberFormatCustom(props: NumberFormatCustomProps) {
         });
       }}
       thousandSeparator
+      decimalScale={2}
       isNumericString
       prefix="$"
     />

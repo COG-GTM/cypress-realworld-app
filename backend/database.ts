@@ -63,6 +63,7 @@ import {
   formatFullName,
   isLikeNotification,
   isCommentNotification,
+  dollarsToCents,
 } from "../src/utils/transactionUtils";
 import { DbSchema } from "../src/models/db-schema";
 
@@ -532,7 +533,7 @@ export const createTransaction = (
     id: shortid(),
     uuid: v4(),
     source: transactionDetails.source,
-    amount: transactionDetails.amount * 100,
+    amount: dollarsToCents(transactionDetails.amount),
     description: transactionDetails.description,
     receiverId: transactionDetails.receiverId,
     senderId: userId,
