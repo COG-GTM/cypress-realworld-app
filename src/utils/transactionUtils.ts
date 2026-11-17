@@ -233,6 +233,19 @@ export function localDateToUTCISOString(localDate: ValuePiece) {
   return utcDate.toISOString();
 }
 
+export function utcISOStringToLocalDate(isoString: string): Date {
+  const utcDate = new Date(isoString);
+  return new Date(
+    utcDate.getUTCFullYear(),
+    utcDate.getUTCMonth(),
+    utcDate.getUTCDate(),
+    utcDate.getUTCHours(),
+    utcDate.getUTCMinutes(),
+    utcDate.getUTCSeconds(),
+    utcDate.getUTCMilliseconds()
+  );
+}
+
 // Custom UTC functions per:
 // https://github.com/date-fns/date-fns/issues/376#issuecomment-544274031
 // not used in application code

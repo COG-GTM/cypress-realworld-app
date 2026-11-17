@@ -7,7 +7,11 @@ import Calendar from "react-calendar";
 
 import "react-calendar/dist/Calendar.css";
 import { TransactionDateRangePayload, Value, ValuePiece } from "../models";
-import { hasDateQueryFields, localDateToUTCISOString } from "../utils/transactionUtils";
+import {
+  hasDateQueryFields,
+  localDateToUTCISOString,
+  utcISOStringToLocalDate,
+} from "../utils/transactionUtils";
 
 const PREFIX = "TransactionListDateRangeFilter";
 
@@ -42,7 +46,12 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
   const theme = useTheme();
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));
   const queryHasDateFields = dateRangeFilters && hasDateQueryFields(dateRangeFilters);
-  const [calendarValue, setCalendarValue] = useState<Value>(null);
+  const calendarValue: Value = queryHasDateFields
+    ? [
+        utcISOStringToLocalDate(dateRangeFilters.dateRangeStart!),
+        utcISOStringToLocalDate(dateRangeFilters.dateRangeEnd!),
+      ]
+    : null;
 
   const [dateRangeAnchorEl, setDateRangeAnchorEl] = React.useState<HTMLDivElement | null>(null);
 
@@ -53,7 +62,6 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
         dateRangeStart: localDateToUTCISOString(rangeStart),
         dateRangeEnd: localDateToUTCISOString(rangeEnd),
       };
-      setCalendarValue(val);
       filterDateRange(calValue);
       setDateRangeAnchorEl(null);
     }
@@ -103,10 +111,7 @@ const TransactionListDateRangeFilter: React.FC<TransactionListDateRangeFilterPro
           data-test="transaction-list-filter-date-range-button"
           label={`Date: ${dateRangeLabel(calendarValue)}`}
           deleteIcon={<CancelIcon data-test="transaction-list-filter-date-clear-button" />}
-          onDelete={() => {
-            setCalendarValue(null);
-            resetDateRange();
-          }}
+          onDelete={() => resetDateRange()}
         />
       )}
       {!xsBreakpoint && (
