@@ -152,6 +152,28 @@ describe("Transactions API", function () {
       });
     });
 
+    it("ignores senderId and receiverId so only the caller's transactions are exported", function () {
+      cy.database("filter", "transactions").then((transactions: Transaction[]) => {
+        const otherTransaction = transactions.find(
+          (transaction) => !isSenderOrReceiver(transaction)
+        )!;
+        const callerName = `${ctx.authenticatedUser!.firstName} ${ctx.authenticatedUser!.lastName}`;
+
+        cy.request({
+          url: `${apiTransactions}/export`,
+          qs: { senderId: otherTransaction.senderId, receiverId: otherTransaction.receiverId },
+        }).then((response) => {
+          const rows = (response.body as string).trim().split("\r\n").slice(1);
+          expect(rows).to.have.length.greaterThan(0);
+          expect(response.body).not.to.include(otherTransaction.description);
+          rows.forEach((row) => {
+            const [, , sender, receiver] = row.split(",");
+            expect([sender, receiver]).to.include(callerName);
+          });
+        });
+      });
+    });
+
     it("requires authentication", function () {
       cy.clearAllCookies();
       cy.request({ url: `${apiTransactions}/export`, failOnStatusCode: false }).then((response) => {

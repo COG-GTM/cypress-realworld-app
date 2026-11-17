@@ -2,7 +2,7 @@
 
 import express from "express";
 import { Readable } from "stream";
-import { remove, isEmpty, slice, concat } from "lodash/fp";
+import { remove, isEmpty, slice, concat, omit } from "lodash/fp";
 import {
   getTransactionsForUserContacts,
   createTransaction,
@@ -150,7 +150,8 @@ router.get(
     ...isTransactionQSValidator,
   ]),
   (req, res) => {
-    const query = omitPaginationQueryFields(req.query);
+    // senderId/receiverId would override the caller's ownership filter
+    const query = omit(["senderId", "receiverId"], omitPaginationQueryFields(req.query));
     /* istanbul ignore next */
     const transactions = getTransactionsForUserForApi(req.user?.id!, query);
     const filename = getTransactionsCsvFilename(query);
