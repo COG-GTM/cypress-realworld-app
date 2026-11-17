@@ -7,7 +7,6 @@ import {
   map,
   sample,
   reject,
-  includes,
   orderBy,
   flow,
   flatMap,
@@ -17,6 +16,7 @@ import {
   filter,
   inRange,
   remove,
+  groupBy,
 } from "lodash/fp";
 import { isWithinInterval } from "date-fns";
 import low from "lowdb";
@@ -362,14 +362,46 @@ export const formatTransactionForApiResponse = (
   };
 };
 
+type UserSummary = Pick<User, "avatar"> & { fullName: string };
+
+const indexUserSummariesById = (users: User[]) => {
+  const userSummariesById = new Map<User["id"], UserSummary>();
+  users.forEach((user) => {
+    if (!userSummariesById.has(user.id)) {
+      userSummariesById.set(user.id, { fullName: formatFullName(user), avatar: user.avatar });
+    }
+  });
+  return userSummariesById;
+};
+
 export const formatTransactionsForApiResponse = (
   transactions: Transaction[]
-): TransactionResponseItem[] =>
-  orderBy(
+): TransactionResponseItem[] => {
+  const usersById = indexUserSummariesById(getAllUsers());
+  const likesByTransactionId = groupBy("transactionId", db.get(LIKE_TABLE).value());
+  const commentsByTransactionId = groupBy("transactionId", db.get(COMMENT_TABLE).value());
+
+  const formatTransaction = (transaction: Transaction): TransactionResponseItem => {
+    const receiver = usersById.get(transaction.receiverId)!;
+    const sender = usersById.get(transaction.senderId)!;
+
+    return {
+      receiverName: receiver.fullName,
+      senderName: sender.fullName,
+      receiverAvatar: receiver.avatar,
+      senderAvatar: sender.avatar,
+      likes: likesByTransactionId[transaction.id] || [],
+      comments: commentsByTransactionId[transaction.id] || [],
+      ...transaction,
+    };
+  };
+
+  return orderBy(
     [(transaction: Transaction) => new Date(transaction.modifiedAt)],
     ["desc"],
-    transactions.map((transaction) => formatTransactionForApiResponse(transaction))
+    transactions.map(formatTransaction)
   );
+};
 
 export const getAllTransactionsForUserByObj = curry((userId: string, query?: object) => {
   const queryWithoutFilterFields = query && getQueryWithoutFilterFields(query);
@@ -450,21 +482,33 @@ export const getTransactionIds = (transactions: Transaction[]) => map("id", tran
 export const getContactsTransactionIds = (userId: string): Transaction["id"][] =>
   flow(getTransactionsForUserContacts, getTransactionIds)(userId);
 
-export const nonContactPublicTransactions = (userId: string): Transaction[] => {
-  const contactsTransactionIds = getContactsTransactionIds(userId);
-  return flow(
-    getAllPublicTransactions,
-    reject((transaction: Transaction) => includes(transaction.id, contactsTransactionIds))
-  )();
+export const nonContactPublicTransactions = (
+  userId: string,
+  contactsTransactionIds: Transaction["id"][] = getContactsTransactionIds(userId)
+): Transaction[] => {
+  const contactsTransactionIdSet = new Set(contactsTransactionIds);
+  return reject(
+    (transaction: Transaction) => contactsTransactionIdSet.has(transaction.id),
+    getAllPublicTransactions()
+  );
 };
 
-export const getNonContactPublicTransactionsForApi = (userId: string) =>
-  flow(nonContactPublicTransactions, formatTransactionsForApiResponse)(userId);
+export const getNonContactPublicTransactionsForApi = (
+  userId: string,
+  contactsTransactionIds?: Transaction["id"][]
+) => formatTransactionsForApiResponse(nonContactPublicTransactions(userId, contactsTransactionIds));
 
-export const getPublicTransactionsDefaultSort = (userId: string) => ({
-  contactsTransactions: getTransactionsForUserContacts(userId),
-  publicTransactions: getNonContactPublicTransactionsForApi(userId),
-});
+export const getPublicTransactionsDefaultSort = (userId: string) => {
+  const contactsTransactions = getTransactionsForUserContacts(userId);
+
+  return {
+    contactsTransactions,
+    publicTransactions: getNonContactPublicTransactionsForApi(
+      userId,
+      getTransactionIds(contactsTransactions)
+    ),
+  };
+};
 
 export const getPublicTransactionsByQuery = (userId: string, query: TransactionQueryPayload) => {
   if (query && (hasDateQueryFields(query) || hasAmountQueryFields(query))) {
@@ -479,10 +523,7 @@ export const getPublicTransactionsByQuery = (userId: string, query: TransactionQ
       )(getNonContactPublicTransactionsForApi(userId)),
     };
   } else {
-    return {
-      contactsTransactions: getTransactionsForUserContacts(userId),
-      publicTransactions: getNonContactPublicTransactionsForApi(userId),
-    };
+    return getPublicTransactionsDefaultSort(userId);
   }
 };
 
