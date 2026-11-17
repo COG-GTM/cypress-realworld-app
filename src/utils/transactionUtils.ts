@@ -57,6 +57,8 @@ export const getFakeAmount = (min: number = 1000, max: number = 50000) =>
   parseInt(faker.finance.amount(min, max), 10);
 
 /* istanbul ignore next */
+export const dollarsToCents = (dollars: number | string) => Math.round(Number(dollars) * 100);
+
 export const formatAmount = (amount: number) => Dinero({ amount }).toFormat();
 
 /* istanbul ignore next */

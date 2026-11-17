@@ -6,6 +6,7 @@ import {
   getQueryWithoutDateFields,
   getQueryWithoutAmountFields,
   getQueryWithoutFilterFields,
+  dollarsToCents,
 } from "../transactionUtils";
 import { faker } from "@faker-js/faker";
 import {
@@ -148,5 +149,16 @@ describe("Transaction Utils", () => {
         status: TransactionStatus.incomplete,
       })
     ).toMatchObject({ status: "incomplete" });
+  });
+
+  test.each([
+    ["12.34", 1234],
+    [12.34, 1234],
+    ["0.99", 99],
+    [0.29, 29],
+    ["1234.56", 123456],
+    ["12", 1200],
+  ])("dollarsToCents(%s) returns %s", (dollars, cents) => {
+    expect(dollarsToCents(dollars)).toBe(cents);
   });
 });

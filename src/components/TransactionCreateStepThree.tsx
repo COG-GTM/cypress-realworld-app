@@ -15,7 +15,7 @@ import {
   CreateTransactionMachineSchema,
 } from "../machines/createTransactionMachine";
 import { useActor } from "@xstate/react";
-import { formatAmount } from "../utils/transactionUtils";
+import { dollarsToCents, formatAmount } from "../utils/transactionUtils";
 
 const PREFIX = "TransactionCreateStepThree";
 
@@ -99,7 +99,7 @@ const TransactionCreateStepThree: React.FC<TransactionCreateStepThreeProps> = ({
             <Typography component="h2" variant="h6" color="primary" gutterBottom>
               {transactionDetails?.transactionType === "payment" ? "Paid " : "Requested "}
               {transactionDetails?.amount &&
-                formatAmount(parseInt(transactionDetails.amount, 10) * 100)}{" "}
+                formatAmount(dollarsToCents(transactionDetails.amount))}{" "}
               for {transactionDetails?.description}
             </Typography>
           </Grid>
