@@ -1,5 +1,6 @@
 import React, { useEffect, ReactNode } from "react";
 import { useMachine } from "@xstate/react";
+import { Grid } from "@mui/material";
 import {
   TransactionPagination,
   TransactionResponseItem,
@@ -7,6 +8,7 @@ import {
   TransactionAmountRangePayload,
 } from "../models";
 import TransactionList from "./TransactionList";
+import TransactionDownloadCsvButton from "./TransactionDownloadCsvButton";
 import { personalTransactionsMachine } from "../machines/personalTransactionsMachine";
 
 export interface TransactionPersonalListProps {
@@ -39,7 +41,17 @@ const TransactionPersonalList: React.FC<TransactionPersonalListProps> = ({
   return (
     <>
       <TransactionList
-        filterComponent={filterComponent}
+        filterComponent={
+          <Grid container direction="row" justifyContent="space-between" alignItems="center">
+            <Grid item>{filterComponent}</Grid>
+            <Grid item sx={{ pr: 2 }}>
+              <TransactionDownloadCsvButton
+                dateRangeFilters={dateRangeFilters}
+                amountRangeFilters={amountRangeFilters}
+              />
+            </Grid>
+          </Grid>
+        }
         header="Personal"
         transactions={results as TransactionResponseItem[]}
         isLoading={current.matches("loading")}

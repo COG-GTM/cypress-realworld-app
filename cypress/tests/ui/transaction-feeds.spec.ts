@@ -302,6 +302,46 @@ describe("Transaction Feed", function () {
     });
   });
 
+  describe("downloads Mine transactions as CSV", function () {
+    it("only shows the Download CSV button on the Mine tab", function () {
+      cy.getBySelLike(feedViews.public.tab).click();
+      cy.getBySel("transaction-list-download-csv").should("not.exist");
+      cy.getBySelLike(feedViews.personal.tab).click();
+      cy.getBySel("transaction-list-download-csv").should("be.visible");
+    });
+
+    it("downloads the transactions matching the amount range filter", function () {
+      const dollarAmountRange = { min: 200, max: 800 };
+      const downloadsFolder = Cypress.config("downloadsFolder");
+
+      cy.intercept("GET", "/transactions/export*").as("exportTransactions");
+      cy.getBySelLike(feedViews.personal.tab).click();
+      cy.wait(`@${feedViews.personal.routeAlias}`);
+
+      cy.setTransactionAmountRange(dollarAmountRange.min, dollarAmountRange.max);
+      cy.wait(`@${feedViews.personal.routeAlias}`);
+      cy.get("body").type("{esc}");
+
+      cy.getBySel("transaction-list-download-csv").click();
+      cy.wait("@exportTransactions").then(({ request, response }) => {
+        const params = new URL(request.url).searchParams;
+        expect(params.get("amountMin")).to.eq(`${dollarAmountRange.min * 100}`);
+        expect(params.get("amountMax")).to.eq(`${dollarAmountRange.max * 100}`);
+        expect(response!.statusCode).to.eq(200);
+      });
+
+      cy.readFile(`${downloadsFolder}/transactions_all-dates.csv`).then((csv: string) => {
+        const [header, ...rows] = csv.trim().split("\r\n");
+        expect(header).to.eq("date,description,sender,receiver,amount,status");
+        expect(rows.length).to.be.greaterThan(0);
+        rows.forEach((row) => {
+          const amount = Number(row.match(/,(\d+\.\d{2}),[a-z]+$/)![1]);
+          expect(amount).to.be.within(dollarAmountRange.min, dollarAmountRange.max);
+        });
+      });
+    });
+  });
+
   describe("filters transaction feeds by amount range", function () {
     const dollarAmountRange = {
       min: 200,

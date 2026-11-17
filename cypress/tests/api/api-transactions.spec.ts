@@ -84,6 +84,104 @@ describe("Transactions API", function () {
     });
   });
 
+  context("GET /transactions/export", function () {
+    const csvHeader = "date,description,sender,receiver,amount,status";
+
+    it("streams a CSV of the user's transactions", function () {
+      cy.request("GET", `${apiTransactions}`).then(({ body: { pageData } }) => {
+        cy.request("GET", `${apiTransactions}/export`).then((response) => {
+          expect(response.status).to.eq(200);
+          expect(response.headers["content-type"]).to.include("text/csv");
+          expect(response.headers["content-disposition"]).to.eq(
+            'attachment; filename="transactions_all-dates.csv"'
+          );
+
+          const lines = (response.body as string).trim().split("\r\n");
+          expect(lines[0]).to.eq(csvHeader);
+          expect(lines.length - 1).to.be.greaterThan(Number(pageData.limit));
+        });
+      });
+    });
+
+    it("exports only transactions within the date and amount range", function () {
+      const qs = {
+        dateRangeStart: "2018-01-01T00:00:00.000Z",
+        dateRangeEnd: "2030-12-05T23:59:59.999Z",
+        amountMin: 5000,
+        amountMax: 30000,
+      };
+
+      cy.request({ url: `${apiTransactions}`, qs }).then(({ body: { pageData } }) => {
+        cy.request({ url: `${apiTransactions}/export`, qs }).then((response) => {
+          expect(response.headers["content-disposition"]).to.include(
+            "transactions_2018-01-01_to_2030-12-05.csv"
+          );
+
+          const rows = (response.body as string).trim().split("\r\n").slice(1);
+          const { limit, totalPages } = pageData;
+          expect(rows.length).to.be.within(limit * (totalPages - 1) + 1, limit * totalPages);
+
+          rows.forEach((row) => {
+            const createdAt = new Date(row.split(",")[0]).getTime();
+            expect(createdAt).to.be.within(
+              new Date(qs.dateRangeStart).getTime(),
+              new Date(qs.dateRangeEnd).getTime()
+            );
+            const amount = Number(row.match(/,(\d+\.\d{2}),[a-z]+$/)![1]) * 100;
+            expect(amount).to.be.within(qs.amountMin, qs.amountMax);
+          });
+        });
+      });
+    });
+
+    it("escapes commas and quotes in descriptions", function () {
+      const description = 'Dinner, drinks and "dessert"';
+
+      cy.request("POST", `${apiTransactions}`, {
+        transactionType: "payment",
+        source: ctx.bankAccountId,
+        receiverId: ctx.receiver!.id,
+        description,
+        amount: 1234,
+        privacyLevel: "public",
+      });
+
+      cy.request("GET", `${apiTransactions}/export`).then((response) => {
+        expect(response.body).to.include('"Dinner, drinks and ""dessert"""');
+        expect(response.body).to.include(",1234.00,");
+      });
+    });
+
+    it("ignores senderId and receiverId so only the caller's transactions are exported", function () {
+      cy.database("filter", "transactions").then((transactions: Transaction[]) => {
+        const otherTransaction = transactions.find(
+          (transaction) => !isSenderOrReceiver(transaction)
+        )!;
+        const callerName = `${ctx.authenticatedUser!.firstName} ${ctx.authenticatedUser!.lastName}`;
+
+        cy.request({
+          url: `${apiTransactions}/export`,
+          qs: { senderId: otherTransaction.senderId, receiverId: otherTransaction.receiverId },
+        }).then((response) => {
+          const rows = (response.body as string).trim().split("\r\n").slice(1);
+          expect(rows).to.have.length.greaterThan(0);
+          expect(response.body).not.to.include(otherTransaction.description);
+          rows.forEach((row) => {
+            const [, , sender, receiver] = row.split(",");
+            expect([sender, receiver]).to.include(callerName);
+          });
+        });
+      });
+    });
+
+    it("requires authentication", function () {
+      cy.clearAllCookies();
+      cy.request({ url: `${apiTransactions}/export`, failOnStatusCode: false }).then((response) => {
+        expect(response.status).to.eq(401);
+      });
+    });
+  });
+
   context("GET /transactions/contacts", function () {
     it("gets a list of transactions for users list of contacts, page one", function () {
       cy.request("GET", `${apiTransactions}/contacts`).then((response) => {

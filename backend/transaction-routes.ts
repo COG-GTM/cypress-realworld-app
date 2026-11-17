@@ -1,7 +1,8 @@
 ///<reference path="types.ts" />
 
 import express from "express";
-import { remove, isEmpty, slice, concat } from "lodash/fp";
+import { Readable } from "stream";
+import { remove, isEmpty, slice, concat, omit } from "lodash/fp";
 import {
   getTransactionsForUserContacts,
   createTransaction,
@@ -21,7 +22,13 @@ import {
   isTransactionPatchValidator,
   isTransactionPublicQSValidator,
 } from "./validators";
-import { getPaginatedItems } from "../src/utils/transactionUtils";
+import { getPaginatedItems, omitPaginationQueryFields } from "../src/utils/transactionUtils";
+import {
+  getTransactionsCsvFilename,
+  transactionCsvHeaderRow,
+  transactionToCsvRow,
+} from "../src/utils/csvUtils";
+import { TransactionResponseItem } from "../src/models";
 const router = express.Router();
 
 // Routes
@@ -130,6 +137,38 @@ router.get(
       },
       results: paginatedItems,
     });
+  }
+);
+
+//GET /transactions/export - scoped user, auth-required, streams CSV of filtered transactions
+router.get(
+  "/export",
+  ensureAuthenticated,
+  validateMiddleware([
+    sanitizeTransactionStatus,
+    sanitizeRequestStatus,
+    ...isTransactionQSValidator,
+  ]),
+  (req, res) => {
+    // senderId/receiverId would override the caller's ownership filter
+    const query = omit(["senderId", "receiverId"], omitPaginationQueryFields(req.query));
+    /* istanbul ignore next */
+    const transactions = getTransactionsForUserForApi(req.user?.id!, query);
+    const filename = getTransactionsCsvFilename(query);
+
+    function* csvRows() {
+      yield transactionCsvHeaderRow();
+      for (const transaction of transactions as TransactionResponseItem[]) {
+        yield transactionToCsvRow(transaction);
+      }
+    }
+
+    res.status(200);
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.setHeader("Cache-Control", "no-store");
+
+    Readable.from(csvRows()).pipe(res);
   }
 );
 
