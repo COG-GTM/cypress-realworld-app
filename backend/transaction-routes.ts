@@ -96,8 +96,6 @@ router.get(
   ensureAuthenticated,
   validateMiddleware(isTransactionPublicQSValidator),
   (req, res) => {
-    const isFirstPage = (req.query.page as unknown as number) === 1;
-
     /* istanbul ignore next */
     let transactions = !isEmpty(req.query)
       ? getPublicTransactionsByQuery(req.user?.id!, req.query)
@@ -106,18 +104,13 @@ router.get(
 
     const { contactsTransactions, publicTransactions } = transactions;
 
-    let publicTransactionsWithContacts;
-
-    if (isFirstPage) {
-      const firstFiveContacts = slice(0, 5, contactsTransactions);
-
-      publicTransactionsWithContacts = concat(firstFiveContacts, publicTransactions);
-    }
+    const firstFiveContacts = slice(0, 5, contactsTransactions);
+    const publicTransactionsWithContacts = concat(firstFiveContacts, publicTransactions);
 
     const { totalPages, data: paginatedItems } = getPaginatedItems(
       req.query.page as unknown as number,
       req.query.limit as unknown as number,
-      isFirstPage ? publicTransactionsWithContacts : publicTransactions
+      publicTransactionsWithContacts
     );
 
     res.status(200);
