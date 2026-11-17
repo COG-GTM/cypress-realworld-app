@@ -17,7 +17,7 @@ import {
   amountRangeValueText,
   amountRangeValueTextLabel,
   padAmountWithZeros,
-  //hasAmountQueryFields
+  hasAmountQueryFields,
 } from "../utils/transactionUtils";
 import { first, last } from "lodash/fp";
 
@@ -36,7 +36,11 @@ const TransactionListAmountRangeFilter: React.FC<TransactionListAmountRangeFilte
   const xsBreakpoint = useMediaQuery(theme.breakpoints.only("xs"));
 
   const initialAmountRange = [0, 100];
-  const [amountRangeValue, setAmountRangeValue] = React.useState<number[]>(initialAmountRange);
+  const [amountRangeValue, setAmountRangeValue] = React.useState<number[]>(() =>
+    amountRangeFilters && hasAmountQueryFields(amountRangeFilters)
+      ? [Number(amountRangeFilters.amountMin) / 1000, Number(amountRangeFilters.amountMax) / 1000]
+      : initialAmountRange
+  );
 
   const [amountRangeAnchorEl, setAmountRangeAnchorEl] = React.useState<HTMLDivElement | null>(null);
 

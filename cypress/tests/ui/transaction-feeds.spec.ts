@@ -7,7 +7,7 @@ import {
   Contact,
   TransactionStatus,
 } from "../../../src/models";
-import { addDays, isWithinInterval, startOfDay } from "date-fns";
+import { addDays, format, isWithinInterval, startOfDay, startOfMonth } from "date-fns";
 import {
   endOfDayUTC,
   isoStringToLocalMidnightStart,
@@ -281,6 +281,29 @@ describe("Transaction Feed", function () {
         });
       });
 
+      it(`keeps the date range label when switching to the ${feedName} feed`, function () {
+        const dateRangeStart = startOfMonth(new Date());
+        const dateRangeEnd = addDays(dateRangeStart, 1);
+        const dateRangeLabel = `${format(dateRangeStart, "MMM, d yyyy")} - ${format(
+          dateRangeEnd,
+          "MMM, d yyyy"
+        )}`;
+        const otherFeed = feedName === "public" ? feedViews.contacts : feedViews.public;
+
+        cy.getBySelLike(otherFeed.tab).click();
+        cy.wait(`@${otherFeed.routeAlias}`);
+
+        cy.pickDateRange(dateRangeStart, dateRangeEnd);
+        cy.wait(`@${otherFeed.routeAlias}`);
+        cy.getBySelLike("filter-date-range-button").should("contain", dateRangeLabel);
+
+        cy.getBySelLike(feed.tab).click();
+        cy.wait(`@${feed.routeAlias}`);
+        cy.getBySelLike("filter-date-range-button")
+          .should("contain", dateRangeLabel)
+          .and("not.contain", "undefined");
+      });
+
       it(`does not show ${feedName} transactions for out of range date limits`, function () {
         const dateRangeStart = startOfDay(new Date(2025, 7, 1));
         const dateRangeEnd = endOfDayUTC(addDays(dateRangeStart, 1));
@@ -357,6 +380,28 @@ describe("Transaction Feed", function () {
             .should("deep.equal", unfilteredResults);
           cy.visualSnapshot("Unfiltered Transactions");
         });
+      });
+
+      it(`keeps the amount range label when switching to the ${feedName} feed`, function () {
+        const otherFeed = feedName === "public" ? feedViews.contacts : feedViews.public;
+        const amountRangeLabel = `$${dollarAmountRange.min} - $${dollarAmountRange.max}`;
+
+        cy.getBySelLike(otherFeed.tab).click();
+        cy.wait(`@${otherFeed.routeAlias}`);
+
+        cy.setTransactionAmountRange(dollarAmountRange.min, dollarAmountRange.max);
+        cy.wait(`@${otherFeed.routeAlias}`);
+        cy.getBySelLike("filter-amount-range-button").should("contain", amountRangeLabel);
+
+        if (isMobile()) {
+          cy.getBySelLike("amount-range-filter-drawer-close").click();
+        } else {
+          cy.get("body").type("{esc}");
+        }
+
+        cy.getBySelLike(feed.tab).click({ force: true });
+        cy.wait(`@${feed.routeAlias}`);
+        cy.getBySelLike("filter-amount-range-button").should("contain", amountRangeLabel);
       });
 
       it(`does not show ${feedName} transactions for out of range amount limits`, function () {

@@ -6,6 +6,8 @@ import {
   getQueryWithoutDateFields,
   getQueryWithoutAmountFields,
   getQueryWithoutFilterFields,
+  localDateToUTCISOString,
+  utcISOStringToLocalDate,
 } from "../transactionUtils";
 import { faker } from "@faker-js/faker";
 import {
@@ -148,5 +150,12 @@ describe("Transaction Utils", () => {
         status: TransactionStatus.incomplete,
       })
     ).toMatchObject({ status: "incomplete" });
+  });
+
+  test("converts a UTC ISO date range value back to the local calendar date", () => {
+    const localDate = new Date(2019, 11, 1, 0, 0, 0, 0);
+    const isoString = localDateToUTCISOString(localDate);
+    expect(isoString).toBe("2019-12-01T00:00:00.000Z");
+    expect(utcISOStringToLocalDate(isoString)).toEqual(localDate);
   });
 });
