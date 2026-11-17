@@ -382,6 +382,28 @@ describe("Transaction Feed", function () {
         });
       });
 
+      it(`keeps the amount range label when switching to the ${feedName} feed`, function () {
+        const otherFeed = feedName === "public" ? feedViews.contacts : feedViews.public;
+        const amountRangeLabel = `$${dollarAmountRange.min} - $${dollarAmountRange.max}`;
+
+        cy.getBySelLike(otherFeed.tab).click();
+        cy.wait(`@${otherFeed.routeAlias}`);
+
+        cy.setTransactionAmountRange(dollarAmountRange.min, dollarAmountRange.max);
+        cy.wait(`@${otherFeed.routeAlias}`);
+        cy.getBySelLike("filter-amount-range-button").should("contain", amountRangeLabel);
+
+        if (isMobile()) {
+          cy.getBySelLike("amount-range-filter-drawer-close").click();
+        } else {
+          cy.get("body").type("{esc}");
+        }
+
+        cy.getBySelLike(feed.tab).click({ force: true });
+        cy.wait(`@${feed.routeAlias}`);
+        cy.getBySelLike("filter-amount-range-button").should("contain", amountRangeLabel);
+      });
+
       it(`does not show ${feedName} transactions for out of range amount limits`, function () {
         cy.getBySelLike(feed.tab).click();
         cy.wait(`@${feed.routeAlias}`);
