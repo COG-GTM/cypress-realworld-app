@@ -7,7 +7,6 @@ import {
   map,
   sample,
   reject,
-  includes,
   orderBy,
   flow,
   flatMap,
@@ -450,21 +449,35 @@ export const getTransactionIds = (transactions: Transaction[]) => map("id", tran
 export const getContactsTransactionIds = (userId: string): Transaction["id"][] =>
   flow(getTransactionsForUserContacts, getTransactionIds)(userId);
 
-export const nonContactPublicTransactions = (userId: string): Transaction[] => {
-  const contactsTransactionIds = getContactsTransactionIds(userId);
-  return flow(
-    getAllPublicTransactions,
-    reject((transaction: Transaction) => includes(transaction.id, contactsTransactionIds))
-  )();
+export const nonContactPublicTransactions = (
+  userId: string,
+  contactsTransactionIds: Transaction["id"][] = getContactsTransactionIds(userId)
+): Transaction[] => {
+  const excludedIds = new Set(contactsTransactionIds);
+  return reject(
+    (transaction: Transaction) => excludedIds.has(transaction.id),
+    getAllPublicTransactions()
+  );
 };
 
-export const getNonContactPublicTransactionsForApi = (userId: string) =>
-  flow(nonContactPublicTransactions, formatTransactionsForApiResponse)(userId);
+export const getNonContactPublicTransactionsForApi = (
+  userId: string,
+  contactsTransactionIds?: Transaction["id"][]
+) => formatTransactionsForApiResponse(nonContactPublicTransactions(userId, contactsTransactionIds));
 
-export const getPublicTransactionsDefaultSort = (userId: string) => ({
-  contactsTransactions: getTransactionsForUserContacts(userId),
-  publicTransactions: getNonContactPublicTransactionsForApi(userId),
-});
+const getUnfilteredPublicTransactions = (userId: string) => {
+  const contactsTransactions = getTransactionsForUserContacts(userId);
+  return {
+    contactsTransactions,
+    publicTransactions: getNonContactPublicTransactionsForApi(
+      userId,
+      getTransactionIds(contactsTransactions)
+    ),
+  };
+};
+
+export const getPublicTransactionsDefaultSort = (userId: string) =>
+  getUnfilteredPublicTransactions(userId);
 
 export const getPublicTransactionsByQuery = (userId: string, query: TransactionQueryPayload) => {
   if (query && (hasDateQueryFields(query) || hasAmountQueryFields(query))) {
@@ -479,10 +492,7 @@ export const getPublicTransactionsByQuery = (userId: string, query: TransactionQ
       )(getNonContactPublicTransactionsForApi(userId)),
     };
   } else {
-    return {
-      contactsTransactions: getTransactionsForUserContacts(userId),
-      publicTransactions: getNonContactPublicTransactionsForApi(userId),
-    };
+    return getUnfilteredPublicTransactions(userId);
   }
 };
 
